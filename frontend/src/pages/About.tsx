@@ -1,10 +1,9 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import { Page } from "src/components";
 
 export function About() {
   return (
-    <Page>
+    <>
       <Helmet>
         <title>About | TSE Todos</title>
       </Helmet>
@@ -12,6 +11,6 @@ export function About() {
       <p>
         <Link to="/">Back to home</Link>
       </p>
-    </Page>
+    </>
   );
 }

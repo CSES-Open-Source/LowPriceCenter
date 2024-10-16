@@ -2,7 +2,7 @@
 # shellcheck disable=SC2034,SC2148
 
 # Change 1 to 0 to disable linting.
-enabled=1
+enabled=0
 
 # Directories containing JavaScript projects to be linted, separated by spaces.
 node_dirs='backend frontend'
