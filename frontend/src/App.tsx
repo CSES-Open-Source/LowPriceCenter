@@ -1,23 +1,11 @@
 import { HelmetProvider } from "react-helmet-async";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { Page } from "src/components";
-import { About, Home } from "src/pages";
-import "src/globals.css";
+import { Home } from "src/pages";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Page />,
-    children: [
-      {
-        path: "/",
-        element: <Home />,
-      },
-      {
-        path: "/about",
-        element: <About />,
-      },
-    ],
+    element: <Home />,
   },
 ]);
 
