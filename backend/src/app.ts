@@ -6,7 +6,6 @@ import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import { isHttpError } from "http-errors";
-import taskRoutes from "src/routes/task";
 
 const app = express();
 
@@ -24,7 +23,7 @@ app.use(
   }),
 );
 
-app.use("/api/task", taskRoutes);
+// app.use("/api/task", taskRoutes);
 
 /**
  * Error handler; all errors thrown by server are handled here.

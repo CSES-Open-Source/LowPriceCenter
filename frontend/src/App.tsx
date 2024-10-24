@@ -1,17 +1,18 @@
 import { HelmetProvider } from "react-helmet-async";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { About, Home } from "src/pages";
-import "src/globals.css";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { Home } from "src/pages";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+  },
+]);
 
 export default function App() {
   return (
     <HelmetProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-        </Routes>
-      </BrowserRouter>
+      <RouterProvider router={router} />
     </HelmetProvider>
   );
 }
