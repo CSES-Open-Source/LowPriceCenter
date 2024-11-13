@@ -5,6 +5,9 @@ import { FirebaseContext } from "src/utils/FirebaseProvider";
 
 const provider = new GoogleAuthProvider();
 
+const buttonStyles =
+  "bg-slate-800 text-white py-2 px-3 rounded-md mt-2 hover:bg-slate-900 transition-colors";
+
 export function Home() {
   const { app, user } = useContext(FirebaseContext);
   const auth = getAuth(app);
@@ -24,16 +27,20 @@ export function Home() {
       <Helmet>
         <title>Low-Price Center</title>
       </Helmet>
-      <h1>Welcome{user ? " " + user?.displayName + " " : " "}to Low-Price Center!</h1>
-      {user ? (
-        <button onClick={signOutFromFirebase} className="h-16">
-          Sign out
-        </button>
-      ) : (
-        <button className="h-10" onClick={openGoogleAuthentication}>
-          Sign in
-        </button>
-      )}
+      <div className="m-8">
+        <h1 className="text-2xl font-bold">
+          Welcome{user ? " " + user?.displayName + " " : " "}to Low-Price Center!
+        </h1>
+        {user ? (
+          <button className={buttonStyles} onClick={signOutFromFirebase}>
+            Sign out
+          </button>
+        ) : (
+          <button className={buttonStyles} onClick={openGoogleAuthentication}>
+            Sign in
+          </button>
+        )}
+      </div>
     </>
   );
 }
