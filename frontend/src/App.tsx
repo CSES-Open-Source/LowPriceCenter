@@ -2,6 +2,8 @@ import { HelmetProvider } from "react-helmet-async";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Home } from "src/pages";
 
+import FirebaseProvider from "../src/utils/FirebaseProvider";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -12,7 +14,9 @@ const router = createBrowserRouter([
 export default function App() {
   return (
     <HelmetProvider>
-      <RouterProvider router={router} />
+      <FirebaseProvider>
+        <RouterProvider router={router} />
+      </FirebaseProvider>
     </HelmetProvider>
   );
 }
