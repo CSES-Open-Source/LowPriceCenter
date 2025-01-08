@@ -31,8 +31,8 @@ This project is a part of CSES Open-Source, and will transition to a full open-s
 ### Additional Installations
 
 - Download the Prettier extension in VSCode.
-  - Set Prettier as the [default formatter](https://stackoverflow.com/questions/63954584/how-to-make-prettier-the-default-formatter-in-vs-code)
-  - Set Prettier to [format on save](https://www.digitalocean.com/community/tutorials/how-to-format-code-with-prettier-in-visual-studio-code#step-2-formatting-code-on-save)
+  - Set Prettier as the [default formatter](https://stackoverflow.com/questions/63954584/how-to-make-prettier-the-default-formatter-in-vs-code).
+  - Set Prettier to [format on save](https://www.digitalocean.com/community/tutorials/how-to-format-code-with-prettier-in-visual-studio-code#step-2-formatting-code-on-save).
 - Download the Tailwind CSS IntelliSense extension in VSCode.
   - Add .\*Styles.\* to class attributes in settings.
 
@@ -51,7 +51,7 @@ When you finish your work in a branch, create a PR into `dev` and request for re
 
 ## Help
 
-If you're having errors with committing, run `npm run lint-fix` (Linting is currently disabled, so this shouldn't be an issue)
+If you're having errors with committing, run `npm run lint-fix` (Linting is currently disabled, so this shouldn't be an issue).
 
 ## Authors
 
@@ -66,7 +66,7 @@ Version 0.0
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE.md file for details
+This project is licensed under the MIT License - see the LICENSE.md file for details.
 
 ## Acknowledgments
 
