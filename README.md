@@ -20,7 +20,7 @@ This project is a part of CSES Open-Source, and will transition to a full open-s
 - Install VSCode and the latest version of Node.js.
 - Clone the repository to your own computer.
 - In both frontend and backend folders, run `npm install`.
-- Add the environmental variables (contact @chase-of-the-fjords for these).
+- Add the environmental variables (contact [@chase-of-the-fjords](https://github.com/chase-of-the-fjords) for these).
 
 ### Executing program
 
@@ -36,6 +36,19 @@ This project is a part of CSES Open-Source, and will transition to a full open-s
 - Download the Tailwind CSS IntelliSense extension in VSCode.
   - Add .\*Styles.\* to class attributes in settings.
 
+## Branching Guidelines
+
+When working on the project, aim to always branch from `dev` instead of `main`. This is where the currently development version will be stored.
+
+Branches should be named with the `prefix/description` format (i.e. `feature/create-product`). Below are a list of the prefixes we'll be using:
+
+- `feature`: Use for new features.
+- `bugfix`: Use for bugfixes.
+- `experiment`: Use for experiments - these will rarely be directly added to `dev`.
+- `merge`: Should be used to merge branches that have messy conflicts before doing a PR into `dev`.
+
+When you finish your work in a branch, create a PR into `dev` and request for review from [@chase-of-the-fjords](https://github.com/chase-of-the-fjords). Add a description of the changes made following the format provided.
+
 ## Help
 
 If you're having errors with committing, run `npm run lint-fix` (Linting is currently disabled, so this shouldn't be an issue)
@@ -43,7 +56,7 @@ If you're having errors with committing, run `npm run lint-fix` (Linting is curr
 ## Authors
 
 Chase Peterson  
-[@chaseofthefjords](https://github.com/chase-of-the-fjords)
+[@chase-of-the-fjords](https://github.com/chase-of-the-fjords)
 
 ## Version History
 
