@@ -4,7 +4,9 @@ An e-commerce platform for UCSD students to exchange and sell goods.
 
 ## Description
 
-In-depth description coming soon.
+Low-Price Center is designed to help UCSD students exchange and sell goods in a streamlined, centralized way. Instead of posting to Reddit or other similar websites, they'll have a more secure and organized place to buy and sell goods with each other on campus. It will also be a resource for student organizations to sell merchandise without having to build their own portals.
+
+This project is a part of CSES Open-Source, and will transition to a full open-source project once there is an MVP. The current goal is to get a basic version of the site up and running so that it'll become easier to contribute to.
 
 ## Getting Started
 
@@ -15,19 +17,28 @@ In-depth description coming soon.
 
 ### Installing
 
+- Install VSCode and the latest version of Node.js.
 - Clone the repository to your own computer.
-- In both frontend and backend folders, run `pnpm install`.
+- In both frontend and backend folders, run `npm install`.
 - Add the environmental variables (contact @chase-of-the-fjords for these).
 
 ### Executing program
 
 - Start two terminals.
-- In the first terminal, cd into the backend folder and run `pnpm run start`.
-- In the second terminal, cd into the frontend folder and run `pnpm run dev`.
+- In the first terminal, cd into the backend folder and run `npm run start`.
+- In the second terminal, cd into the frontend folder and run `npm run dev`.
+
+### Additional Installations
+
+- Download the Prettier extension in VSCode.
+  - Set Prettier as the [default formatter](https://stackoverflow.com/questions/63954584/how-to-make-prettier-the-default-formatter-in-vs-code)
+  - Set Prettier to [format on save](https://www.digitalocean.com/community/tutorials/how-to-format-code-with-prettier-in-visual-studio-code#step-2-formatting-code-on-save)
+- Download the Tailwind CSS IntelliSense extension in VSCode.
+  - Add .\*Styles.\* to class attributes in settings.
 
 ## Help
 
-If you're having errors with committing, run `pnpm run lint-fix`
+If you're having errors with committing, run `npm run lint-fix` (Linting is currently disabled, so this shouldn't be an issue)
 
 ## Authors
 
@@ -38,7 +49,7 @@ Chase Peterson
 
 Version 0.0
 
-- Just getting things set up
+- Created skeleton code in preparation for the kickoff of the project.
 
 ## License
 

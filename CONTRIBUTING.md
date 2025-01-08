@@ -1,10 +1,10 @@
-# Contributing to CSES Opportune
+# Contributing to CSES Low-Price Center
 
-First off, thank you for considering contributing to Opportune! 🎉 We welcome all contributions and are excited to see what you'll bring to the project.
+First off, thank you for considering contributing to Low-Price Center! 🎉 We welcome all contributions and are excited to see what you'll bring to the project.
 
 ## Table of Contents
 
-- [Contributing to CSES Opportune](#contributing-to-cses-opportune)
+- [Contributing to CSES Low-Price Center](#contributing-to-cses-low-price-center)
   - [Table of Contents](#table-of-contents)
   - [Code of Conduct](#code-of-conduct)
   - [Getting Started](#getting-started)
@@ -81,11 +81,11 @@ By participating in this project, you agree to uphold the [Code of Conduct](CODE
 1. **Fork the repository** to your GitHub account.
 2. **Clone** the origin repository locally:
    ```bash
-   git clone https://github.com/CSES-Open-Source/Opportune.git
+   git clone https://github.com/CSES-Open-Source/LowPriceCenter.git
    ```
 3. Create a **remote repository**:
    ```bash
-   git remote add [your-username] https://github.com/[your-username]/Opportune.git
+   git remote add [your-username] https://github.com/[your-username]/LowPriceCenter.git
    ```
 4. Run:
    ```bash
@@ -93,10 +93,10 @@ By participating in this project, you agree to uphold the [Code of Conduct](CODE
    ```
    The output should be something like the following:
    ```bash
-   [your-username]    https://github.com/[your-username]/Opportune.git (fetch)
-   [your-username]    https://github.com/[your-username]/Opportune.git (push)
-   origin  https://github.com/CSES-Open-Source/Opportune.git (fetch)
-   origin  https://github.com/CSES-Open-Source/Opportune.git (push)
+   [your-username]    https://github.com/[your-username]/LowPriceCenter.git (fetch)
+   [your-username]    https://github.com/[your-username]/LowPriceCenter.git (push)
+   origin  https://github.com/CSES-Open-Source/LowPriceCenter.git (fetch)
+   origin  https://github.com/CSES-Open-Source/LowPriceCenter.git (push)
    ```
 
 ### Installing Dependencies
@@ -121,7 +121,7 @@ By participating in this project, you agree to uphold the [Code of Conduct](CODE
 ### Setting Up the Local Development Database
 
 1. Go to [mongodb.com](https://www.mongodb.com/) and create a new account (or login to an existing account if you already have one).
-2. **Create a new project** and name it Opportune (or anything you like).
+2. **Create a new project** and name it Low-Price Center (or anything you like).
 3. **Create a new cluster** in this project by selecting M0 as the plan and deselect **Automate security setup** and **Preload sample datase**. Feel free to choose and name for the cluster and select any location that is closest to you.
 4. Go to **Database Access** (under security in the side bar) and create a new user for yourself. Make sure to select **Atlas Admin** as your role.
 5. Go to **Network Access** (under security again) and add a new IP address. Click on **Allow access from anywhere**.
@@ -158,7 +158,7 @@ By participating in this project, you agree to uphold the [Code of Conduct](CODE
 
 ### Reporting Bugs
 
-1. Open the [CSES Opensource Opportune Github Repo](https://github.com/CSES-Open-Source/Opportune/).
+1. Open the [CSES OpenSource Low-Price Center Github Repo](https://github.com/CSES-Open-Source/LowPriceCenter/).
 2. Click on the **issues** tab (next to code).
 3. Create a **new issue**.
 4. Select **Bug report** as the type of issue.
@@ -166,7 +166,7 @@ By participating in this project, you agree to uphold the [Code of Conduct](CODE
 
 ### Suggesting Features
 
-1. Open the [CSES Opensource Opportune Github Repo](https://github.com/CSES-Open-Source/Opportune/).
+1. Open the [CSES Opensource Low-Price Center Github Repo](https://github.com/CSES-Open-Source/LowPriceCenter/).
 2. Click on the **issues** tab (next to code).
 3. Create a **new issue**.
 4. Select **Feature request** as the type of issue.
