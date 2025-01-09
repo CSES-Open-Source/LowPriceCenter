@@ -2,8 +2,20 @@ import { Helmet } from "react-helmet-async";
 import { Navbar } from "src/components";
 import Product from "src/components/Product";
 
+const placeholderData: [string, number, string][] = [
+  ["24oz Water Bottle", 15.0, "productImages/water-bottle.png"],
+  ["Shower Caddy", 16.0, "productImages/shower-caddy.jpeg"],
+  ["Mattress", 169.75, "productImages/mattress.png"],
+  ["Vintage Lamp", 30.0, "productImages/vintage-lamp.jpeg"],
+  ["Vintage Lamp", 30.0, "productImages/vintage-lamp.jpeg"],
+  ["Mattress", 169.75, "productImages/mattress.png"],
+  ["24oz Water Bottle", 15.0, "productImages/water-bottle.png"],
+  ["Shower Caddy", 16.0, "productImages/shower-caddy.jpeg"],
+  ["24oz Water Bottle", 15.0, "productImages/water-bottle.png"],
+  ["Shower Caddy", 16.0, "productImages/shower-caddy.jpeg"],
+];
+
 export function Marketplace() {
-  const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   return (
     <>
       <Helmet>
@@ -19,9 +31,13 @@ export function Marketplace() {
             </button>
           </div>
           <div className="grid grid-cols-4 gap-6">
-            {arr.map((item) => (
-              <div key={item}>
-                <Product />
+            {placeholderData.map((product, index) => (
+              <div key={index}>
+                <Product
+                  productName={product[0]}
+                  productPrice={product[1]}
+                  productImage={product[2]}
+                />
               </div>
             ))}
           </div>
