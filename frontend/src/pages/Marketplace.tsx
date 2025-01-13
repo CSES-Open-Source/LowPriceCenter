@@ -24,15 +24,21 @@ export function Marketplace() {
       <Navbar />
       <main className="w-screen flex justify-center items-center mt-12 mb-20">
         <div className="max-w-[80%]">
-          <div className="flex justify-between mb-4">
+          <div id="grid-header" className="flex justify-between flex-wrap mb-2 px-3">
             <p className="text-3xl font-mono font-medium">Marketplace</p>
-            <button className="bg-[#00629B] text-white font-semibold py-2 px-4 shadow-lg">
+            <button
+              className="bg-[#00629B] text-white font-semibold py-2 px-4 shadow-lg"
+              onClick={() => (window.location.href = "/")}
+            >
               Add Product
             </button>
           </div>
-          <div className="grid grid-cols-4 gap-6">
+          <div
+            id="grid"
+            className="grid sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 xxl:grid-cols-4"
+          >
             {placeholderData.map((product, index) => (
-              <div key={index}>
+              <div key={index} className="px-3 py-3">
                 <Product
                   productName={product[0]}
                   productPrice={product[1]}
