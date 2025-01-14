@@ -62,4 +62,23 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+router.patch("/:id", async (req, res) => {
+  try {
+    const updates = req.body;
+    const id = req.params.id;
+    const updatedProduct = await ProductModel.findByIdAndUpdate(
+      id,
+      { ...updates, timeUpdated: new Date() },
+      { new: true },
+    );
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.status(200).json({
+      message: "Product successfully updated",
+      updatedProduct,
+    });
+  } catch (error) {}
+});
 export default router;
