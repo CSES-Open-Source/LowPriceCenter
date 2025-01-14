@@ -4,7 +4,7 @@
 
 import express from "express";
 import ProductModel from "src/models/product";
-
+const mongoose = require("mongoose");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -39,6 +39,9 @@ router.post("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
     const product = await ProductModel.findById(id);
     res.status(200).json(product);
   } catch (error) {
@@ -49,9 +52,10 @@ router.get("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const id = req.params.id;
-
     const deletedProduct = await ProductModel.findByIdAndDelete(id);
-
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
     if (!deletedProduct) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -66,6 +70,9 @@ router.patch("/:id", async (req, res) => {
   try {
     const updates = req.body;
     const id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
     const updatedProduct = await ProductModel.findByIdAndUpdate(
       id,
       { ...updates, timeUpdated: new Date() },
@@ -79,6 +86,8 @@ router.patch("/:id", async (req, res) => {
       message: "Product successfully updated",
       updatedProduct,
     });
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({ message: "Error patching product", error });
+  }
 });
 export default router;
