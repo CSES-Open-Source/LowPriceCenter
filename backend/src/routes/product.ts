@@ -4,8 +4,10 @@
 
 import express from "express";
 import ProductModel from "src/models/product";
-const mongoose = require("mongoose");
+import mongoose = require("mongoose");
+
 const router = express.Router();
+
 /**
  * get all the products in database
  */
