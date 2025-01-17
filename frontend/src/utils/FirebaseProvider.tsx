@@ -15,12 +15,13 @@ const FirebaseContext = createContext<{ app: FirebaseApp | undefined; user: User
  * May be moved to environmental variables later.
  */
 const firebaseConfig = {
-  apiKey: "AIzaSyCJsTam2s3h-lSMmv9rD2A2UoVkKDHwlJM",
-  authDomain: "lowpricecenter-960e9.firebaseapp.com",
-  projectId: "lowpricecenter-960e9",
-  storageBucket: "lowpricecenter-960e9.firebasestorage.app",
-  messagingSenderId: "410570144308",
-  appId: "1:410570144308:web:9b46ed663503f8bcc26861",
+  apiKey: "AIzaSyBssbaMlxIJHYI7G7zOriU0VaWGnGrQv5M",
+  authDomain: "low-price-center.firebaseapp.com",
+  projectId: "low-price-center",
+  storageBucket: "low-price-center.firebasestorage.app",
+  messagingSenderId: "163704233704",
+  appId: "1:163704233704:web:6ee0dc540f6f25d6ceb35d",
+  measurementId: "G-RV7RV9W17W",
 };
 
 /**
