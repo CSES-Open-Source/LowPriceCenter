@@ -3,6 +3,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Home } from "src/pages";
 import { Marketplace } from "src/pages/Marketplace";
 import { Navbar } from "./components/Navbar";
+import { AddProduct } from "./pages/AddProduct";
 
 import FirebaseProvider from "../src/utils/FirebaseProvider";
 
@@ -14,6 +15,10 @@ const router = createBrowserRouter([
   {
     path: "/marketplace",
     element: <Marketplace />,
+  },
+  {
+    path: "/add-product",
+    element: <AddProduct />,
   },
 ]);
 

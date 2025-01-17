@@ -26,7 +26,7 @@ export function Marketplace() {
             <p className="text-3xl font-mono font-medium">Marketplace</p>
             <button
               className="bg-[#00629B] text-white font-semibold py-2 px-4 shadow-lg"
-              onClick={() => (window.location.href = "/")}
+              onClick={() => (window.location.href = "/add-product")}
             >
               Add Product
             </button>
