@@ -1,22 +1,24 @@
-import { FormEvent, useRef } from "react";
+import { FormEvent, useRef, useContext } from "react";
 import { Helmet } from "react-helmet-async";
 import { Navbar } from "src/components";
 import { post } from "src/api/requests";
+import { FirebaseContext } from "src/utils/FirebaseProvider";
 
 export function AddProduct() {
   const productName = useRef<HTMLInputElement>(null);
   const productPrice = useRef<HTMLInputElement>(null);
   const productDescription = useRef<HTMLTextAreaElement>(null);
   const productImages = useRef<HTMLInputElement>(null);
+  const { user } = useContext(FirebaseContext);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (productName.current && productPrice.current && productDescription.current) {
-      post("/api/products", {
+    if (productName.current && productPrice.current && productDescription.current && user) {
+      return await post("/api/products", {
         name: productName.current.value,
         price: productPrice.current.value,
         description: productDescription.current.value,
-        userEmail: "cseslowpricecenter@gmail.com", //need to get current user's email
+        userEmail: user.email,
       });
     }
   };
