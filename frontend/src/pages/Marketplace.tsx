@@ -1,5 +1,4 @@
 import { Helmet } from "react-helmet-async";
-import { Navbar } from "src/components";
 import Product from "src/components/Product";
 
 const placeholderData: [string, number, string][] = [
@@ -21,7 +20,6 @@ export function Marketplace() {
       <Helmet>
         <title>Low-Price Center Marketplace</title>
       </Helmet>
-      <Navbar />
       <main className="w-full flex justify-center items-center mt-12 mb-20">
         <div className="max-w-[80%]">
           <div id="grid-header" className="flex justify-between flex-wrap mb-2 px-3">
