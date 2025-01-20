@@ -24,8 +24,10 @@ export function AddProduct() {
           description: productDescription.current.value,
           userEmail: user.email,
         });
-        if (res.ok) setProductAdded(true);
-        else throw Error;
+        if (res.ok) {
+          setProductAdded(true);
+          setError(false);
+        } else throw Error();
       }
     } catch (err) {
       setError(true); //displays an error message to the user
@@ -124,13 +126,19 @@ export function AddProduct() {
                 <div className="flex flex-row gap-10 mt-8">
                   <button
                     className="text-[#00629B] font-semibold py-2 px-4 hover:text-blue-900"
-                    onClick={() => (window.location.href = "/add-product")}
+                    onClick={() => {
+                      setProductAdded(false);
+                      window.location.href = "/add-product";
+                    }}
                   >
                     Add Another Product
                   </button>
                   <button
                     className="text-[#00629B] font-semibold py-2 px-4  hover:text-blue-900"
-                    onClick={() => (window.location.href = "/marketplace")}
+                    onClick={() => {
+                      setProductAdded(false);
+                      window.location.href = "/marketplace";
+                    }}
                   >
                     View Marketplace
                   </button>
