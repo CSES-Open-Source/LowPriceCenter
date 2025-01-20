@@ -16,6 +16,7 @@ export function Marketplace() {
         });
       };
       fetchProducts();
+      setError(false);
     } catch (err) {
       setError(true);
     }
