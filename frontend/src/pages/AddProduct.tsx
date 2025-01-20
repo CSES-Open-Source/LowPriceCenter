@@ -11,6 +11,7 @@ export function AddProduct() {
   const productDescription = useRef<HTMLTextAreaElement>(null);
   const productImages = useRef<HTMLInputElement>(null);
   const [productAdded, setProductAdded] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
   const { user } = useContext(FirebaseContext);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -24,9 +25,10 @@ export function AddProduct() {
           userEmail: user.email,
         });
         if (res.ok) setProductAdded(true);
+        else throw Error;
       }
     } catch (err) {
-      //handle error
+      setError(true); //displays an error message to the user
     }
   };
 
@@ -98,7 +100,9 @@ export function AddProduct() {
             className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5 y-600"
           />
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-3">
+          {/* error message */}
+          {error && <p className="text-sm text-red-800">Error adding product. Try again.</p>}
           <button
             type="submit"
             className="bg-[#00629B] text-white font-semibold py-2 px-4 shadow-lg"
@@ -107,6 +111,7 @@ export function AddProduct() {
           </button>
         </div>
       </form>
+      {/* Product added confirmation */}
       <dialog open={productAdded}>
         <div className="backdrop-blur-[2px] flex overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center mt-20 w-full md:inset-0 h-[calc(100%-1rem)]">
           <div className="relative p-4 w-full max-w-2xl max-h-full">
