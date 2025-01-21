@@ -1,9 +1,9 @@
 name: Run tests
 on:
   pull_request:
-    branches: main
+    branches: main, dev
   push:
-    branches: main
+    branches: main, dev
 jobs:
   frontend:
     name: Frontend tests
