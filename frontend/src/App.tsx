@@ -5,6 +5,7 @@ import { Marketplace } from "src/pages/Marketplace";
 import { Navbar } from "./components/Navbar";
 
 import FirebaseProvider from "../src/utils/FirebaseProvider";
+import { IndividualProductPage } from "./pages/Individual-product-page";
 
 const router = createBrowserRouter([
   {
@@ -14,6 +15,10 @@ const router = createBrowserRouter([
   {
     path: "/marketplace",
     element: <Marketplace />,
+  },
+  {
+    path: "/individual-product-page",
+    element: <IndividualProductPage />,
   },
 ]);
 

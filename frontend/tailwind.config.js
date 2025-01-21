@@ -10,6 +10,8 @@ export default {
       colors: {
         'ucsd-blue': '#00629B',
         'ucsd-darkblue': '#182B49',
+        'ucsd-gold': '#FFCD00',
+        'black-gray': '#35393C',
       },
       fontFamily: {
         jetbrains: ['JetBrains Mono', 'monospace'],
