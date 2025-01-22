@@ -1,6 +1,5 @@
 import { FormEvent, useRef, useContext, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Navbar } from "src/components";
 import { post } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 import { CiCircleCheck } from "react-icons/ci";
@@ -28,8 +27,9 @@ export function AddProduct() {
           setProductAdded(true);
           setError(false);
         } else throw Error();
-      }
+      } else throw Error();
     } catch (err) {
+      setProductAdded(false);
       setError(true); //displays an error message to the user
     }
   };
@@ -39,7 +39,6 @@ export function AddProduct() {
       <Helmet>
         <title>Low-Price Center Marketplace</title>
       </Helmet>
-      <Navbar />
       <div className="w-full mt-12 mb-6">
         <p className="text-3xl text-center font-mono font-medium">Add Product</p>
       </div>
