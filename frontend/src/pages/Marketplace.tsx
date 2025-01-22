@@ -7,6 +7,7 @@ export function Marketplace() {
   const [products, setProducts] = useState<[]>();
   const [error, setError] = useState<boolean>(false);
 
+  // Handles getting list of products from API
   useEffect(() => {
     const fetchProducts = async () => {
       try {
