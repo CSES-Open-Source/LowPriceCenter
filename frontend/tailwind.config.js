@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
@@ -11,11 +12,10 @@ export default {
         'ucsd-blue': '#00629B',
         'ucsd-darkblue': '#182B49',
         'ucsd-gold': '#FFCD00',
-        'black-gray': '#35393C',
       },
       fontFamily: {
         jetbrains: ['JetBrains Mono', 'monospace'],
-        inter: ['"Inter"', 'sans-serif'],
+        inter: ['Inter', 'monospace'],
       },
     },
   },

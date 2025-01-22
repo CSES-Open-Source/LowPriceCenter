@@ -47,7 +47,7 @@ export function IndividualProductPage() {
 
             <hr className="my-6 w-full mx-auto h-0 border-[1px] border-solid border-gray-300" />
             
-            <h2 className="font-inter text-black-gray text-xl font-normal pb-6">
+            <h2 className="font-inter text-[#35393C] text-xl font-normal pb-6">
               USD ${product.productPrice.toFixed(2)}
             </h2>
             {product.productInfo && (
