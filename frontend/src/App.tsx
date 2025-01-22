@@ -3,6 +3,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Home } from "src/pages";
 import { Marketplace } from "src/pages/Marketplace";
 import { Navbar } from "./components/Navbar";
+import { Footer } from "./components/Footer";
 
 import FirebaseProvider from "../src/utils/FirebaseProvider";
 
@@ -23,6 +24,7 @@ export default function App() {
       <FirebaseProvider>
         <Navbar />
         <RouterProvider router={router} />
+        <Footer />
       </FirebaseProvider>
     </HelmetProvider>
   );
