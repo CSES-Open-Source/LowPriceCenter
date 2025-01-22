@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import ProductModel from "src/models/product";
 import mongoose = require("mongoose");
+
 /**
  * get all the products in database
  */
