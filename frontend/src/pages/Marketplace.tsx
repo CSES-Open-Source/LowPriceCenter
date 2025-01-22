@@ -8,18 +8,18 @@ export function Marketplace() {
   const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
-    try {
-      const fetchProducts = async () => {
-        await get("/api/products/").then(async (response) => {
-          const productData = await response.json();
-          setProducts(productData);
-        });
-      };
-      fetchProducts();
-      setError(false);
-    } catch (err) {
-      setError(true);
-    }
+    const fetchProducts = async () => {
+      try {
+        const response = await get("/api/products/");
+        const productData = await response.json();
+        setProducts(productData);
+        setError(false);
+      } catch (err) {
+        setError(true);
+        setProducts([]);
+      }
+    };
+    fetchProducts();
   }, []);
 
   return (
