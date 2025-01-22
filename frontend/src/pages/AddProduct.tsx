@@ -46,7 +46,7 @@ export function AddProduct() {
         {/* Product Name */}
         <div className="mb-5">
           <label htmlFor="productName" className="block mb-2 font-medium text-black">
-            Product Name
+            Name
           </label>
           <input
             id="productName"
@@ -60,7 +60,7 @@ export function AddProduct() {
         {/* Product Price */}
         <div className="mb-5">
           <label htmlFor="productPrice" className="block mb-2 font-medium text-black">
-            Product Price
+            Price
           </label>
           <input
             id="productPrice"
@@ -76,7 +76,7 @@ export function AddProduct() {
         {/* Product Description */}
         <div className="mb-5">
           <label htmlFor="productDescription" className="block mb-2 font-medium text-black">
-            Product Description
+            Description
           </label>
           <textarea
             id="productDescription"
@@ -84,19 +84,17 @@ export function AddProduct() {
             ref={productDescription}
             className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5 y-600"
             placeholder="Tell us more about this product..."
-            required
           />
         </div>
-        {/* Product Images */}
+        {/* Product Image */}
         <div className="mb-5">
           <label htmlFor="productImages" className="block mb-2 font-medium text-black">
-            Product Images
+            Image
           </label>
           <input
             id="productImages"
             type="file"
             accept="image/png, image/jpeg"
-            multiple
             ref={productImages}
             className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5 y-600"
           />
