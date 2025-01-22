@@ -12,7 +12,7 @@ const userSchema = new Schema({
     type: Boolean,
     required: true,
   },
-  lastLogIn: {
+  lastLogin: {
     type: Date,
     required: true,
   },
