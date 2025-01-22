@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import ProductModel from "src/models/product";
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 import multer from "multer";
 import { bucket } from "src/config/firebase"; // Import Firebase bucket

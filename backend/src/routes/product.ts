@@ -6,7 +6,6 @@ import {
   deleteProductById,
   updateProductById,
 } from "src/controllers/products";
-const mongoose = require("mongoose");
 const router = express.Router();
 
 router.get("/", getProducts);
