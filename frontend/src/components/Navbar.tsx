@@ -1,8 +1,10 @@
 import { faBars, faCartShopping, faUser, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { FirebaseContext } from "src/utils/FirebaseProvider";
 
 export function Navbar() {
+  const { user, signOutFromFirebase, openGoogleAuthentication } = useContext(FirebaseContext);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLUListElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -55,10 +57,23 @@ export function Navbar() {
             </button>
           </li>
           <li>
-            <button className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue">
-              <FontAwesomeIcon className="text-lg pr-2" icon={faUser} aria-label="User Icon" />
-              Sign Out
-            </button>
+            {user ? (
+              <button
+                onClick={signOutFromFirebase}
+                className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue"
+              >
+                <FontAwesomeIcon className="text-lg pr-2" icon={faUser} aria-label="User Icon" />
+                Sign Out
+              </button>
+            ) : (
+              <button
+                onClick={openGoogleAuthentication}
+                className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue"
+              >
+                <FontAwesomeIcon className="text-lg pr-2" icon={faUser} aria-label="User Icon" />
+                Sign In
+              </button>
+            )}
           </li>
         </ul>
 
@@ -88,10 +103,23 @@ export function Navbar() {
               </button>
             </li>
             <li>
-              <button className="font-inter w-full text-center px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue">
-                <FontAwesomeIcon className="text-lg pr-2" icon={faUser} aria-label="User Icon" />
-                Sign Out
-              </button>
+              {user ? (
+                <button
+                  onClick={signOutFromFirebase}
+                  className="font-inter w-full text-center px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue"
+                >
+                  <FontAwesomeIcon className="text-lg pr-2" icon={faUser} aria-label="User Icon" />
+                  Sign Out
+                </button>
+              ) : (
+                <button
+                  onClick={openGoogleAuthentication}
+                  className="font-inter w-full text-center px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue"
+                >
+                  <FontAwesomeIcon className="text-lg pr-2" icon={faUser} aria-label="User Icon" />
+                  Sign In
+                </button>
+              )}
             </li>
           </ul>
         </div>

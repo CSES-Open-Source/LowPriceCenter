@@ -1,13 +1,20 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
-import { User, getAuth } from "firebase/auth";
-import { ReactNode, createContext, useEffect, useState } from "react";
+import { GoogleAuthProvider, User, getAuth, signInWithPopup, signOut } from "firebase/auth";
+import { MouseEventHandler, ReactNode, createContext, useEffect, useState } from "react";
 
 /**
  * Context used by FirebaseProvider to provide app and user to pages
  */
-const FirebaseContext = createContext<{ app: FirebaseApp | undefined; user: User | null }>({
+const FirebaseContext = createContext<{
+  app: FirebaseApp | undefined;
+  user: User | null;
+  openGoogleAuthentication: MouseEventHandler<HTMLButtonElement>;
+  signOutFromFirebase: MouseEventHandler<HTMLButtonElement>;
+}>({
   app: undefined,
   user: null,
+  openGoogleAuthentication: () => {},
+  signOutFromFirebase: () => {},
 });
 
 /**
@@ -34,6 +41,19 @@ export default function FirebaseProvider({ children }: { children: ReactNode }) 
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  async function openGoogleAuthentication() {
+    await signInWithPopup(auth, provider).catch((error) => {
+      console.error(error);
+    });
+    window.location.href = "/marketplace";
+  }
+
+  async function signOutFromFirebase() {
+    await signOut(auth);
+    window.location.href = "/";
+  }
 
   /**
    * Tracks when the user logs in and out to change
@@ -47,7 +67,11 @@ export default function FirebaseProvider({ children }: { children: ReactNode }) 
     return unsubscribe;
   }, []);
 
-  return <FirebaseContext.Provider value={{ app, user }}>{children}</FirebaseContext.Provider>;
+  return (
+    <FirebaseContext.Provider value={{ app, user, openGoogleAuthentication, signOutFromFirebase }}>
+      {children}
+    </FirebaseContext.Provider>
+  );
 }
 
 export { FirebaseContext };
