@@ -1,6 +1,16 @@
 import { Request, Response } from "express";
 import ProductModel from "src/models/product";
-import mongoose = require("mongoose");
+import mongoose from "mongoose";
+
+import multer from "multer";
+import { bucket } from "src/config/firebase"; // Import Firebase bucket
+import { v4 as uuidv4 } from "uuid"; // For unique filenames
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
+}).single("image");
+
 /**
  * get all the products in database
  */
@@ -34,27 +44,46 @@ export const getProductById = async (req: Request, res: Response) => {
  * add product to database thru name, price, description, and userEmail
  */
 export const addProduct = async (req: Request, res: Response) => {
-  try {
-    const { name, price, description, userEmail } = req.body;
-
-    if (!name || !price || !userEmail) {
-      return res.status(400).json({ message: "Name, price, and userEmail are required." });
+  upload(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ message: "Error uploading image", error: err.message });
     }
 
-    const newProduct = new ProductModel({
-      name,
-      price,
-      description,
-      userEmail,
-      timeCreated: new Date(),
-      timeUpdated: new Date(),
-    });
+    try {
+      const { name, price, description, userEmail } = req.body;
 
-    const savedProduct = await newProduct.save();
-    res.status(201).json(savedProduct);
-  } catch (error) {
-    res.status(500).json({ message: "Error adding product", error });
-  }
+      if (!name || !price || !userEmail) {
+        return res.status(400).json({ message: "Name, price, and userEmail are required." });
+      }
+
+      let image = "";
+      if (req.file) {
+        const fileName = `${uuidv4()}-${req.file.originalname}`;
+        const file = bucket.file(fileName);
+
+        await file.save(req.file.buffer, {
+          metadata: { contentType: req.file.mimetype },
+        });
+
+        image = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+      }
+
+      const newProduct = new ProductModel({
+        name,
+        price,
+        description,
+        userEmail,
+        image, // Save the image URL in MongoDB
+        timeCreated: new Date(),
+        timeUpdated: new Date(),
+      });
+
+      const savedProduct = await newProduct.save();
+      res.status(201).json(savedProduct);
+    } catch (error) {
+      res.status(500).json({ message: "Error adding product", error });
+    }
+  });
 };
 /**
  * delete product from database thru id
