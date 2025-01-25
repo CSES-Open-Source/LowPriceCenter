@@ -3,6 +3,8 @@
  * https://github.com/TritonSE/TSE-Fulcrum/blob/main/frontend/src/api.ts
  */
 
+import {getToken} from "src/utils/User";
+
 /**
  * A custom type defining which HTTP methods we will handle in this file
  */
@@ -39,6 +41,11 @@ async function fetchRequest(
   const hasBody = body !== undefined;
 
   const newHeaders = { ...headers };
+
+  //add firebase token to request header
+  const token = await getToken();
+  if(token) newHeaders["token"] = token;
+
   if (hasBody) {
     newHeaders["Content-Type"] = "application/json";
   }

@@ -23,7 +23,7 @@ const FirebaseContext = createContext<{
  * Config information for Firebase.
  * May be moved to environmental variables later.
  */
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyBssbaMlxIJHYI7G7zOriU0VaWGnGrQv5M",
   authDomain: "low-price-center.firebaseapp.com",
   projectId: "low-price-center",
