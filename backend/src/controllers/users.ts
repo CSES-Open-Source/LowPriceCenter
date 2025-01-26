@@ -90,4 +90,42 @@ export const deleteUserById = async (req: Request, res: Response) => {
   }
 };
 
-export const updateUserById = async (req: Request, res: Response) => {};
+export const updateUserById = async (req: Request, res: Response) => {
+  try {
+    const { displayName, deactivateAccount } = req.body;
+    const id = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
+
+    const updatedUser = await UserModel.findById(id);
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update fields if provided
+    if (displayName != undefined) {
+      updatedUser.displayName = displayName;
+    }
+
+    if (deactivateAccount != undefined) {
+      updatedUser.activeUser = false;
+    }
+
+    // Update Firebase user
+    const firebaseUser = await getAuth().getUserByEmail(user.userEmail);
+    if (firebaseUser) {
+      await getAuth().updateUser(firebaseUser.uid, { disabled: true });
+    }
+
+    await updatedUser.save();
+
+    res.status(200).json({
+      message: "User successfully updated",
+      updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating user", error });
+  }
+};
