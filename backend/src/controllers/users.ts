@@ -114,7 +114,7 @@ export const updateUserById = async (req: Request, res: Response) => {
     }
 
     // Update Firebase user
-    const firebaseUser = await getAuth().getUserByEmail(user.userEmail);
+    const firebaseUser = await getAuth().getUserByEmail(updatedUser.userEmail);
     if (firebaseUser) {
       await getAuth().updateUser(firebaseUser.uid, { disabled: true });
     }
