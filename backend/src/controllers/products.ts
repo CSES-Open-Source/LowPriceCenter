@@ -1,8 +1,10 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import ProductModel from "src/models/product";
 import UserModel from "src/models/user";
 import { AuthenticatedRequest, authenticateUser } from "src/validators/authUserMiddleware";
 import mongoose = require("mongoose");
+import { bucket } from "src/config/firebase";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * get all the products in database
@@ -45,11 +47,24 @@ export const addProduct = async (req: AuthenticatedRequest, res: Response) => {
       return res.status(400).json({ message: "Name, price, and userEmail are required." });
     }
 
+    let image = "";
+    if (req.file) {
+      const fileName = `${uuidv4()}-${req.file.originalname}`;
+      const file = bucket.file(fileName);
+
+      await file.save(req.file.buffer, {
+        metadata: { contentType: req.file.mimetype },
+      });
+
+      image = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+    }
+
     const newProduct = new ProductModel({
       name,
       price,
       description,
       userEmail,
+      image, // Save the image URL in MongoDB
       timeCreated: new Date(),
       timeUpdated: new Date(),
     });
