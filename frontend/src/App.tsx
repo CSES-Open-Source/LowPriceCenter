@@ -2,6 +2,8 @@ import { HelmetProvider } from "react-helmet-async";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Home } from "src/pages";
 import { Marketplace } from "src/pages/Marketplace";
+import { AddProduct } from "./pages/AddProduct";
+
 import { Navbar } from "src/components/Navbar";
 import { Footer } from "src/components/Footer";
         
@@ -17,6 +19,10 @@ const router = createBrowserRouter([
   {
     path: "/marketplace",
     element: <Marketplace />,
+  },
+  {
+    path: "/add-product",
+    element: <AddProduct />,
   },
 ]);
 
