@@ -1,15 +1,14 @@
 import { HelmetProvider } from "react-helmet-async";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { PrivateRoute } from "./components/PrivateRoute";
 import { Home } from "src/pages";
 import { Marketplace } from "src/pages/Marketplace";
 import { AddProduct } from "./pages/AddProduct";
 
 import { Navbar } from "src/components/Navbar";
 import { Footer } from "src/components/Footer";
-        
+
 import FirebaseProvider from "../src/utils/FirebaseProvider";
-
-
 
 const router = createBrowserRouter([
   {
@@ -18,11 +17,19 @@ const router = createBrowserRouter([
   },
   {
     path: "/marketplace",
-    element: <Marketplace />,
+    element: (
+      <PrivateRoute>
+        <Marketplace />
+      </PrivateRoute>
+    ),
   },
   {
     path: "/add-product",
-    element: <AddProduct />,
+    element: (
+      <PrivateRoute>
+        <AddProduct />
+      </PrivateRoute>
+    ),
   },
 ]);
 
@@ -41,4 +48,3 @@ export default function App() {
     </HelmetProvider>
   );
 }
-
