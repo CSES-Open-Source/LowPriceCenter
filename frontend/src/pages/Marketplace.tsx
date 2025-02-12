@@ -52,12 +52,15 @@ export function Marketplace() {
           >
             {products &&
               products.map(
-                (product: { name: string; price: number }, index: Key | null | undefined) => (
+                (
+                  product: { name: string; price: number; image: string },
+                  index: Key | null | undefined,
+                ) => (
                   <div key={index} className="px-3 py-3">
                     <Product
                       productName={product.name}
                       productPrice={product.price}
-                      productImage={"productImages/product-placeholder.webp"}
+                      productImage={product.image ?? "/productImages/product-placeholder.webp"}
                     />
                   </div>
                 ),
