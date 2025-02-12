@@ -15,7 +15,7 @@ export default {
       },
       fontFamily: {
         jetbrains: ['JetBrains Mono', 'monospace'],
-        inter: ['Inter', 'monospace'],
+        inter: ['Inter', 'sans-serif'],
       },
     },
   },
