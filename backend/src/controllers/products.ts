@@ -5,6 +5,9 @@ import mongoose from "mongoose";
 import multer from "multer";
 import { bucket } from "src/config/firebase"; // Import Firebase bucket
 import { v4 as uuidv4 } from "uuid"; // For unique filenames
+import {getStorage, ref, getDownloadURL} from "firebase/storage";
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "src/config/firebaseConfig";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -65,7 +68,9 @@ export const addProduct = async (req: Request, res: Response) => {
           metadata: { contentType: req.file.mimetype },
         });
 
-        image = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+        const app = initializeApp(firebaseConfig);
+        const storage = getStorage(app);
+        image = await getDownloadURL(ref(storage, fileName));
       }
 
       const newProduct = new ProductModel({
