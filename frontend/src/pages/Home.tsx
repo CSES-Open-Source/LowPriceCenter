@@ -1,25 +1,16 @@
-import { GoogleAuthProvider, getAuth, signInWithPopup, signOut } from "firebase/auth";
 import { useContext } from "react";
 import { Helmet } from "react-helmet-async";
+import { Navigate } from "react-router-dom";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
-
-const provider = new GoogleAuthProvider();
 
 const buttonStyles =
   "bg-slate-800 text-white py-3 px-4 rounded-md mt-2 hover:bg-slate-900 transition-colors w-full sm:w-fit flex flex-row gap-3 justify-center";
 
 export function Home() {
-  const { app, user } = useContext(FirebaseContext);
-  const auth = getAuth(app);
+  const { user, openGoogleAuthentication } = useContext(FirebaseContext);
 
-  function openGoogleAuthentication() {
-    signInWithPopup(auth, provider).catch((error) => {
-      console.error(error);
-    });
-  }
-
-  function signOutFromFirebase() {
-    signOut(auth);
+  if (user) {
+    return <Navigate to="/marketplace" />;
   }
 
   return (

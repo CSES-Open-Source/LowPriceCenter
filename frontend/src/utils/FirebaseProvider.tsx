@@ -1,20 +1,29 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
-import { User, getAuth } from "firebase/auth";
-import { ReactNode, createContext, useEffect, useState } from "react";
+import { GoogleAuthProvider, User, getAuth, signInWithPopup, signOut } from "firebase/auth";
+import { MouseEventHandler, ReactNode, createContext, useEffect, useState } from "react";
 
 /**
  * Context used by FirebaseProvider to provide app and user to pages
  */
-const FirebaseContext = createContext<{ app: FirebaseApp | undefined; user: User | null }>({
+const FirebaseContext = createContext<{
+  app: FirebaseApp | undefined;
+  user: User | null;
+  loading: boolean;
+  openGoogleAuthentication: MouseEventHandler<HTMLButtonElement>;
+  signOutFromFirebase: MouseEventHandler<HTMLButtonElement>;
+}>({
   app: undefined,
   user: null,
+  loading: true,
+  openGoogleAuthentication: () => {},
+  signOutFromFirebase: () => {},
 });
 
 /**
  * Config information for Firebase.
  * May be moved to environmental variables later.
  */
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyBssbaMlxIJHYI7G7zOriU0VaWGnGrQv5M",
   authDomain: "low-price-center.firebaseapp.com",
   projectId: "low-price-center",
@@ -31,9 +40,25 @@ const firebaseConfig = {
  */
 export default function FirebaseProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  /*sign in*/
+  async function openGoogleAuthentication() {
+    await signInWithPopup(auth, provider).catch((error) => {
+      console.error(error);
+    });
+    window.location.href = "/marketplace";
+  }
+
+  /*sign out*/
+  async function signOutFromFirebase() {
+    await signOut(auth);
+    window.location.href = "/";
+  }
 
   /**
    * Tracks when the user logs in and out to change
@@ -42,12 +67,18 @@ export default function FirebaseProvider({ children }: { children: ReactNode }) 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((u) => {
       setUser(u);
+      setLoading(false);
     });
-
     return unsubscribe;
   }, []);
 
-  return <FirebaseContext.Provider value={{ app, user }}>{children}</FirebaseContext.Provider>;
+  return (
+    <FirebaseContext.Provider
+      value={{ app, user, loading, openGoogleAuthentication, signOutFromFirebase }}
+    >
+      {children}
+    </FirebaseContext.Provider>
+  );
 }
 
 export { FirebaseContext };
