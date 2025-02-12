@@ -6,7 +6,6 @@ import { Navbar } from "src/components/Navbar";
 import { Footer } from "src/components/Footer";
         
 import FirebaseProvider from "../src/utils/FirebaseProvider";
-import Homepage from "./pages/Homepage";
 
 
 
@@ -18,10 +17,6 @@ const router = createBrowserRouter([
   {
     path: "/marketplace",
     element: <Marketplace />,
-  },
-  {
-    path: "/homepage",
-    element: <Homepage />,
   },
 ]);
 
