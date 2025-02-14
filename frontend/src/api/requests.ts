@@ -46,14 +46,14 @@ async function fetchRequest(
   const token = await getToken();
   if(token) newHeaders["token"] = token;
 
-  if (hasBody) {
+  if (hasBody && !(body instanceof FormData)) {
     newHeaders["Content-Type"] = "application/json";
   }
 
   const response = await fetch(url, {
     method,
     headers: newHeaders,
-    body: hasBody ? JSON.stringify(body) : undefined,
+    body: hasBody && !(body instanceof FormData) ? JSON.stringify(body) : body,
   });
 
   return response;

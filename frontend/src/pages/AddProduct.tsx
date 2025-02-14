@@ -17,15 +17,24 @@ export function AddProduct() {
     e.preventDefault();
     try {
       if (productName.current && productPrice.current && productDescription.current && user) {
-        const res = await post("/api/products", {
-          name: productName.current.value,
-          price: productPrice.current.value,
-          description: productDescription.current.value,
-          userEmail: user.email,
-        });
+        let image;
+        if (productImages.current && productImages.current.files) {
+          image = productImages.current.files[0];
+        }
+
+        const body = new FormData();
+        body.append("name", productName.current.value);
+        body.append("price", productPrice.current.value);
+        body.append("description", productDescription.current.value);
+        if (user.email) body.append("userEmail", user.email);
+        if (image) body.append("image", image);
+
+        const res = await post("/api/products", body);
+
         if (res.ok) {
           setProductAdded(true);
           setError(false);
+          console.log(res);
         } else throw Error();
       } else throw Error();
     } catch (err) {
