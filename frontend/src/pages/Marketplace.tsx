@@ -60,7 +60,9 @@ export function Marketplace() {
                     <Product
                       productName={product.name}
                       productPrice={product.price}
-                      productImage={product.image ?? "/productImages/product-placeholder.webp"}
+                      productImage={
+                        product.image ? product.image : "/productImages/product-placeholder.webp"
+                      }
                     />
                   </div>
                 ),
