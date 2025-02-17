@@ -49,12 +49,12 @@ export function AddProduct() {
         <title>Low-Price Center Marketplace</title>
       </Helmet>
       <div className="w-full mt-12 mb-6">
-        <p className="text-3xl text-center font-mono font-medium">Add Product</p>
+        <p className="text-3xl text-center font-jetbrains font-medium">Add Product</p>
       </div>
       <form className="max-w-sm mx-auto p-4" onSubmit={handleSubmit}>
         {/* Product Name */}
         <div className="mb-5">
-          <label htmlFor="productName" className="block mb-2 font-medium text-black">
+          <label htmlFor="productName" className="block mb-2 font-medium font-inter text-black">
             Name
           </label>
           <input
@@ -68,7 +68,7 @@ export function AddProduct() {
         </div>
         {/* Product Price */}
         <div className="mb-5">
-          <label htmlFor="productPrice" className="block mb-2 font-medium text-black">
+          <label htmlFor="productPrice" className="block mb-2 font-medium font-inter text-black">
             Price
           </label>
           <input
@@ -84,7 +84,10 @@ export function AddProduct() {
         </div>
         {/* Product Description */}
         <div className="mb-5">
-          <label htmlFor="productDescription" className="block mb-2 font-medium text-black">
+          <label
+            htmlFor="productDescription"
+            className="block mb-2 font-medium font-inter text-black"
+          >
             Description
           </label>
           <textarea
@@ -97,7 +100,7 @@ export function AddProduct() {
         </div>
         {/* Product Image */}
         <div className="mb-5">
-          <label htmlFor="productImages" className="block mb-2 font-medium text-black">
+          <label htmlFor="productImages" className="block mb-2 font-medium font-inter text-black">
             Image
           </label>
           <input
@@ -113,7 +116,7 @@ export function AddProduct() {
           {error && <p className="text-sm text-red-800">Error adding product. Try again.</p>}
           <button
             type="submit"
-            className="bg-[#00629B] text-white font-semibold py-2 px-4 shadow-lg"
+            className="bg-[#00629B] text-white font-semibold font-inter py-2 px-4 shadow-lg"
           >
             Submit
           </button>

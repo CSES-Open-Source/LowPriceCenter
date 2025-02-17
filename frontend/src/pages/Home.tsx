@@ -7,7 +7,7 @@ const buttonStyles =
   "bg-slate-800 text-white py-3 px-4 rounded-md mt-2 hover:bg-slate-900 transition-colors w-full sm:w-fit flex flex-row gap-3 justify-center";
 
 export function Home() {
-  const { user, openGoogleAuthentication } = useContext(FirebaseContext);
+  const { user, openGoogleAuthentication, signOutFromFirebase } = useContext(FirebaseContext);
 
   if (user) {
     return <Navigate to="/marketplace" />;

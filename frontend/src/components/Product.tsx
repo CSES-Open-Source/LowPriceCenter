@@ -12,8 +12,8 @@ function Product({ productImage, productName, productPrice }: Props) {
           <img className="w-full h-full object-cover" src={productImage} alt="" />
         </div>
         <div className="p-2">
-          <p className="font-semibold">{productName}</p>
-          <p className="font-extralight">${productPrice.toFixed(2)}</p>
+          <p className="font-semibold font-inter">{productName}</p>
+          <p className="font-light font-inter ">${productPrice.toFixed(2)}</p>
         </div>
       </a>
     </div>
