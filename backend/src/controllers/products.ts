@@ -41,6 +41,7 @@ export const getProductById = async (req: AuthenticatedRequest, res: Response) =
 export const addProduct = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { name, price, description } = req.body;
+    console.log(req.body);
     const userId = req.user.id;
     const userEmail = req.user.userEmail;
     if (!name || !price || !userEmail) {
