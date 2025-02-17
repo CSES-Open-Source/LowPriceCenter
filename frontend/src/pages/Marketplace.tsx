@@ -31,9 +31,9 @@ export function Marketplace() {
       <main className="w-full flex justify-center items-center mt-12 mb-20">
         <div className="max-w-[80%] w-full">
           <div id="grid-header" className="flex justify-between flex-wrap mb-2 px-3">
-            <p className="text-3xl font-mono font-medium">Marketplace</p>
+            <p className="text-lg sm:text-3xl font-mono font-medium">Marketplace</p>
             <button
-              className="bg-[#00629B] text-white font-semibold py-2 px-4 shadow-lg"
+              className="bg-[#00629B] text-white text-[0.6rem] font-semibold px-1 py-2 sm:text-base sm:px-4 shadow-lg"
               onClick={() => (window.location.href = "/add-product")}
             >
               Add Product
