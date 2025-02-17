@@ -34,7 +34,7 @@ export function Marketplace() {
             <p className="text-3xl font-mono font-medium">Marketplace</p>
             <button
               className="bg-[#00629B] text-white font-semibold py-2 px-4 shadow-lg"
-              onClick={() => (window.location.href = "/")}
+              onClick={() => (window.location.href = "/add-product")}
             >
               Add Product
             </button>
@@ -52,12 +52,17 @@ export function Marketplace() {
           >
             {products &&
               products.map(
-                (product: { name: string; price: number }, index: Key | null | undefined) => (
+                (
+                  product: { name: string; price: number; image: string },
+                  index: Key | null | undefined,
+                ) => (
                   <div key={index} className="px-3 py-3">
                     <Product
                       productName={product.name}
                       productPrice={product.price}
-                      productImage={"productImages/product-placeholder.webp"}
+                      productImage={
+                        product.image ? product.image : "/productImages/product-placeholder.webp"
+                      }
                     />
                   </div>
                 ),
