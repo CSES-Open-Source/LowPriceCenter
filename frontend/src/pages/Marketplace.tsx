@@ -53,11 +53,12 @@ export function Marketplace() {
             {products &&
               products.map(
                 (
-                  product: { name: string; price: number; image: string },
+                  product: { _id: string; name: string; price: number; image: string },
                   index: Key | null | undefined,
                 ) => (
                   <div key={index} className="px-3 py-3">
                     <Product
+                      productId={product._id}
                       productName={product.name}
                       productPrice={product.price}
                       productImage={

@@ -33,8 +33,12 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/individual-product-page",
-    element: <IndividualProductPage />,
+    path: "/individual-product-page/:id",
+    element: (
+      <PrivateRoute>
+        <IndividualProductPage />
+      </PrivateRoute>
+    ),
   },
 ]);
 

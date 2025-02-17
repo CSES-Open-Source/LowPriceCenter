@@ -75,6 +75,7 @@ export function AddProduct() {
             id="productPrice"
             type="number"
             min={0}
+            max={1000000000}
             step={0.01}
             ref={productPrice}
             className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5 y-600"
