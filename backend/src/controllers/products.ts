@@ -2,9 +2,19 @@ import { Response } from "express";
 import ProductModel from "src/models/product";
 import UserModel from "src/models/user";
 import { AuthenticatedRequest, authenticateUser } from "src/validators/authUserMiddleware";
-import mongoose = require("mongoose");
-import { bucket } from "src/config/firebase";
-import { v4 as uuidv4 } from "uuid";
+import mongoose from "mongoose";
+
+import multer from "multer";
+import { bucket } from "src/config/firebase"; // Import Firebase bucket
+import { v4 as uuidv4 } from "uuid"; // For unique filenames
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "src/config/firebaseConfig";
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
+}).single("image");
 
 /**
  * get all the products in database
@@ -53,8 +63,32 @@ export const addProduct = async (req: AuthenticatedRequest, res: Response) => {
       const fileName = `${uuidv4()}-${req.file.originalname}`;
       const file = bucket.file(fileName);
 
-      await file.save(req.file.buffer, {
-        metadata: { contentType: req.file.mimetype },
+      if (!name || !price || !userEmail) {
+        return res.status(400).json({ message: "Name, price, and userEmail are required." });
+      }
+
+      let image = "";
+      if (req.file) {
+        const fileName = `${uuidv4()}-${req.file.originalname}`;
+        const file = bucket.file(fileName);
+
+        await file.save(req.file.buffer, {
+          metadata: { contentType: req.file.mimetype },
+        });
+
+        const app = initializeApp(firebaseConfig);
+        const storage = getStorage(app);
+        image = await getDownloadURL(ref(storage, fileName));
+      }
+
+      const newProduct = new ProductModel({
+        name,
+        price,
+        description,
+        userEmail,
+        image, // Save the image URL in MongoDB
+        timeCreated: new Date(),
+        timeUpdated: new Date(),
       });
 
       image = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
