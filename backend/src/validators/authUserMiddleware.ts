@@ -35,7 +35,7 @@ export const authenticateUser = async (
         const user = await UserModel.findOne({ firebaseUid: uid });
 
         if (!user) {
-          return res.status(403).json({ message: "User not found." });
+          return res.status(403).json({ message: "User not found. (middleware)" });
         }
 
         if (!user.activeUser) {

@@ -12,33 +12,28 @@ export const getUsers = async (req: Request, res: Response) => {
   }
 };
 
+// id: firebase user id
 export const getUserById = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid ID format" });
+    const firebaseUid = req.params.firebaseUid;
+
+    const user = await UserModel.findOne({ firebaseUid: firebaseUid });
+    if (!user) {
+      throw new Error("User not found");
     }
-    const product = await UserModel.findById(id);
-    if (!product) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.status(200).json(product);
+    return user;
   } catch (error) {
     res.status(500).json({ message: "Error getting user", error });
   }
 };
 
+// id: firebase user id
 export const addUser = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
-
-    if (!id) {
-      return res.status(400).json({ message: "Missing required idToken" });
-    }
-
-    // Verify ID token and get Firebase user info
-    const decodedToken = await getAuth().verifyIdToken(id);
-    const firebaseUser = await getAuth().getUser(decodedToken.uid);
+    console.log(req.body);
+    const { firebaseUid } = req.body;
+    console.log(firebaseUid);
+    const firebaseUser = await getAuth().getUser(firebaseUid);
 
     const userEmail = firebaseUser.email;
     const displayName = firebaseUser.displayName || "";
@@ -50,6 +45,7 @@ export const addUser = async (req: Request, res: Response) => {
       activeUser: true,
       lastLogin: new Date(),
       productList: [],
+      firebaseUid,
     });
 
     await newUser.save();
@@ -60,17 +56,13 @@ export const addUser = async (req: Request, res: Response) => {
   }
 };
 
+// id: firebase user id
 export const deleteUserById = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid ID format" });
-    }
-
-    const user = await UserModel.findById(id);
+    const firebaseUid = req.params.firebaseUid;
+    const user = await UserModel.findOne({ firebaseUid: firebaseUid });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      throw new Error("User not found");
     }
 
     // Toggle activeUser status
@@ -90,18 +82,14 @@ export const deleteUserById = async (req: Request, res: Response) => {
   }
 };
 
+// id: firebase user id
 export const updateUserById = async (req: Request, res: Response) => {
   try {
     const { displayName, deactivateAccount } = req.body;
-    const id = req.params.id;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid ID format" });
-    }
-
-    const updatedUser = await UserModel.findById(id);
+    const firebaseUid = req.params.firebaseUid;
+    const updatedUser = await UserModel.findOne({ firebaseUid: firebaseUid });
     if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
+      throw new Error("User not found");
     }
 
     // Update fields if provided

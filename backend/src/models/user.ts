@@ -21,6 +21,10 @@ const userSchema = new Schema({
     required: true,
     default: [],
   },
+  firebaseUid: {
+    type: String,
+    required: true,
+  },
 });
 
 type User = InferSchemaType<typeof userSchema>;
