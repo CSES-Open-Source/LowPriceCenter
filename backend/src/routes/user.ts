@@ -10,7 +10,7 @@ import {
 const router = express.Router();
 
 router.get("/", getUsers);
-router.get("/:id", getUserById);
+router.get("/:firebaseUid", getUserById);
 router.post("/", addUser);
 router.delete("/:id", deleteUserById);
 router.patch("/:id", updateUserById);
