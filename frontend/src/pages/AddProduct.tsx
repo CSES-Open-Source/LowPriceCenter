@@ -2,14 +2,12 @@ import { FormEvent, useRef, useContext, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { post } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
-import { CiCircleCheck } from "react-icons/ci";
 
 export function AddProduct() {
   const productName = useRef<HTMLInputElement>(null);
   const productPrice = useRef<HTMLInputElement>(null);
   const productDescription = useRef<HTMLTextAreaElement>(null);
   const productImages = useRef<HTMLInputElement>(null);
-  const [productAdded, setProductAdded] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const { user } = useContext(FirebaseContext);
 
@@ -32,13 +30,11 @@ export function AddProduct() {
         const res = await post("/api/products", body);
 
         if (res.ok) {
-          setProductAdded(true);
           setError(false);
-          console.log(res);
+          window.location.href = "/products";
         } else throw Error();
       } else throw Error();
     } catch (err) {
-      setProductAdded(false);
       setError(true); //displays an error message to the user
     }
   };
@@ -123,41 +119,6 @@ export function AddProduct() {
           </button>
         </div>
       </form>
-      {/* Product added confirmation */}
-      <dialog open={productAdded}>
-        <div className="backdrop-blur-[2px] flex overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center mt-20 w-full md:inset-0 h-[calc(100%-1rem)]">
-          <div className="relative p-4 w-full max-w-2xl max-h-full">
-            <div className="relative bg-blue-50 rounded-lg shadow-2xl">
-              <div className="flex flex-col items-center gap-3 p-4 md:p-5 border-b">
-                <CiCircleCheck className="text-green-600 w-10 h-10" />
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Your product is now on the marketplace!
-                </h3>
-                <div className="flex flex-row gap-10 mt-8">
-                  <button
-                    className="text-[#00629B] font-semibold py-2 px-4 hover:text-blue-900"
-                    onClick={() => {
-                      setProductAdded(false);
-                      window.location.href = "/add-product";
-                    }}
-                  >
-                    Add Another Product
-                  </button>
-                  <button
-                    className="text-[#00629B] font-semibold py-2 px-4  hover:text-blue-900"
-                    onClick={() => {
-                      setProductAdded(false);
-                      window.location.href = "/products";
-                    }}
-                  >
-                    View Marketplace
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </dialog>
     </>
   );
 }
