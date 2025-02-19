@@ -51,7 +51,7 @@ export default function FirebaseProvider({ children }: { children: ReactNode }) 
     await signInWithPopup(auth, provider).catch((error) => {
       console.error(error);
     });
-    window.location.href = "/marketplace";
+    window.location.href = "/products";
   }
 
   /*sign out*/

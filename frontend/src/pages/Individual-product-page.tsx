@@ -30,7 +30,7 @@ export function IndividualProductPage() {
       <main className="w-[80%] max-w-screen-2xl mx-auto m-12">
         <button
           className="text-lg mb-4 font-inter hover:underline"
-          onClick={() => navigate("/marketplace")}
+          onClick={() => navigate("/products")}
         >
           &larr; Return to Marketplace
         </button>

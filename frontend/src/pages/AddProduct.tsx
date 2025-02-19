@@ -147,7 +147,7 @@ export function AddProduct() {
                     className="text-[#00629B] font-semibold py-2 px-4  hover:text-blue-900"
                     onClick={() => {
                       setProductAdded(false);
-                      window.location.href = "/marketplace";
+                      window.location.href = "/products";
                     }}
                   >
                     View Marketplace

@@ -17,7 +17,7 @@ const router = createBrowserRouter([
     element: <Home />,
   },
   {
-    path: "/marketplace",
+    path: "/products",
     element: (
       <PrivateRoute>
         <Marketplace />
@@ -33,7 +33,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/individual-product-page/:id",
+    path: "/products/:id",
     element: (
       <PrivateRoute>
         <IndividualProductPage />

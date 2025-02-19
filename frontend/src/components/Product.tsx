@@ -8,7 +8,7 @@ interface Props {
 function Product({ productId, productImage, productName, productPrice }: Props) {
   return (
     <div className="w-full bg-[#F8F8F8] shadow-xl">
-      <a href={`/individual-product-page/${productId}`}>
+      <a href={`/products/${productId}`}>
         <div className="max-h-[16rem] h-[16rem] overflow-hidden">
           <img className="w-full h-full object-cover" src={productImage} alt="" />
         </div>
