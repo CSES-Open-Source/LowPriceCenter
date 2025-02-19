@@ -31,9 +31,9 @@ export function Marketplace() {
       <main className="w-full flex justify-center items-center mt-12 mb-20">
         <div className="max-w-[80%] w-full">
           <div id="grid-header" className="flex justify-between flex-wrap mb-2 px-3">
-            <p className="text-3xl font-mono font-medium">Marketplace</p>
+            <p className="text-lg sm:text-3xl font-jetbrains font-medium">Marketplace</p>
             <button
-              className="bg-[#00629B] text-white font-semibold py-2 px-4 shadow-lg"
+              className="bg-[#00629B] text-white text-[0.6rem] font-inter font-semibold px-1 py-2 sm:text-base sm:px-4 shadow-lg"
               onClick={() => (window.location.href = "/add-product")}
             >
               Add Product
@@ -53,11 +53,12 @@ export function Marketplace() {
             {products &&
               products.map(
                 (
-                  product: { name: string; price: number; image: string },
+                  product: { _id: string; name: string; price: number; image: string },
                   index: Key | null | undefined,
                 ) => (
                   <div key={index} className="px-3 py-3">
                     <Product
+                      productId={product._id}
                       productName={product.name}
                       productPrice={product.price}
                       productImage={
