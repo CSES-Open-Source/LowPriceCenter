@@ -69,7 +69,7 @@ export function IndividualProductPage() {
                 Interested? Contact them here:
               </p>
               <p className="font-inter text-black text-base md:text-xl font-medium break-words">
-                {product?.userEmail}
+                <a href={`mailto:${product?.userEmail}`}>{product?.userEmail}</a>
               </p>
             </div>
           </section>
