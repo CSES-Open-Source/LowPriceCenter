@@ -63,32 +63,8 @@ export const addProduct = async (req: AuthenticatedRequest, res: Response) => {
       const fileName = `${uuidv4()}-${req.file.originalname}`;
       const file = bucket.file(fileName);
 
-      if (!name || !price || !userEmail) {
-        return res.status(400).json({ message: "Name, price, and userEmail are required." });
-      }
-
-      let image = "";
-      if (req.file) {
-        const fileName = `${uuidv4()}-${req.file.originalname}`;
-        const file = bucket.file(fileName);
-
-        await file.save(req.file.buffer, {
-          metadata: { contentType: req.file.mimetype },
-        });
-
-        const app = initializeApp(firebaseConfig);
-        const storage = getStorage(app);
-        image = await getDownloadURL(ref(storage, fileName));
-      }
-
-      const newProduct = new ProductModel({
-        name,
-        price,
-        description,
-        userEmail,
-        image, // Save the image URL in MongoDB
-        timeCreated: new Date(),
-        timeUpdated: new Date(),
+      await file.save(req.file.buffer, {
+        metadata: { contentType: req.file.mimetype },
       });
 
       image = `https://storage.googleapis.com/${bucket.name}/${fileName}`;

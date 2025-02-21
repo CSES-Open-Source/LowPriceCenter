@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import UserModel from "src/models/user";
-import mongoose = require("mongoose");
 import { getAuth } from "firebase-admin/auth";
 
 export const getUsers = async (req: Request, res: Response) => {
@@ -30,13 +29,18 @@ export const getUserById = async (req: Request, res: Response) => {
 // id: firebase user id
 export const addUser = async (req: Request, res: Response) => {
   try {
-    console.log(req.body);
     const { firebaseUid } = req.body;
-    console.log(firebaseUid);
     const firebaseUser = await getAuth().getUser(firebaseUid);
 
     const userEmail = firebaseUser.email;
     const displayName = firebaseUser.displayName || "";
+
+    // Check for an existing user in MongoDB
+    const existingUser = await UserModel.findOne({ firebaseUid: firebaseUid });
+    if (existingUser) {
+      res.status(409).json({ message: "User already exists", user: existingUser });
+      return;
+    }
 
     // Add user to MongoDB
     const newUser = new UserModel({
