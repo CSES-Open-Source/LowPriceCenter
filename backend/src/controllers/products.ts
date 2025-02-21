@@ -7,14 +7,6 @@ import mongoose from "mongoose";
 import multer from "multer";
 import { bucket } from "src/config/firebase"; // Import Firebase bucket
 import { v4 as uuidv4 } from "uuid"; // For unique filenames
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import { initializeApp } from "firebase/app";
-import { firebaseConfig } from "src/config/firebaseConfig";
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
-}).single("image");
 
 /**
  * get all the products in database
