@@ -25,8 +25,8 @@ export function Home() {
             <br />
             <span className="font-bold">Low-Price Center</span>
           </h1>
-          <div className="bg-[#F5F0E6] w-fit max-w-[90%] flex justify-center items-center mb-7 mx-auto sm:mx-0 p-1">
-            <p className="font-inter font-normal text-sm sm:text-base lg:text-xl p-5">
+          <div className="bg-[#F5F0E6] max-w-[90%] flex justify-center items-center mb-7 mx-auto sm:mx-0 p-1">
+            <p className="font-inter font-normal text-sm sm:text-base lg:text-xl p-5 inline-block text-center">
               An online marketplace made <strong>by</strong> and <strong>for</strong> UCSD students
               to buy and sell goods.
             </p>

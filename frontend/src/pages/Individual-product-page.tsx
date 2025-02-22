@@ -36,16 +36,16 @@ export function IndividualProductPage() {
         </button>
         <div className="flex flex-wrap flex-col md:flex-row mb-6 gap-12">
           {/* Image Section */}
-          <section className="max-w-full w-full max-h-[606px] flex-1 flex justify-center md:h-auto">
-            <div className="w-full h-0 pb-[100%] relative max-w-lg border-8 border-ucsd-blue">
+          <section className="w-full flex-1 flex justify-center md:h-auto">
+            <div className="w-auto h-auto relative border-8 border-ucsd-blue">
               <img
                 src={product?.image ? product?.image : "/productImages/product-placeholder.webp"}
                 alt="Product"
-                className="w-full h-full object-cover absolute top-0 left-0"
+                className="w-full max-h-[500px] object-cover"
               />
             </div>
           </section>
-
+          
           {/* Info Section */}
           <section className="max-w-[100%] md:max-w-[50%] flex-1 flex flex-col">
             <h1 className="pt-2 font-jetbrains text-black font-bold text-4xl break-words">
