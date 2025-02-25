@@ -10,7 +10,7 @@ export function Home() {
   const { user, openGoogleAuthentication, signOutFromFirebase } = useContext(FirebaseContext);
 
   if (user) {
-    return <Navigate to="/marketplace" />;
+    return <Navigate to="/products" />;
   }
 
   return (
