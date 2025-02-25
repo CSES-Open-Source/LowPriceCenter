@@ -44,7 +44,12 @@ export function Navbar() {
     <>
       <nav className="bg-ucsd-blue text-white w-full h-12 max-h-12 p-2 flex items-center justify-between sticky top-0 z-50">
         {/* Desktop View */}
-        <button className="font-jetbrains text-xl pl-2">Low-Price Center</button>
+        <button
+          className="font-jetbrains text-xl pl-2"
+          onClick={() => (window.location.href = "/products")}
+        >
+          Low-Price Center
+        </button>
         <ul className="hidden md:flex items-center space-x-4 text-xl">
           <li>
             <button className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue">
