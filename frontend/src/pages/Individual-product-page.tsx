@@ -37,15 +37,16 @@ export function IndividualProductPage() {
         <div className="flex flex-wrap flex-col md:flex-row mb-6 gap-12">
           {/* Image Section */}
           <section className="w-full flex-1 flex justify-center md:h-auto">
-            <div className="w-auto h-auto relative border-8 border-ucsd-blue">
+            <div className="max-h-[32rem] h-[32rem] max-w-[32rem] w-[32rem] relative border-8 border-ucsd-blue">
               <img
                 src={product?.image ? product?.image : "/productImages/product-placeholder.webp"}
+                // src="/ucsd-pricecenter.png"
                 alt="Product"
-                className="w-full max-h-[500px] object-cover"
+                className="w-full h-full object-cover"
               />
             </div>
           </section>
-          
+
           {/* Info Section */}
           <section className="max-w-[100%] md:max-w-[50%] flex-1 flex flex-col">
             <h1 className="pt-2 font-jetbrains text-black font-bold text-4xl break-words">
