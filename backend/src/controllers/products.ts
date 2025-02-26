@@ -5,14 +5,14 @@ import mongoose from "mongoose";
 import multer from "multer";
 import { bucket } from "src/config/firebase"; // Import Firebase bucket
 import { v4 as uuidv4 } from "uuid"; // For unique filenames
-import {getStorage, ref, getDownloadURL} from "firebase/storage";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "src/config/firebaseConfig";
 
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
-}).single("image");
+}).array("images", 10);
 
 /**
  * get all the products in database
@@ -25,6 +25,7 @@ export const getProducts = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error fetching products", error });
   }
 };
+
 /**
  * get individual product thru product id
  */
@@ -43,6 +44,7 @@ export const getProductById = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error getting product", error });
   }
 };
+
 /**
  * add product to database thru name, price, description, and userEmail
  */
@@ -59,18 +61,22 @@ export const addProduct = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Name, price, and userEmail are required." });
       }
 
-      let image = "";
-      if (req.file) {
-        const fileName = `${uuidv4()}-${req.file.originalname}`;
-        const file = bucket.file(fileName);
-
-        await file.save(req.file.buffer, {
-          metadata: { contentType: req.file.mimetype },
-        });
-
+      let images: string[] = [];
+      if (req.files && Array.isArray(req.files)) {
         const app = initializeApp(firebaseConfig);
         const storage = getStorage(app);
-        image = await getDownloadURL(ref(storage, fileName));
+
+        for (const file of req.files as Express.Multer.File[]) {
+          const fileName = `${uuidv4()}-${file.originalname}`;
+          const firebaseFile = bucket.file(fileName);
+
+          await firebaseFile.save(file.buffer, {
+            metadata: { contentType: file.mimetype },
+          });
+
+          const imageUrl = await getDownloadURL(ref(storage, fileName));
+          images.push(imageUrl);
+        }
       }
 
       const newProduct = new ProductModel({
@@ -78,7 +84,7 @@ export const addProduct = async (req: Request, res: Response) => {
         price,
         description,
         userEmail,
-        image, // Save the image URL in MongoDB
+        images,
         timeCreated: new Date(),
         timeUpdated: new Date(),
       });
@@ -90,6 +96,7 @@ export const addProduct = async (req: Request, res: Response) => {
     }
   });
 };
+
 /**
  * delete product from database thru id
  */
@@ -111,6 +118,7 @@ export const deleteProductById = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error deleting product", error });
   }
 };
+
 /**
  * patch product in database thru id and updated parameters in req
  */
