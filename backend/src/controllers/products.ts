@@ -61,7 +61,7 @@ export const addProduct = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Name, price, and userEmail are required." });
       }
 
-      let images: string[] = [];
+      const images: string[] = [];
       if (req.files && Array.isArray(req.files)) {
         const app = initializeApp(firebaseConfig);
         const storage = getStorage(app);
