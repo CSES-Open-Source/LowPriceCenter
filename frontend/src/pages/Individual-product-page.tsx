@@ -16,8 +16,9 @@ export function IndividualProductPage() {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const res = await get(`/api/products/${id}`);
-      setProduct(await res.json());
+      await get(`/api/products/${id}`)
+        .then(async (res) => setProduct(await res.json()))
+        .catch((err) => console.log("error in fetchProduct()", err["message"]));
     };
     fetchProduct();
   }, []);
@@ -56,7 +57,7 @@ export function IndividualProductPage() {
             <hr className="my-6 w-full mx-auto h-0 border-[1px] border-solid border-gray-300" />
 
             <h2 className="font-inter text-[#35393C] text-base md:text-xl font-normal pb-6">
-              USD ${product?.price.toFixed(2)}
+              USD ${product?.price?.toFixed(2)}
             </h2>
             {product?.description && (
               <div className="bg-[#F5F0E6] p-5 mb-6">
