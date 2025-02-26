@@ -75,8 +75,7 @@ async function assertOk(response: Response): Promise<void> {
   let message = `${response.status} ${response.statusText}`;
 
   try {
-    const  responseCopy = response.clone();
-    const text = await responseCopy.text();
+    const text = await response.text();
     if (text) {
       message += ": " + text;
     }
