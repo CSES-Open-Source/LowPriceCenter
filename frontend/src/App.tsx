@@ -9,6 +9,7 @@ import { Navbar } from "src/components/Navbar";
 import { Footer } from "src/components/Footer";
 
 import FirebaseProvider from "../src/utils/FirebaseProvider";
+import { IndividualProductPage } from "./pages/Individual-product-page";
 
 const router = createBrowserRouter([
   {
@@ -16,7 +17,7 @@ const router = createBrowserRouter([
     element: <Home />,
   },
   {
-    path: "/marketplace",
+    path: "/products",
     element: (
       <PrivateRoute>
         <Marketplace />
@@ -28,6 +29,14 @@ const router = createBrowserRouter([
     element: (
       <PrivateRoute>
         <AddProduct />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/products/:id",
+    element: (
+      <PrivateRoute>
+        <IndividualProductPage />
       </PrivateRoute>
     ),
   },

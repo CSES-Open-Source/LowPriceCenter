@@ -54,7 +54,7 @@ async function fetchRequest(
     method,
     headers: newHeaders,
     body: hasBody && !(body instanceof FormData) ? JSON.stringify(body) : body,
-  });
+  })
 
   return response;
 }
@@ -96,7 +96,7 @@ async function assertOk(response: Response): Promise<void> {
 export async function get(url: string, headers: Record<string, string> = {}): Promise<Response> {
   // GET requests do not have a body
   const response = await fetchRequest("GET", API_BASE_URL + url, undefined, headers);
-  void assertOk(response);
+  void await assertOk(response).catch();
   return response;
 }
 
@@ -114,7 +114,7 @@ export async function post(
   headers: Record<string, string> = {},
 ): Promise<Response> {
   const response = await fetchRequest("POST", API_BASE_URL + url, body, headers);
-  void assertOk(response);
+  void await assertOk(response).catch();
   return response;
 }
 
@@ -132,7 +132,7 @@ export async function put(
   headers: Record<string, string> = {},
 ): Promise<Response> {
   const response = await fetchRequest("PUT", API_BASE_URL + url, body, headers);
-  void assertOk(response);
+  void await assertOk(response).catch();
   return response;
 }
 
