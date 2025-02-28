@@ -17,12 +17,14 @@ export const getUserById = async (req: Request, res: Response) => {
     const firebaseUid = req.params.firebaseUid;
 
     const user = await UserModel.findOne({ firebaseUid: firebaseUid });
+
     if (!user) {
-      throw new Error("User not found");
+      return res.status(404).json({ message: "User not found" });
     }
-    return user;
+
+    return res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ message: "Error getting user", error });
+    return res.status(500).json({ message: "Error getting user", error });
   }
 };
 
