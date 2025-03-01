@@ -37,6 +37,11 @@ export const addUser = async (req: Request, res: Response) => {
     const userEmail = firebaseUser.email;
     const displayName = firebaseUser.displayName || "";
 
+    // Restrict to UCSD emails only
+    if (!userEmail || !userEmail.endsWith("@ucsd.edu")) {
+      return res.status(403).json({ message: "Only UCSD emails are allowed." });
+    }
+
     // Check for an existing user in MongoDB
     const existingUser = await UserModel.findOne({ firebaseUid: firebaseUid });
     if (existingUser) {
