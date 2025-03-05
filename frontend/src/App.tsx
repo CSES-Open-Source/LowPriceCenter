@@ -10,6 +10,7 @@ import { Footer } from "src/components/Footer";
 
 import FirebaseProvider from "../src/utils/FirebaseProvider";
 import { IndividualProductPage } from "./pages/Individual-product-page";
+import { EditProduct } from "./pages/EditProduct";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,14 @@ const router = createBrowserRouter([
     element: (
       <PrivateRoute>
         <AddProduct />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/edit-product/:id",
+    element: (
+      <PrivateRoute>
+        <EditProduct />
       </PrivateRoute>
     ),
   },
