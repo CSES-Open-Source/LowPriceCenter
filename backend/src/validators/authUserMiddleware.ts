@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
 import UserModel from "src/models/user";
 import dotenv from "dotenv";
 import admin from "firebase-admin";
@@ -26,7 +25,7 @@ export const authenticateUser = async (
     if (!token) {
       return res.status(401).json({ message: "Access denied. No token provided." });
     }
-    const decodedToken = await admin
+    await admin
       .auth()
       .verifyIdToken(token)
       .then(async (decodedToken) => {
