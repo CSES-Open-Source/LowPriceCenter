@@ -6,7 +6,7 @@ import admin from "firebase-admin";
 dotenv.config();
 
 export interface AuthenticatedRequest extends Request {
-  user?: any;
+  user?: IUser & Document;
 }
 
 if (!admin.apps.length) {
