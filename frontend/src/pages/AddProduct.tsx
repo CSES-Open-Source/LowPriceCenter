@@ -101,6 +101,7 @@ export function AddProduct() {
             Image
           </label>
           <input
+            name="image"
             id="productImages"
             type="file"
             accept="image/png, image/jpeg"
