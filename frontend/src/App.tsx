@@ -4,7 +4,7 @@ import { PrivateRoute } from "./components/PrivateRoute";
 import { Home } from "src/pages";
 import { Marketplace } from "src/pages/Marketplace";
 import { AddProduct } from "./pages/AddProduct";
-
+import { PageNotFound } from "./pages/PageNotFound";
 import { Navbar } from "src/components/Navbar";
 import { Footer } from "src/components/Footer";
 
@@ -39,6 +39,10 @@ const router = createBrowserRouter([
         <IndividualProductPage />
       </PrivateRoute>
     ),
+  },
+  {
+    path: "*",
+    element: <PageNotFound />,
   },
 ]);
 
