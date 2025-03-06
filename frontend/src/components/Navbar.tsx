@@ -52,7 +52,11 @@ export function Navbar() {
         </button>
         <ul className="hidden md:flex items-center space-x-4 text-xl">
           <li>
-            <button className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue">
+            <button
+              hidden={user == null}
+              onClick={() => (window.location.href = "/products")}
+              className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue"
+            >
               <FontAwesomeIcon
                 className="text-lg pr-2"
                 icon={faCartShopping}
@@ -98,7 +102,11 @@ export function Navbar() {
             transition-transform duration-300 ${isMobileMenuOpen ? "block" : "hidden"}`}
           >
             <li className="mb-2">
-              <button className="font-inter w-full text-center px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue">
+              <button
+                hidden={user == null}
+                onClick={() => (window.location.href = "/products")}
+                className="font-inter w-full text-center px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue"
+              >
                 <FontAwesomeIcon
                   className="text-lg pr-2"
                   icon={faCartShopping}
