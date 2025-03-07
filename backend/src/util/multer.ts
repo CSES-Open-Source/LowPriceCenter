@@ -1,5 +1,4 @@
-import path from "path";
-import multer, { FileFilterCallback } from "multer";
+import multer from "multer";
 
 // Multer configuration for file uploads
 const storage = multer.diskStorage({
