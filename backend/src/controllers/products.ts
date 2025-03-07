@@ -4,7 +4,12 @@ import UserModel from "src/models/user";
 import { AuthenticatedRequest } from "src/validators/authUserMiddleware";
 import mongoose from "mongoose";
 import { bucket } from "src/config/firebase"; // Import Firebase bucket
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid"; // For unique filenames
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "src/config/firebaseConfig";
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 /**
  * get all the products in database
@@ -38,47 +43,51 @@ export const getProductById = async (req: AuthenticatedRequest, res: Response) =
 /**
  * add product to database thru name, price, description, and userEmail
  */
-export const addProduct = async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const { name, price, description } = req.body;
-    console.log(req.body);
-    const userId = req.user.id;
-    const userEmail = req.user.userEmail;
-    if (!name || !price || !userEmail) {
-      return res.status(400).json({ message: "Name, price, and userEmail are required." });
-    }
+export const addProduct = [
+  upload.single("image"),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { name, price, description } = req.body;
+      const userId = req.user.id;
+      const userEmail = req.user.userEmail;
+      if (!name || !price || !userEmail) {
+        return res.status(400).json({ message: "Name, price, and userEmail are required." });
+      }
 
-    let image = "";
-    if (req.file) {
-      const fileName = `${uuidv4()}-${req.file.originalname}`;
-      const file = bucket.file(fileName);
+      let image = "";
+      if (req.file) {
+        const fileName = `${uuidv4()}-${req.file.originalname}`;
+        const file = bucket.file(fileName);
 
-      await file.save(req.file.buffer, {
-        metadata: { contentType: req.file.mimetype },
+        await file.save(req.file.buffer, {
+          metadata: { contentType: req.file.mimetype },
+        });
+
+        const app = initializeApp(firebaseConfig);
+        const storage = getStorage(app);
+        image = await getDownloadURL(ref(storage, fileName));
+      }
+
+      const newProduct = new ProductModel({
+        name,
+        price,
+        description,
+        userEmail,
+        image,
+        timeCreated: new Date(),
+        timeUpdated: new Date(),
       });
 
-      image = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+      const savedProduct = await newProduct.save();
+      await UserModel.findByIdAndUpdate(userId, {
+        $push: { productList: savedProduct._id },
+      });
+      res.status(201).json(savedProduct);
+    } catch (error) {
+      res.status(500).json({ message: "Error adding product", error });
     }
-
-    const newProduct = new ProductModel({
-      name,
-      price,
-      description,
-      userEmail,
-      image, // Save the image URL in MongoDB
-      timeCreated: new Date(),
-      timeUpdated: new Date(),
-    });
-
-    const savedProduct = await newProduct.save();
-    await UserModel.findByIdAndUpdate(userId, {
-      $push: { productList: savedProduct._id },
-    });
-    res.status(201).json(savedProduct);
-  } catch (error) {
-    res.status(500).json({ message: "Error adding product", error });
-  }
-};
+  },
+];
 /**
  * delete product from database thru id
  */
