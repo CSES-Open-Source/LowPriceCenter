@@ -2,13 +2,13 @@ import { useContext, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 import { get } from "src/api/requests";
-// import { FirebaseContext } from "src/utils/FirebaseProvider";
+import { FirebaseContext } from "src/utils/FirebaseProvider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 
 export function IndividualProductPage() {
   const navigate = useNavigate();
-  // const { user } = useContext(FirebaseContext);
+  const { user } = useContext(FirebaseContext);
   let { id } = useParams();
   const [product, setProduct] = useState<{
     name: string;
@@ -18,7 +18,7 @@ export function IndividualProductPage() {
     description: string;
   }>();
   const [error, setError] = useState<String>();
-  // const [canEdit, setCanEdit] = useState<boolean>(false);
+  const [hasPermissions, setHasPermissions] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -29,19 +29,19 @@ export function IndividualProductPage() {
     fetchProduct();
   }, []);
 
-  // useEffect(() => {
-  //   const findEditPermission = async () => {
-  //     const uid = user?.uid;
-  //     if (uid)
-  //       await get(`/api/users/${uid}`).then(async (res) => {
-  //         const ownedByUser = await res.json().then((data) => {
-  //           return data.productList.includes(id);
-  //         });
-  //         setCanEdit(ownedByUser);
-  //       });
-  //   };
-  //   findEditPermission();
-  // }, []);
+  useEffect(() => {
+    const findEditPermission = async () => {
+      const uid = user?.uid;
+      if (uid)
+        await get(`/api/users/${uid}`).then(async (res) => {
+          const ownedByUser = await res.json().then((data) => {
+            return data.productList.includes(id);
+          });
+          setHasPermissions(ownedByUser);
+        });
+    };
+    findEditPermission();
+  }, []);
 
   return (
     <>
@@ -57,12 +57,14 @@ export function IndividualProductPage() {
             &larr; Return to Marketplace
           </button>
 
-          <button
-            className="text-lg mb-4 font-inter hover:underline"
-            onClick={() => navigate(`/edit-product/${id}`)}
-          >
-            Edit Product <FontAwesomeIcon icon={faPenToSquare} />
-          </button>
+          {hasPermissions && (
+            <button
+              className="text-lg mb-4 font-inter hover:underline"
+              onClick={() => navigate(`/edit-product/${id}`)}
+            >
+              Edit Product <FontAwesomeIcon icon={faPenToSquare} />
+            </button>
+          )}
         </div>
         {/* Error message if product not found */}
         {error && <p className="max-w-[80%] w-full px-3 text-red-800">{error}</p>}

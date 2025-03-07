@@ -1,7 +1,7 @@
 import { FormEvent, useRef, useContext, useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
-import { DELETE, get } from "src/api/requests";
+import { DELETE, get, patch } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 
 export function EditProduct() {
@@ -19,10 +19,10 @@ export function EditProduct() {
   const productPrice = useRef<HTMLInputElement>(null);
   const productDescription = useRef<HTMLTextAreaElement>(null);
   const productImages = useRef<HTMLInputElement>(null);
-
   const [currentImage, setCurrentImage] = useState<string | null>(null);
 
   const [error, setError] = useState<boolean>(false);
+
   const { user } = useContext(FirebaseContext);
   const navigate = useNavigate();
 
@@ -54,16 +54,13 @@ export function EditProduct() {
         body.append("description", productDescription.current.value);
         if (user.email) body.append("userEmail", user.email);
         if (image) body.append("image", image);
+        console.log(body.get("price"));
 
-        // const res = await put(`/api/products/${id}`, body);
-        const res = await fetch(`/api/products/${id}`, {
-          method: "PATCH",
-          body,
-        });
+        const res = await patch(`/api/products/${id}`, body);
 
         if (res.ok) {
           setError(false);
-          window.location.href = `/product/${id}`;
+          navigate(`/products/${id}`);
         } else throw Error();
       } else throw Error();
     } catch (err) {
