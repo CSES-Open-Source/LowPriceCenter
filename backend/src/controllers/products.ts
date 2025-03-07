@@ -8,6 +8,7 @@ import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid"; // For unique filenames
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "src/config/firebaseConfig";
+import multer from "multer";
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -116,41 +117,64 @@ export const deleteProductById = async (req: AuthenticatedRequest, res: Response
     res.status(500).json({ message: "Error deleting product", error });
   }
 };
-/**
- * patch product in database thru id and updated parameters in req
- */
-export const updateProductById = async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const id = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid ID format" });
-    }
-    const updates = req.body;
-    const userId = req.user.id;
-    const user = await UserModel.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+// /**
+//  * patch product in database thru id and updated parameters in req
+//  */
+export const updateProductById = [
+  upload.single("image"),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const id = req.params.id;
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
 
-    if (!user.productList.includes(id)) {
-      return res.status(400).json({ message: "User does not own this product" });
+      const userId = req.user.id;
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (!user.productList.includes(id)) {
+        return res.status(400).json({ message: "User does not own this product" });
+      }
+
+      const updates: any = {
+        name: req.body.name,
+        price: req.body.price,
+        description: req.body.description,
+        timeUpdated: new Date(),
+      };
+
+      if (req.file) {
+        const fileName = `${uuidv4()}-${req.file.originalname}`;
+        const file = bucket.file(fileName);
+
+        await file.save(req.file.buffer, {
+          metadata: { contentType: req.file.mimetype },
+        });
+
+        const app = initializeApp(firebaseConfig);
+        const storage = getStorage(app);
+        updates.image = await getDownloadURL(ref(storage, fileName));
+      }
+
+      const updatedProduct = await ProductModel.findByIdAndUpdate(
+        id,
+        updates,
+        { new: true }
+      );
+
+      if (!updatedProduct) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      res.status(200).json({
+        message: "Product successfully updated",
+        updatedProduct,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error patching product", error });
     }
-
-    const updatedProduct = await ProductModel.findByIdAndUpdate(
-      id,
-      { ...updates, timeUpdated: new Date() },
-      { new: true },
-    );
-
-    if (!updatedProduct) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    res.status(200).json({
-      message: "Product successfully updated",
-      updatedProduct,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Error patching product", error });
-  }
-};
+  },
+];

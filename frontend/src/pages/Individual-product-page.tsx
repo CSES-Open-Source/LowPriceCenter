@@ -1,10 +1,14 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 import { get } from "src/api/requests";
+import { FirebaseContext } from "src/utils/FirebaseProvider";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 
 export function IndividualProductPage() {
   const navigate = useNavigate();
+  const { user } = useContext(FirebaseContext);
   let { id } = useParams();
   const [product, setProduct] = useState<{
     name: string;
@@ -14,6 +18,7 @@ export function IndividualProductPage() {
     description: string;
   }>();
   const [error, setError] = useState<String>();
+  const [hasPermissions, setHasPermissions] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -24,18 +29,43 @@ export function IndividualProductPage() {
     fetchProduct();
   }, []);
 
+  useEffect(() => {
+    const findEditPermission = async () => {
+      const uid = user?.uid;
+      if (uid)
+        await get(`/api/users/${uid}`).then(async (res) => {
+          const ownedByUser = await res.json().then((data) => {
+            return data.productList.includes(id);
+          });
+          setHasPermissions(ownedByUser);
+        });
+    };
+    findEditPermission();
+  }, []);
+
   return (
     <>
       <Helmet>
         <title>{`${product?.name} - Low-Price Center`}</title>
       </Helmet>
       <main className="w-[80%] max-w-screen-2xl mx-auto m-12">
-        <button
-          className="text-lg mb-4 font-inter hover:underline"
-          onClick={() => navigate("/products")}
-        >
-          &larr; Return to Marketplace
-        </button>
+        <div className="flex justify-between">
+          <button
+            className="text-lg mb-4 font-inter hover:underline"
+            onClick={() => navigate("/products")}
+          >
+            &larr; Return to Marketplace
+          </button>
+
+          {hasPermissions && (
+            <button
+              className="text-lg mb-4 font-inter hover:underline"
+              onClick={() => navigate(`/edit-product/${id}`)}
+            >
+              Edit Product <FontAwesomeIcon icon={faPenToSquare} />
+            </button>
+          )}
+        </div>
         {/* Error message if product not found */}
         {error && <p className="max-w-[80%] w-full px-3 text-red-800">{error}</p>}
         {/* Display product */}
@@ -46,7 +76,6 @@ export function IndividualProductPage() {
               <div className="max-h-[32rem] h-[32rem] max-w-[32rem] w-[32rem] relative border-8 border-ucsd-blue">
                 <img
                   src={product?.image ? product?.image : "/productImages/product-placeholder.webp"}
-                  // src="/ucsd-pricecenter.png"
                   alt="Product"
                   className="w-full h-full object-cover"
                 />
