@@ -47,8 +47,6 @@ export const addProduct = [
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { name, price, description } = req.body;
-      console.log("Headers:", req.headers["content-type"]); // Debugging
-      console.log("Body:", req.body);
       const userId = req.user.id;
       const userEmail = req.user.userEmail;
       if (!name || !price || !userEmail) {
@@ -72,7 +70,7 @@ export const addProduct = [
         price,
         description,
         userEmail,
-        image, // Save the image URL in MongoDB
+        image,
         timeCreated: new Date(),
         timeUpdated: new Date(),
       });
