@@ -101,6 +101,7 @@ export function AddProduct() {
             Image
           </label>
           <input
+            name="image"
             id="productImages"
             type="file"
             accept="image/png, image/jpeg"
@@ -113,7 +114,7 @@ export function AddProduct() {
           {error && <p className="text-sm text-red-800">Error adding product. Try again.</p>}
           <button
             type="submit"
-            className="bg-[#00629B] text-white font-semibold font-inter py-2 px-4 shadow-lg"
+            className="bg-[#00629B] text-white font-semibold font-inter py-2 px-4 shadow-lg hover:brightness-90 transition-all"
           >
             Submit
           </button>

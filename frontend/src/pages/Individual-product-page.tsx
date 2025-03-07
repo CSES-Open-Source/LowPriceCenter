@@ -102,7 +102,7 @@ export function IndividualProductPage() {
                 <p className="font-inter text-black text-base md:text-xl font-light">
                   Interested? Contact them here:
                 </p>
-                <p className="font-inter text-black text-base md:text-xl font-medium break-words">
+                <p className="font-inter text-black hover:text-ucsd-darkblue text-base md:text-xl font-medium break-words transition-colors">
                   <a href={`mailto:${product?.userEmail}`}>{product?.userEmail}</a>
                 </p>
               </div>

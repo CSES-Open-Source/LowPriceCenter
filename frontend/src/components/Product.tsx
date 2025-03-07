@@ -7,7 +7,7 @@ interface Props {
 
 function Product({ productId, productImage, productName, productPrice }: Props) {
   return (
-    <div className="w-full bg-[#F8F8F8] shadow-xl">
+    <div className="w-full bg-[#F8F8F8] shadow-lg rounded-lg hover:brightness-[96%] transition-all overflow-clip">
       <a href={`/products/${productId}`}>
         <div className="max-h-[16rem] h-[16rem] overflow-hidden">
           <img className="w-full h-full object-cover" src={productImage} alt="" />
