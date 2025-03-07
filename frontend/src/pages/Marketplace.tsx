@@ -33,7 +33,7 @@ export function Marketplace() {
           <div id="grid-header" className="flex justify-between flex-wrap mb-2 px-3">
             <p className="text-lg sm:text-3xl font-jetbrains font-medium">Marketplace</p>
             <button
-              className="bg-[#00629B] text-white text-[0.6rem] font-inter font-semibold px-1 py-2 sm:text-base sm:px-4 shadow-lg"
+              className="bg-[#00629B] text-white text-[0.6rem] font-inter font-semibold px-1 py-2 sm:text-base sm:px-4 shadow-lg hover:brightness-90 transition-all"
               onClick={() => (window.location.href = "/add-product")}
             >
               Add Product
