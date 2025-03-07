@@ -8,6 +8,7 @@ import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid"; // For unique filenames
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "src/config/firebaseConfig";
+import multer from "multer";
 
 const upload = multer({ storage: multer.memoryStorage() });
 

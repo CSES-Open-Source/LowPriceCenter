@@ -8,7 +8,7 @@ import { getToken } from "src/utils/User";
 /**
  * A custom type defining which HTTP methods we will handle in this file
  */
-type Method = "GET" | "POST" | "PUT";
+type Method = "GET" | "POST" | "PUT" | "DELETE";
 
 /**
  * The first part of the backend API URL, which we will automatically prepend to
@@ -135,6 +135,21 @@ export async function put(
 ): Promise<Response> {
   const response = await fetchRequest("PUT", API_BASE_URL + url, body, headers);
   void (await assertOk(response).catch());
+  return response;
+}
+
+/**
+ * Sends a GET request to the provided API URL.
+ *
+ * @param url The URL to request
+ * @param headers The headers of the request (optional)
+ * @returns The Response object returned by `fetch()`
+ */
+export async function DELETE(url: string, headers: Record<string, string> = {}): Promise<Response> {
+  const response = await fetchRequest("DELETE", API_BASE_URL + url, undefined, headers);
+  void (await assertOk(response).catch((e) => {
+    throw e;
+  }));
   return response;
 }
 

@@ -1,7 +1,7 @@
 import { FormEvent, useRef, useContext, useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
-import { get, post, put } from "src/api/requests";
+import { DELETE, get } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 
 export function EditProduct() {
@@ -55,7 +55,11 @@ export function EditProduct() {
         if (user.email) body.append("userEmail", user.email);
         if (image) body.append("image", image);
 
-        const res = await put(`/api/products/${id}`, body);
+        // const res = await put(`/api/products/${id}`, body);
+        const res = await fetch(`/api/products/${id}`, {
+          method: "PATCH",
+          body,
+        });
 
         if (res.ok) {
           setError(false);
@@ -70,15 +74,14 @@ export function EditProduct() {
   const handleDelete = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch(`/api/products/${id}`, {
-        method: "DELETE",
-      });
+      const res = await DELETE(`/api/products/${id}`);
 
       if (res.ok) {
         setError(false);
         window.location.href = "/products";
       } else throw Error();
     } catch (err) {
+      console.error(err);
       setError(true);
     }
   };
