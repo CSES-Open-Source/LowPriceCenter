@@ -43,7 +43,7 @@ export const getProductById = async (req: AuthenticatedRequest, res: Response) =
  * add product to database thru name, price, description, and userEmail
  */
 export const addProduct = [
-  upload.fields([{ name: "image", maxCount: 5 }]), // Handle both file & form data
+  upload.single("image"),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { name, price, description } = req.body;
