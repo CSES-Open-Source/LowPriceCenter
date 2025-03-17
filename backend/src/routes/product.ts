@@ -1,15 +1,18 @@
-/**
- * Product route requests.
- */
-
 import express from "express";
-import ProductModel from "src/models/product";
-
+import {
+  getProducts,
+  getProductById,
+  addProduct,
+  deleteProductById,
+  updateProductById,
+} from "src/controllers/products";
+import { authenticateUser } from "src/validators/authUserMiddleware";
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  const products = await ProductModel.find();
-  res.status(200).json(products);
-});
+router.get("/", authenticateUser, getProducts);
+router.get("/:id", authenticateUser, getProductById);
+router.post("/", authenticateUser, addProduct);
+router.delete("/:id", authenticateUser, deleteProductById);
+router.patch("/:id", authenticateUser, updateProductById);
 
 export default router;

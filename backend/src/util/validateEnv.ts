@@ -9,4 +9,6 @@ import { port, str } from "envalid/dist/validators";
 export default cleanEnv(process.env, {
   PORT: port(),
   MONGODB_URI: str(),
+  FIREBASE_PRIVATE_KEY_BASE64: str(),
+  FIREBASE_PROJECT_ID: str(),
 });
