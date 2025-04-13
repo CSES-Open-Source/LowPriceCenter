@@ -1,28 +1,11 @@
-import { Key, useEffect, useState } from "react";
+import { Key, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { get } from "src/api/requests";
 import Product from "src/components/Product";
 import SearchBar from "src/components/SearchBar";
 
 export function Marketplace() {
   const [products, setProducts] = useState<[]>();
-  const [error, setError] = useState<boolean>(false);
-
-  // Handles getting list of products from API
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await get("/api/products/");
-        const productData = await response.json();
-        setProducts(productData);
-        setError(false);
-      } catch (err) {
-        setError(true);
-        setProducts([]);
-      }
-    };
-    fetchProducts();
-  }, []);
+  const [error, setError] = useState<string>("");
 
   return (
     <>
@@ -40,12 +23,12 @@ export function Marketplace() {
               Add Product
             </button>
           </div>
-          <SearchBar />
+          <SearchBar setProducts={setProducts} setError={setError} />
           {/* Error message if products cannot be displayed */}
-          {error && (
-            <p className="max-w-[80%] w-full px-3 text-red-800">
-              Unable to display products. Try again later.
-            </p>
+          {error && <p className="max-w-[80%] w-full px-3 pt-3 text-red-800">{error}</p>}
+          {/* if no products are available */}
+          {!error && products?.length === 0 && (
+            <p className="max-w-[80%] font-inter text-lg w-full px-3 pt-3">No products available</p>
           )}
           {/* Grid of products */}
           <div
