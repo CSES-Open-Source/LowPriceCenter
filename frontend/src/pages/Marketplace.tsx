@@ -2,6 +2,7 @@ import { Key, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { get } from "src/api/requests";
 import Product from "src/components/Product";
+import SearchBar from "src/components/SearchBar";
 
 export function Marketplace() {
   const [products, setProducts] = useState<[]>();
@@ -39,6 +40,7 @@ export function Marketplace() {
               Add Product
             </button>
           </div>
+          <SearchBar />
           {/* Error message if products cannot be displayed */}
           {error && (
             <p className="max-w-[80%] w-full px-3 text-red-800">
