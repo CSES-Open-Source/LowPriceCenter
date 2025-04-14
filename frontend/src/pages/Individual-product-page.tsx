@@ -5,7 +5,7 @@ import { get } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
-
+import { post } from "src/api/requests";
 export function IndividualProductPage() {
   const navigate = useNavigate();
   const { user } = useContext(FirebaseContext);
@@ -17,6 +17,7 @@ export function IndividualProductPage() {
     userEmail: string;
     description: string;
   }>();
+  const [message, setMessage] = useState("");
   const [error, setError] = useState<String>();
   const [hasPermissions, setHasPermissions] = useState<boolean>(false);
 
@@ -42,7 +43,24 @@ export function IndividualProductPage() {
     };
     findEditPermission();
   }, []);
-
+  const handleSendInterestEmail = async () => {
+    const consumerId = user?.uid;
+    const productId = id;
+    try {
+      const response = await post("/api/interestEmail", { consumerId, productId });
+      const result = await response.json();
+      if (!response.ok) {
+        setMessage(`Error: ${result.message}`);
+        console.error("Error sending interest email:", result.message);
+      } else {
+        setMessage("Interest email sent successfully!");
+        console.log("Interest email sent successfully:", result.message);
+      }
+    } catch (error) {
+      console.error("An unexpected error occurred:", error);
+      setMessage("An unexpected error occurred.");
+    }
+  };
   return (
     <>
       <Helmet>
@@ -100,14 +118,18 @@ export function IndividualProductPage() {
                   </p>
                 </div>
               )}
-              <div className="mt-0">
-                <p className="font-inter text-black text-base md:text-xl font-light">
-                  Interested? Contact them here:
-                </p>
-                <p className="font-inter text-black hover:text-ucsd-darkblue text-base md:text-xl font-medium break-words transition-colors">
-                  <a href={`mailto:${product?.userEmail}`}>{product?.userEmail}</a>
-                </p>
-              </div>
+              {!hasPermissions && (
+                <div className="mt-0">
+                  <p className="font-inter text-black text-base md:text-xl font-light">
+                    Interested? Contact them here: {product?.userEmail}
+                  </p>
+
+                  <button onClick={handleSendInterestEmail}>Click to Send Interest Email</button>
+                  {/* <p className="font-inter text-black hover:text-ucsd-darkblue text-base md:text-xl font-medium break-words transition-colors">
+                    <a href={`mailto:${product?.userEmail}`}>{product?.userEmail}</a>
+                  </p> */}
+                </div>
+              )}
             </section>
           </div>
         )}

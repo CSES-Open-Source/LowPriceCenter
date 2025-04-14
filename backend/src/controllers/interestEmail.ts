@@ -29,9 +29,10 @@ export const handleInterestEmail = async (
   }
   const productName = product.name;
   const sellerEmail = product?.userEmail;
-  const consumer = await UserModel.findById(consumerId);
-
+  const consumer = await UserModel.findOne({ firebaseUid: consumerId });
+  console.log(consumer);
   if (!consumer) {
+    console.log("not working");
     res.status(404).json({ message: "Consumer not found" });
     return;
   }
@@ -40,7 +41,7 @@ export const handleInterestEmail = async (
 
   const EMAIL_SUBJECT = `${consumerName} is interested in one of your products on Low-Price Center`;
   const EMAIL_BODY = `${consumerName} is interested in your listing of ${productName}. \nPlease reach out to ${consumerName} for more details!\nTheir email is ${consumerEmail}`;
-
+  console.log("reached");
   try {
     validationErrorParser(errors);
     const transporter = nodemailer.createTransport({
