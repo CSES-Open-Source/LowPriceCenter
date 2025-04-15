@@ -41,6 +41,23 @@ export const getProductById = async (req: AuthenticatedRequest, res: Response) =
     res.status(500).json({ message: "Error getting product", error });
   }
 };
+
+/*
+ * search for product by name
+ */
+export const getProductsByName = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const query = req.params.query;
+    const products = await ProductModel.find({ name: { $regex: query, $options: "i" }});
+    if (!products) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: "Error getting product", error });
+  }
+}
+
 /**
  * add product to database thru name, price, description, and userEmail
  */
@@ -117,6 +134,7 @@ export const deleteProductById = async (req: AuthenticatedRequest, res: Response
     res.status(500).json({ message: "Error deleting product", error });
   }
 };
+
 // /**
 //  * patch product in database thru id and updated parameters in req
 //  */
