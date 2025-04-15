@@ -73,14 +73,14 @@ export default function FirebaseProvider({ children }: { children: ReactNode }) 
             setUser(u);
           })
           .catch(async (e) => {
-            if (e.message == '404 Not Found: {"message":"User not found"}') {
+            if (e.message === '404 Not Found: {"message":"User not found"}') {
               await post(`/api/users`, { firebaseUid: u.uid })
                 .then(() => {
                   setUser(u);
                 })
-                .catch((e) => {
+                .catch((e2) => {
                   signOutFromFirebase();
-                  console.error(e);
+                  console.error(e2);
                 });
             } else {
               signOutFromFirebase();

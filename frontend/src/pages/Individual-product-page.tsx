@@ -9,7 +9,7 @@ import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 export function IndividualProductPage() {
   const navigate = useNavigate();
   const { user } = useContext(FirebaseContext);
-  let { id } = useParams();
+  const { id } = useParams();
   const [product, setProduct] = useState<{
     name: string;
     price: number;
@@ -17,7 +17,7 @@ export function IndividualProductPage() {
     userEmail: string;
     description: string;
   }>();
-  const [error, setError] = useState<String>();
+  const [error, setError] = useState<string>();
   const [hasPermissions, setHasPermissions] = useState<boolean>(false);
 
   useEffect(() => {
