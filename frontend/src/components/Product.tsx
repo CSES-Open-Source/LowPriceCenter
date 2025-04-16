@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 interface Props {
   productImages: string[];
   productId: string;
@@ -6,9 +8,21 @@ interface Props {
 }
 
 function Product({ productId, productImages, productName, productPrice }: Props) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handlePrev = (event: React.MouseEvent) => {
+    event.preventDefault();
+    setCurrentIndex((prevIndex) => (prevIndex === 0 ? productImages.length - 1 : prevIndex - 1));
+  };
+
+  const handleNext = (event: React.MouseEvent) => {
+    event.preventDefault();
+    setCurrentIndex((prevIndex) => (prevIndex === productImages.length - 1 ? 0 : prevIndex + 1));
+  };
+
   const displayImage =
     productImages && productImages.length > 0
-      ? productImages[0]
+      ? productImages[currentIndex]
       : "/productImages/product-placeholder.webp";
 
   return (
