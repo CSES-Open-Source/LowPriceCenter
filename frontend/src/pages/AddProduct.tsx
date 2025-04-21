@@ -15,9 +15,9 @@ export function AddProduct() {
     e.preventDefault();
     try {
       if (productName.current && productPrice.current && productDescription.current && user) {
-        let image;
+        let images;
         if (productImages.current && productImages.current.files) {
-          image = productImages.current.files[0];
+          images = productImages.current.files[0];
         }
 
         const body = new FormData();
@@ -25,7 +25,12 @@ export function AddProduct() {
         body.append("price", productPrice.current.value);
         body.append("description", productDescription.current.value);
         if (user.email) body.append("userEmail", user.email);
-        if (image) body.append("image", image);
+
+        if (productImages.current && productImages.current.files) {
+          Array.from(productImages.current.files).forEach((file) => {
+            body.append("images", file);
+          });
+        }
 
         const res = await post("/api/products", body);
 
@@ -98,12 +103,13 @@ export function AddProduct() {
         {/* Product Image */}
         <div className="mb-5">
           <label htmlFor="productImages" className="block mb-2 font-medium font-inter text-black">
-            Image
+            Images
           </label>
           <input
-            name="image"
+            name="images"
             id="productImages"
             type="file"
+            multiple
             accept="image/png, image/jpeg"
             ref={productImages}
             className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5 y-600"
