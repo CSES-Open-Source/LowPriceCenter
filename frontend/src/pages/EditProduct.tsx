@@ -10,7 +10,7 @@ export function EditProduct() {
   const [product, setProduct] = useState<{
     name: string;
     price: number;
-    image: string;
+    images: string[];
     userEmail: string;
     description: string;
   }>();
@@ -53,8 +53,11 @@ export function EditProduct() {
         body.append("price", productPrice.current.value);
         body.append("description", productDescription.current.value);
         if (user.email) body.append("userEmail", user.email);
-        if (image) body.append("image", image);
-        console.log(body.get("price"));
+        if (productImages.current && productImages.current.files) {
+          Array.from(productImages.current.files).forEach((file) => {
+            body.append("images", file);
+          });
+        }
 
         const res = await patch(`/api/products/${id}`, body);
 
@@ -155,6 +158,7 @@ export function EditProduct() {
             Image
           </label>
           <input
+            name="images"
             id="productImages"
             type="file"
             accept="image/png, image/jpeg"

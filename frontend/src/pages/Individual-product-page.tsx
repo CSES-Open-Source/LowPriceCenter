@@ -13,12 +13,26 @@ export function IndividualProductPage() {
   const [product, setProduct] = useState<{
     name: string;
     price: number;
-    image: string;
+    images: string[];
     userEmail: string;
     description: string;
   }>();
   const [error, setError] = useState<string>();
   const [hasPermissions, setHasPermissions] = useState<boolean>(false);
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handlePrev = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 && product?.images?.length ? product.images.length - 1 : prevIndex - 1,
+    );
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prevIndex) =>
+      product?.images && prevIndex === product.images.length - 1 ? 0 : prevIndex + 1,
+    );
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -75,10 +89,30 @@ export function IndividualProductPage() {
             <section className="w-full flex-1 flex justify-center md:h-auto">
               <div className="max-h-[32rem] h-[32rem] max-w-[32rem] w-[32rem] relative border-8 border-ucsd-blue">
                 <img
-                  src={product?.image ? product?.image : "/productImages/product-placeholder.webp"}
-                  alt="Product"
+                  src={
+                    product?.images && product.images.length > 0
+                      ? product.images[currentIndex]
+                      : "/productImages/product-placeholder.webp"
+                  }
+                  alt={`Image ${currentIndex + 1} of ${product?.name}`}
                   className="w-full h-full object-cover"
                 />
+                {product?.images && product.images.length > 1 && (
+                  <>
+                    <button
+                      className="absolute top-1/2 left-0 px-2 py-1 text-sm"
+                      onClick={handlePrev}
+                    >
+                      ‹
+                    </button>
+                    <button
+                      className="absolute top-1/2 right-0 px-2 py-1 text-sm"
+                      onClick={handleNext}
+                    >
+                      ›
+                    </button>
+                  </>
+                )}
               </div>
             </section>
 
