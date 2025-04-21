@@ -1,17 +1,45 @@
-import { FormEvent, useContext, useRef, useState } from "react";
+import { FormEvent, useContext, useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { post } from "src/api/requests";
+import { useNavigate, useParams } from "react-router-dom";
+import { DELETE, get, patch } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 
-export function AddProduct() {
+export function EditProduct() {
+  const { id } = useParams();
+
+  const [product, setProduct] = useState<{
+    name: string;
+    price: number;
+    image: string;
+    userEmail: string;
+    description: string;
+  }>();
+
   const productName = useRef<HTMLInputElement>(null);
   const productPrice = useRef<HTMLInputElement>(null);
   const productDescription = useRef<HTMLTextAreaElement>(null);
   const productImages = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState<boolean>(false);
-  const { user } = useContext(FirebaseContext);
+  const [currentImage, setCurrentImage] = useState<string | null>(null);
 
-  const handleSubmit = async (e: FormEvent) => {
+  const [error, setError] = useState<boolean>(false);
+
+  const { user } = useContext(FirebaseContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      await get(`/api/products/${id}`)
+        .then(async (res) => {
+          const productData = await res.json();
+          setProduct(productData);
+          setCurrentImage(productData.image);
+        })
+        .catch(() => setError(true));
+    };
+    fetchProduct();
+  }, [id]);
+
+  const handleEdit = async (e: FormEvent) => {
     e.preventDefault();
     try {
       if (productName.current && productPrice.current && productDescription.current && user) {
@@ -26,16 +54,39 @@ export function AddProduct() {
         body.append("description", productDescription.current.value);
         if (user.email) body.append("userEmail", user.email);
         if (image) body.append("image", image);
+        console.log(body.get("price"));
 
-        const res = await post("/api/products", body);
+        const res = await patch(`/api/products/${id}`, body);
 
         if (res.ok) {
           setError(false);
-          window.location.href = "/products";
+          navigate(`/products/${id}`);
         } else throw Error();
       } else throw Error();
     } catch (err) {
       setError(true); //displays an error message to the user
+    }
+  };
+
+  const handleDelete = async (e: FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await DELETE(`/api/products/${id}`);
+
+      if (res.ok) {
+        setError(false);
+        window.location.href = "/products";
+      } else throw Error();
+    } catch (err) {
+      console.error(err);
+      setError(true);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setCurrentImage(URL.createObjectURL(file));
     }
   };
 
@@ -45,9 +96,9 @@ export function AddProduct() {
         <title>Low-Price Center Marketplace</title>
       </Helmet>
       <div className="w-full mt-12 mb-6">
-        <p className="text-3xl text-center font-jetbrains font-medium">Add Product</p>
+        <p className="text-3xl text-center font-jetbrains font-medium">Edit Product</p>
       </div>
-      <form className="max-w-sm mx-auto p-4" onSubmit={handleSubmit}>
+      <form className="max-w-sm mx-auto p-4" onSubmit={handleEdit}>
         {/* Product Name */}
         <div className="mb-5">
           <label htmlFor="productName" className="block mb-2 font-medium font-inter text-black">
@@ -56,6 +107,7 @@ export function AddProduct() {
           <input
             id="productName"
             type="text"
+            defaultValue={product?.name}
             ref={productName}
             className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5 y-600"
             placeholder="Product Name"
@@ -73,6 +125,7 @@ export function AddProduct() {
             min={0}
             max={1000000000}
             step={0.01}
+            defaultValue={product?.price}
             ref={productPrice}
             className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5 y-600"
             placeholder="$0.00"
@@ -90,6 +143,7 @@ export function AddProduct() {
           <textarea
             id="productDescription"
             rows={10}
+            defaultValue={product?.description}
             ref={productDescription}
             className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5 y-600"
             placeholder="Tell us more about this product..."
@@ -101,24 +155,45 @@ export function AddProduct() {
             Image
           </label>
           <input
-            name="image"
             id="productImages"
             type="file"
             accept="image/png, image/jpeg"
+            onChange={handleImageChange}
             ref={productImages}
             className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5 y-600"
           />
+          {currentImage && (
+            <img className="w-full aspect-square mt-2" src={currentImage} alt="Product" />
+          )}
         </div>
-        <div className="flex justify-end gap-3">
-          {/* error message */}
-          {error && <p className="text-sm text-red-800">Error adding product. Try again.</p>}
+        <div className="flex justify-between gap-3">
           <button
-            type="submit"
-            className="bg-[#00629B] text-white font-semibold font-inter py-2 px-4 shadow-lg hover:brightness-90 transition-all"
+            onClick={() => navigate(`/products/${id}`)}
+            className="bg-[#00629B] text-white font-semibold font-inter py-2 px-4 shadow-lg"
           >
-            Submit
+            Cancel
           </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleDelete}
+              className="bg-[#DC3545] text-white font-semibold font-inter py-2 px-4 shadow-lg"
+            >
+              Delete
+            </button>
+            <button
+              type="submit"
+              className="bg-[#00629B] text-white font-semibold font-inter py-2 px-4 shadow-lg"
+            >
+              Done
+            </button>
+          </div>
         </div>
+        {/* error message */}
+        {error && (
+          <p className="m-2 mt-4 text-sm text-red-800 text-center">
+            Error editing product. Try again.
+          </p>
+        )}
       </form>
     </>
   );

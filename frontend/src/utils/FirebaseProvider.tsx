@@ -1,6 +1,9 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { GoogleAuthProvider, User, getAuth, signInWithPopup, signOut } from "firebase/auth";
 import { MouseEventHandler, ReactNode, createContext, useEffect, useState } from "react";
+import { get, post } from "src/api/requests";
+
+import { firebaseConfig } from "src/utils/FirebaseConfig";
 
 /**
  * Context used by FirebaseProvider to provide app and user to pages
@@ -20,20 +23,6 @@ const FirebaseContext = createContext<{
 });
 
 /**
- * Config information for Firebase.
- * May be moved to environmental variables later.
- */
-export const firebaseConfig = {
-  apiKey: "AIzaSyBssbaMlxIJHYI7G7zOriU0VaWGnGrQv5M",
-  authDomain: "low-price-center.firebaseapp.com",
-  projectId: "low-price-center",
-  storageBucket: "low-price-center.firebasestorage.app",
-  messagingSenderId: "163704233704",
-  appId: "1:163704233704:web:6ee0dc540f6f25d6ceb35d",
-  measurementId: "G-RV7RV9W17W",
-};
-
-/**
  * Wraps children in FirebaseContext.Provider to give all
  * children access to sustained Firebase app and user
  * data.
@@ -51,7 +40,6 @@ export default function FirebaseProvider({ children }: { children: ReactNode }) 
     await signInWithPopup(auth, provider).catch((error) => {
       console.error(error);
     });
-    window.location.href = "/marketplace";
   }
 
   /*sign out*/
@@ -65,8 +53,28 @@ export default function FirebaseProvider({ children }: { children: ReactNode }) 
    * the state of the user.
    */
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((u) => {
-      setUser(u);
+    const unsubscribe = auth.onAuthStateChanged(async (u) => {
+      if (!u) setUser(null);
+      else {
+        await get(`/api/users/${u.uid}`)
+          .then(() => {
+            setUser(u);
+          })
+          .catch(async (e) => {
+            if (e.message === '404 Not Found: {"message":"User not found"}') {
+              await post(`/api/users`, { firebaseUid: u.uid })
+                .then(() => {
+                  setUser(u);
+                })
+                .catch((e2) => {
+                  signOutFromFirebase();
+                  console.error(e2);
+                });
+            } else {
+              signOutFromFirebase();
+            }
+          });
+      }
       setLoading(false);
     });
     return unsubscribe;

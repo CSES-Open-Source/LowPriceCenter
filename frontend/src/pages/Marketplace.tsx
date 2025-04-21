@@ -1,27 +1,11 @@
-import { Key, useEffect, useState } from "react";
+import { Key, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { get } from "src/api/requests";
 import Product from "src/components/Product";
+import SearchBar from "src/components/SearchBar";
 
 export function Marketplace() {
   const [products, setProducts] = useState<[]>();
-  const [error, setError] = useState<boolean>(false);
-
-  // Handles getting list of products from API
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await get("/api/products/");
-        const productData = await response.json();
-        setProducts(productData);
-        setError(false);
-      } catch (err) {
-        setError(true);
-        setProducts([]);
-      }
-    };
-    fetchProducts();
-  }, []);
+  const [error, setError] = useState<string>("");
 
   return (
     <>
@@ -31,19 +15,20 @@ export function Marketplace() {
       <main className="w-full flex justify-center items-center mt-12 mb-20">
         <div className="max-w-[80%] w-full">
           <div id="grid-header" className="flex justify-between flex-wrap mb-2 px-3">
-            <p className="text-3xl font-mono font-medium">Marketplace</p>
+            <p className="text-lg sm:text-3xl font-jetbrains font-medium">Marketplace</p>
             <button
-              className="bg-[#00629B] text-white font-semibold py-2 px-4 shadow-lg"
+              className="bg-[#00629B] text-white text-[0.6rem] font-inter font-semibold px-1 py-2 sm:text-base sm:px-4 shadow-lg hover:brightness-90 transition-all"
               onClick={() => (window.location.href = "/add-product")}
             >
               Add Product
             </button>
           </div>
+          <SearchBar setProducts={setProducts} setError={setError} />
           {/* Error message if products cannot be displayed */}
-          {error && (
-            <p className="max-w-[80%] w-full px-3 text-red-800">
-              Unable to display products. Try again later.
-            </p>
+          {error && <p className="max-w-[80%] w-full px-3 pt-3 text-red-800">{error}</p>}
+          {/* if no products are available */}
+          {!error && products?.length === 0 && (
+            <p className="max-w-[80%] font-inter text-lg w-full px-3 pt-3">No products available</p>
           )}
           {/* Grid of products */}
           <div
@@ -53,11 +38,12 @@ export function Marketplace() {
             {products &&
               products.map(
                 (
-                  product: { name: string; price: number; images: string[] },
+                  product: { _id: string; name: string; price: number; images: string[] },
                   index: Key | null | undefined,
                 ) => (
                   <div key={index} className="px-3 py-3">
                     <Product
+                      productId={product._id}
                       productName={product.name}
                       productPrice={product.price}
                       productImages={

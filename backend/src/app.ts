@@ -7,7 +7,8 @@ import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import { isHttpError } from "http-errors";
 import productRoutes from "src/routes/product";
-
+import userRoutes from "src/routes/user";
+import interestEmailRoute from "src/routes/interestEmail";
 const app = express();
 
 // initializes Express to accept JSON in the request/response body
@@ -25,7 +26,8 @@ app.use(
 );
 
 app.use("/api/products", productRoutes);
-
+app.use("/api/users", userRoutes);
+app.use("/api/interestEmail", interestEmailRoute);
 /**
  * Error handler; all errors thrown by server are handled here.
  * Explicit typings required here because TypeScript cannot infer the argument types.
