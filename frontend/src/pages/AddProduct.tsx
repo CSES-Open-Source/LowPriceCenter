@@ -2,15 +2,7 @@ import { FormEvent, useRef, useContext, useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { post } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
-
-const tags = [
-  "Electronics",
-  "School Supplies",
-  "Dorm Essentials",
-  "Furniture",
-  "Clothes",
-  "Miscellaneous",
-];
+import { tags } from "../utils/constants.tsx";
 
 export function AddProduct() {
   const productName = useRef<HTMLInputElement>(null);

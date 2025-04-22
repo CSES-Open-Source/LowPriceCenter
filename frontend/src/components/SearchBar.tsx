@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { get } from "src/api/requests";
+import { FaFilter } from "react-icons/fa6";
+import { tags } from "../utils/constants.tsx";
 
 interface Props {
   setProducts: (products: []) => void;
@@ -41,12 +43,56 @@ export default function SearchBar({ setProducts, setError }: Props) {
     search();
   }, [query]);
 
+  // handle dropdown display
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        dropdownRef.current.hidden = true;
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <input
-      type="text"
-      onChange={(e) => setQuery(e.target.value)}
-      placeholder="Search for a product..."
-      className="w-full bg-[#F8F8F8] shadow-md p-3 px-6 mx-auto my-2 rounded-3xl"
-    />
+    <>
+      <div className="relative w-full my-2">
+        <input
+          type="text"
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search for a product..."
+          className="w-full bg-[#F8F8F8] shadow-md p-3 pr-12 pl-6 rounded-3xl"
+        />
+        <div ref={buttonRef}>
+          <FaFilter
+            onClick={() => {
+              if (dropdownRef.current) dropdownRef.current.hidden = !dropdownRef.current?.hidden;
+            }}
+            className="absolute right-6 top-1/2 transform -translate-y-1/2 text-[#00629B] text-[1.2rem] cursor-pointer"
+          />
+        </div>
+      </div>
+      <div
+        ref={dropdownRef}
+        className="absolute right-36 z-10 mt-1 min-w-60 rounded-md ring-1 shadow-lg ring-black/5 focus:outline-hidden"
+      >
+        <div className="py-3 max-h-35 overflow-y-auto bg-white rounded-md">
+          <span className="font-semibold font-inter text-base px-4">Category</span>
+          {tags.map((tag, index) => (
+            <div key={index} className="px-4 flex flex-row gap-2">
+              <input type="checkbox" id={tag} name={tag} value={tag} />
+              <label className="font-inter"> {tag}</label>
+              <br />
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
   );
 }
