@@ -1,4 +1,4 @@
-import { FormEvent, useRef, useContext, useState } from "react";
+import { FormEvent, useRef, useContext, useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { post } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
@@ -20,6 +20,23 @@ export function AddProduct() {
   const [productTags, setProductTags] = useState<Array<string>>([]);
   const [error, setError] = useState<boolean>(false);
   const { user } = useContext(FirebaseContext);
+
+  // handle dropdown display
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        dropdownRef.current.hidden = true;
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -130,6 +147,10 @@ export function AddProduct() {
           <div
             id="productTags"
             className="flex flex-row max-w-full flex-wrap gap-2 border border-gray-300 text-black text-sm rounded-md w-full p-2.5 min-h-10 hover:cursor-pointer"
+            onClick={() => {
+              if (dropdownRef.current) dropdownRef.current.hidden = false;
+            }}
+            ref={buttonRef}
           >
             {productTags.map((tag) => (
               <div
@@ -148,8 +169,12 @@ export function AddProduct() {
               </div>
             ))}
           </div>
+          {/* Product Tags Dropdown */}
           {productTags.length !== tags.length && (
-            <div className="z-10 mt-2 min-w-64 origin-top-right rounded-md ring-1 shadow-lg ring-black/5 focus:outline-hidden">
+            <div
+              ref={dropdownRef}
+              className="z-10 mt-2 min-w-64 origin-top-right rounded-md ring-1 shadow-lg ring-black/5 focus:outline-hidden"
+            >
               <div className="py-1 max-h-35 overflow-y-auto">
                 {tags.map((tag) => {
                   if (!productTags.includes(tag)) {
