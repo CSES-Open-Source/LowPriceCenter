@@ -65,7 +65,7 @@ export const addProduct = [
   upload.single("image"),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const { name, price, description } = req.body;
+      const { name, price, description, tags } = req.body;
       const userId = req.user.id;
       const userEmail = req.user.userEmail;
       if (!name || !price || !userEmail) {
@@ -92,6 +92,7 @@ export const addProduct = [
         description,
         userEmail,
         image,
+        tags,
         timeCreated: new Date(),
         timeUpdated: new Date(),
       });

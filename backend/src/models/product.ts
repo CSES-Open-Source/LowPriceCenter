@@ -25,6 +25,11 @@ const productSchema = new Schema({
     required: true,
   },
   image: { type: String },
+  tags: {
+    type: String, 
+    enum: ['Electronics', 'School Supplies', 'Dorm Essentials', 'Furniture', 'Clothes', 'Miscellaneous'], 
+    required: false
+  }
 });
 
 type Product = InferSchemaType<typeof productSchema>;
