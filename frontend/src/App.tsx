@@ -1,16 +1,16 @@
 import { HelmetProvider } from "react-helmet-async";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { PrivateRoute } from "./components/PrivateRoute";
+import { Footer } from "src/components/Footer";
+import { Navbar } from "src/components/Navbar";
 import { Home } from "src/pages";
 import { Marketplace } from "src/pages/Marketplace";
-import { AddProduct } from "./pages/AddProduct";
-import { PageNotFound } from "./pages/PageNotFound";
-import { Navbar } from "src/components/Navbar";
-import { Footer } from "src/components/Footer";
 
+import { PrivateRoute } from "../src/components/PrivateRoute";
+import { AddProduct } from "../src/pages/AddProduct";
+import { EditProduct } from "../src/pages/EditProduct";
+import { IndividualProductPage } from "../src/pages/Individual-product-page";
+import { PageNotFound } from "../src/pages/PageNotFound";
 import FirebaseProvider from "../src/utils/FirebaseProvider";
-import { IndividualProductPage } from "./pages/Individual-product-page";
-import { EditProduct } from "./pages/EditProduct";
 
 const router = createBrowserRouter([
   {
