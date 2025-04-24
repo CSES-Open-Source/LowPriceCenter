@@ -84,32 +84,33 @@ export default function SearchBar({ setProducts, setError }: Props) {
             className="absolute right-6 top-1/2 transform -translate-y-1/2 text-[#00629B] text-[1.2rem] cursor-pointer"
           />
         </div>
-      </div>
-      <div
-        ref={dropdownRef}
-        className="absolute right-36 z-10 mt-1 min-w-60 rounded-md ring-1 shadow-lg ring-black/5 focus:outline-hidden"
-      >
-        <div className="py-3 max-h-35 overflow-y-auto bg-white rounded-md">
-          <span className="font-semibold font-inter text-base px-4">Category</span>
-          {tags.map((tag, index) => (
-            <div key={index} className="px-4 flex flex-row gap-2">
-              <input
-                type="checkbox"
-                id={tag}
-                name={tag}
-                value={tag}
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    setTagFilters([...tagFilters, tag]);
-                  } else {
-                    setTagFilters(tagFilters.filter((t) => t !== tag));
-                  }
-                }}
-              />
-              <label className="font-inter"> {tag}</label>
-              <br />
-            </div>
-          ))}
+
+        <div
+          ref={dropdownRef}
+          className="absolute right-0 top-full z-10 mt-2 mr-1 w-56 rounded-md ring-1 shadow-lg ring-black/5 focus:outline-hidden"
+        >
+          <div className="py-3 max-h-35 overflow-y-auto bg-white rounded-md">
+            <span className="font-semibold font-inter text-base px-4">Category</span>
+            {tags.map((tag, index) => (
+              <div key={index} className="px-4 flex flex-row gap-2">
+                <input
+                  type="checkbox"
+                  id={tag}
+                  name={tag}
+                  value={tag}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setTagFilters([...tagFilters, tag]);
+                    } else {
+                      setTagFilters(tagFilters.filter((t) => t !== tag));
+                    }
+                  }}
+                />
+                <label className="font-inter"> {tag}</label>
+                <br />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </>
