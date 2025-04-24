@@ -10,16 +10,23 @@ interface Props {
 
 export default function SearchBar({ setProducts, setError }: Props) {
   const [query, setQuery] = useState<string | null>(null);
+  const [tagFilters, setTagFilters] = useState<string[]>([]);
 
   useEffect(() => {
     /*
-     * if query is null, get all products
-     * otherwise get products that match the query
+     * if query and tags are null, get all products
+     * otherwise get products that match the query/tags
      */
     const search = async () => {
       try {
-        if (query && query.trim().length > 0) {
-          await get(`/api/products/search/${query}`).then((res) => {
+        if ((query && query.trim().length > 0) || tagFilters.length > 0) {
+          const selectedTags = tagFilters.length > 0 ? tagFilters.join(",") : "";
+          let keyword = "";
+          if (query) {
+            keyword = query.trim().length > 0 ? query.trim() : "";
+          }
+
+          await get(`/api/products/search?keyword=${keyword}&tags=${selectedTags}`).then((res) => {
             if (res.ok) {
               res.json().then((data) => {
                 setProducts(data);
@@ -41,7 +48,7 @@ export default function SearchBar({ setProducts, setError }: Props) {
       }
     };
     search();
-  }, [query]);
+  }, [query, tagFilters]);
 
   // handle dropdown display
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -86,7 +93,19 @@ export default function SearchBar({ setProducts, setError }: Props) {
           <span className="font-semibold font-inter text-base px-4">Category</span>
           {tags.map((tag, index) => (
             <div key={index} className="px-4 flex flex-row gap-2">
-              <input type="checkbox" id={tag} name={tag} value={tag} />
+              <input
+                type="checkbox"
+                id={tag}
+                name={tag}
+                value={tag}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setTagFilters([...tagFilters, tag]);
+                  } else {
+                    setTagFilters(tagFilters.filter((t) => t !== tag));
+                  }
+                }}
+              />
               <label className="font-inter"> {tag}</label>
               <br />
             </div>
