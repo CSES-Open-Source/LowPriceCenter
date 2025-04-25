@@ -10,6 +10,7 @@ import { AddProduct } from "../src/pages/AddProduct";
 import { EditProduct } from "../src/pages/EditProduct";
 import { IndividualProductPage } from "../src/pages/Individual-product-page";
 import { PageNotFound } from "../src/pages/PageNotFound";
+import { ProfilePage } from "../src/pages/ProfilePage";
 import FirebaseProvider from "../src/utils/FirebaseProvider";
 
 const router = createBrowserRouter([
@@ -52,6 +53,14 @@ const router = createBrowserRouter([
   {
     path: "*",
     element: <PageNotFound />,
+  },
+  {
+    path: "/user-profile",
+    element: (
+      <PrivateRoute>
+        <ProfilePage />
+      </PrivateRoute>
+    ),
   },
 ]);
 

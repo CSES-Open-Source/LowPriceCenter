@@ -16,7 +16,7 @@ export const getUserById = async (req: Request, res: Response) => {
   try {
     const firebaseUid = req.params.firebaseUid;
 
-    const user = await UserModel.findOne({ firebaseUid: firebaseUid });
+    const user = await UserModel.findOne({ firebaseUid: firebaseUid }).populate("productList");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

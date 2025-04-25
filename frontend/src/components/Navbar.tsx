@@ -67,6 +67,11 @@ export function Navbar() {
           </li>
           <li>
             {user ? (
+              <button onClick={() => (window.location.href = "/user-profile")}>Your Profile</button>
+            ) : null}
+          </li>
+          <li>
+            {user ? (
               <button
                 onClick={signOutFromFirebase}
                 className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"

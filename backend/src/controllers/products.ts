@@ -122,7 +122,7 @@ export const deleteProductById = async (req: AuthenticatedRequest, res: Response
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    if (!user.productList.includes(id)) {
+    if (!user.productList.includes(new mongoose.Types.ObjectId(id))) {
       return res.status(400).json({ message: "User does not own this product" });
     }
 
@@ -162,7 +162,7 @@ export const updateProductById = [
 
       console.log("in the terminal4");
 
-      if (!user.productList.includes(id)) {
+      if (!user.productList.includes(new mongoose.Types.ObjectId(id))) {
         return res.status(400).json({ message: "User does not own this product" });
       }
 

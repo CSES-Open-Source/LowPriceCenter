@@ -16,11 +16,12 @@ const userSchema = new Schema({
     type: Date,
     required: true,
   },
-  productList: {
-    type: [String],
-    required: true,
-    default: [],
-  },
+  productList: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Product",
+    },
+  ],
   firebaseUid: {
     type: String,
     required: true,
