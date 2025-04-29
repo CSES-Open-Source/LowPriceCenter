@@ -9,13 +9,13 @@ export default {
         xxl: "1300px",
       },
       colors: {
-        'ucsd-blue': '#00629B',
-        'ucsd-darkblue': '#182B49',
-        'ucsd-gold': '#FFCD00',
+        "ucsd-blue": "#00629B",
+        "ucsd-darkblue": "#182B49",
+        "ucsd-gold": "#FFCD00",
       },
       fontFamily: {
-        jetbrains: ['JetBrains Mono', 'monospace'],
-        inter: ['Inter', 'sans-serif'],
+        jetbrains: ["JetBrains Mono", "monospace"],
+        inter: ["Inter", "sans-serif"],
       },
     },
   },

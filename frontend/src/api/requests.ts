@@ -7,7 +7,7 @@ import { getToken } from "src/utils/User";
 
 /**
  * A custom type defining which HTTP methods we will handle in this file
- */ 
+ */
 type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 /**

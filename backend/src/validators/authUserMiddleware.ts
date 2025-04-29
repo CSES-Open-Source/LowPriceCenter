@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import UserModel from "src/models/user";
+import UserModel, { User } from "src/models/user";
 import dotenv from "dotenv";
 import admin from "firebase-admin";
 
 dotenv.config();
 
 export interface AuthenticatedRequest extends Request {
-  user?: any;
+  user?: User;
 }
 
 if (!admin.apps.length) {
@@ -31,7 +31,7 @@ export const authenticateUser = async (
       .then(async (decodedToken) => {
         const uid = decodedToken.uid;
 
-        const user = await UserModel.findOne({ firebaseUid: uid });
+        const user = await UserModel.findOne<User>({ firebaseUid: uid });
 
         if (!user) {
           return res.status(403).json({ message: "User not found. (middleware)" });
