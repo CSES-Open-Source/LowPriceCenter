@@ -67,7 +67,13 @@ export function Navbar() {
           </li>
           <li>
             {user ? (
-              <button onClick={() => (window.location.href = "/user-profile")}>Your Profile</button>
+              <button
+                onClick={() => (window.location.href = "/user-profile")}
+                className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
+              >
+                <FontAwesomeIcon className="text-lg pr-2" icon={faUser} aria-label="User Icon" />
+                Your Profile
+              </button>
             ) : null}
           </li>
           <li>
@@ -119,6 +125,17 @@ export function Navbar() {
                 />
                 Products
               </button>
+            </li>
+            <li className="mb-2">
+              {user ? (
+                <button
+                  onClick={() => (window.location.href = "/user-profile")}
+                  className="font-inter w-full text-center px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
+                >
+                  <FontAwesomeIcon className="text-lg pr-2" icon={faUser} aria-label="User Icon" />
+                  Your Profile
+                </button>
+              ) : null}
             </li>
             <li>
               {user ? (
