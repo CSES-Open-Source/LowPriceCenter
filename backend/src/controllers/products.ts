@@ -204,6 +204,7 @@ export const updateProductById = [
         description: req.body.description,
         timeUpdated: new Date(),
         image: newImage,
+        tags: req.body.tags ?? []
       };
 
       console.log("Done...");
