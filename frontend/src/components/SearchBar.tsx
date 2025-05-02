@@ -11,22 +11,27 @@ interface Props {
 export default function SearchBar({ setProducts, setError }: Props) {
   const [query, setQuery] = useState<string | null>(null);
   const [tagFilters, setTagFilters] = useState<string[]>([]);
+  const [priceMax, setPriceMax] = useState<string>();
 
   useEffect(() => {
     /*
-     * if query and tags are null, get all products
-     * otherwise get products that match the query/tags
+     * if query and tags and price are null, get all products
+     * otherwise get products that match the query/tags/price
      */
     const search = async () => {
       try {
-        if ((query && query.trim().length > 0) || tagFilters.length > 0) {
+        if ((query && query.trim().length > 0) || tagFilters.length > 0 || priceMax) {
           const selectedTags = tagFilters.length > 0 ? tagFilters.join(",") : "";
           let keyword = "";
           if (query) {
             keyword = query.trim().length > 0 ? query.trim() : "";
           }
+          let price = "";
+          if (priceMax) price = String(priceMax);
 
-          await get(`/api/products/search?keyword=${keyword}&tags=${selectedTags}`).then((res) => {
+          await get(
+            `/api/products/search?keyword=${keyword}&tags=${selectedTags}&price=${price}`,
+          ).then((res) => {
             if (res.ok) {
               res.json().then((data) => {
                 setProducts(data);
@@ -48,7 +53,7 @@ export default function SearchBar({ setProducts, setError }: Props) {
       }
     };
     search();
-  }, [query, tagFilters]);
+  }, [query, tagFilters, priceMax]);
 
   // handle dropdown display
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -87,12 +92,12 @@ export default function SearchBar({ setProducts, setError }: Props) {
 
         <div
           ref={dropdownRef}
-          className="absolute right-0 top-full z-10 mt-2 mr-1 w-56 rounded-md ring-1 shadow-lg ring-black/5 focus:outline-hidden"
+          className="absolute right-0 top-full z-10 mt-2 mr-1 w-56 px-3 bg-white rounded-md ring-1 shadow-lg ring-black/5 focus:outline-hidden"
         >
           <div className="py-3 max-h-35 overflow-y-auto bg-white rounded-md">
-            <span className="font-semibold font-inter text-base px-4">Category</span>
+            <p className="font-semibold font-inter text-base">Category</p>
             {tags.map((tag, index) => (
-              <div key={index} className="px-4 flex flex-row gap-2">
+              <div key={index} className="flex flex-row gap-2">
                 <input
                   type="checkbox"
                   id={tag}
@@ -110,6 +115,36 @@ export default function SearchBar({ setProducts, setError }: Props) {
                 <br />
               </div>
             ))}
+            <div className="my-3 border-[0.5px] border-ucsd-blue rounded-2xl" />
+            <p className="font-semibold font-inter text-base">Price</p>
+            <input
+              id="default-range"
+              type="range"
+              min={0}
+              max={1000}
+              step={10}
+              value={priceMax}
+              defaultValue={0}
+              onChange={(event) => {
+                setPriceMax(event.target.value);
+              }}
+              className="w-full h-2 bg-gray-200 rounded-lg mb-3 appearance-none cursor-pointer"
+              style={{
+                background: `linear-gradient(to right, #00629B 0%, #00629B ${((Number(priceMax) ?? 0) / 1000) * 100}%, #e5e7eb ${((Number(priceMax) ?? 0) / 1000) * 100}%, #e5e7eb 100%)`,
+              }}
+            />
+            <div className="flex flex-row items-center gap-2 max-w-50">
+              <p className="text-sm">$0 - </p>
+              <input
+                type="number"
+                min={0}
+                max={1000}
+                value={priceMax}
+                step={0.01}
+                onChange={(event) => setPriceMax(event.target.value)}
+                className="w-1/3 p-1 border border-gray-300 text-black text-sm rounded-md"
+              />
+            </div>
           </div>
         </div>
       </div>

@@ -43,7 +43,7 @@ export const getProductById = async (req: AuthenticatedRequest, res: Response) =
 };
 
 /*
- * search for product by name
+ * search for product by name, tags, price
  */
 export const getProductsByQuery = async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -52,6 +52,7 @@ export const getProductsByQuery = async (req: AuthenticatedRequest, res: Respons
     if (typeof req.query.tags === "string" && req.query.tags.length > 0) {
       tags = req.query.tags.split(",");
     }
+    const price = req.query.price;
 
     let query: any = {}
     if (typeof keyword === "string"  && keyword.length > 0){
@@ -60,6 +61,7 @@ export const getProductsByQuery = async (req: AuthenticatedRequest, res: Respons
     if (tags.length > 0) {
       query.tags = { $in: tags };
     }
+    if (price) query.price = {$lte: price};
 
     const products = await ProductModel.find(query);
     if (!products) {
