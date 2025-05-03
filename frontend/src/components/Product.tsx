@@ -62,8 +62,6 @@ function Product({ productId, productImage, productName, productPrice, isSaved: 
           </p>
           <p className="font-light font-inter truncate max-w-44 md:max-w-96">
             ${productPrice.toFixed(2)}
-            title={productPrice.toFixed(2)}
-
           </p>
         </div>
       </a>
