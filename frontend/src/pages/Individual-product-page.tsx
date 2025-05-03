@@ -1,9 +1,10 @@
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faPenToSquare, faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
+import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
-import { get } from "src/api/requests";
+import { get, post } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 
 export function IndividualProductPage() {
@@ -19,6 +20,7 @@ export function IndividualProductPage() {
   }>();
   const [error, setError] = useState<string>();
   const [hasPermissions, setHasPermissions] = useState<boolean>(false);
+  const [isSaved, setIsSaved] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -35,13 +37,36 @@ export function IndividualProductPage() {
       if (uid)
         await get(`/api/users/${uid}`).then(async (res) => {
           const ownedByUser = await res.json().then((data) => {
-            return data.productList.includes(id);
+            const canEdit = data.productList.includes(id);
+            setIsSaved(data.savedProducts?.includes(id));
+            return canEdit;
           });
           setHasPermissions(ownedByUser);
         });
     };
     findEditPermission();
   }, []);
+
+  const toggleSave = async () => {
+    if (!user?.uid) {
+      navigate('/login');
+      return;
+    }
+  
+    try {
+      setIsSaved(prev => !prev);
+      const response = await post(`/api/users/${user.uid}/saved-products`, { productId: id });
+      if (!response.ok) {
+        setIsSaved(prev => !prev);
+        throw new Error('Failed to update saved products');
+      }
+      const userRes = await get(`/api/users/${user.uid}`);
+      const userData = await userRes.json();
+      setIsSaved(userData.savedProducts.includes(id));
+    } catch (error) {
+      console.error("Error saving product:", error);
+    }
+  };
 
   return (
     <>
@@ -72,13 +97,23 @@ export function IndividualProductPage() {
         {!error && (
           <div className="flex flex-wrap flex-col md:flex-row mb-6 gap-12">
             {/* Image Section */}
-            <section className="w-full flex-1 flex justify-center md:h-auto">
+            <section className="w-full flex-1 flex justify-center md:h-auto relative">
               <div className="max-h-[32rem] h-[32rem] max-w-[32rem] w-[32rem] relative border-8 border-ucsd-blue">
                 <img
                   src={product?.image ? product?.image : "/productImages/product-placeholder.webp"}
                   alt="Product"
                   className="w-full h-full object-cover"
                 />
+                <button 
+                  onClick={toggleSave}
+                  className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
+                >
+                  <FontAwesomeIcon 
+                    icon={isSaved ? faHeartSolid : faHeartRegular} 
+                    size="lg" 
+                    className={isSaved ? "text-red-500" : "text-gray-700"} 
+                  />
+                </button>
               </div>
             </section>
 
