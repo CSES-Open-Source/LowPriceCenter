@@ -26,6 +26,12 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  profilePic: {
+    type: String,
+  },
+  biography: {
+    type: String,
+  },
 });
 
 export type User = HydratedDocument<InferSchemaType<typeof userSchema>>;

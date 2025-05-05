@@ -15,6 +15,8 @@ interface UserProfile {
   displayName?: string;
   email: string;
   productList: Product[];
+  profilePic?: string;
+  biography?: string;
 }
 
 export function ProfilePage() {
@@ -53,16 +55,32 @@ export function ProfilePage() {
                   &larr; Return to Marketplace
                 </button>
               </div>
-              <div className="flex justify-between mb-2 px-3">
-                <p className="text-lg sm:text-3xl font-jetbrains font-bold">
-                  {profile?.displayName || profile?.email}
-                </p>
+              <div className="flex justify-between mb-2 px-3 gap-10">
+                <div className="flex-1">
+                  <p className="text-2xl sm:text-3xl font-jetbrains font-bold mb-6">
+                    {profile?.displayName || profile?.email}
+                  </p>
+                  {/* Biography */}
+                  <div className="bg-[#F5F0E6] p-5 mb-6">
+                    <p className="font-inter text-black text-base md:text-xl font-normal break-words">
+                      {profile?.biography || "Welcome to my profile!"}
+                    </p>
+                  </div>
+                </div>
+                {/* Profile Image */}
+                <div>
+                  <img
+                    src={profile?.profilePic ? profile?.profilePic : "/profile-pic-default.png"}
+                    alt="Product Image"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
               <div className="flex justify-between mb-2 px-3">
                 <p className="text-lg sm:text-3xl font-jetbrains font-medium">Products</p>
               </div>
               {profile?.productList.length === 0 && (
-                <p className="font-inter text-lg px-3 pt-3">No posted products yet.</p>
+                <p className="font-inter text-lg px-3 pt-3">No listed products yet.</p>
               )}
 
               <div className="grid sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 xxl:grid-cols-4">

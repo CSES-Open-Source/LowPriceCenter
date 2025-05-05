@@ -116,7 +116,7 @@ export function Navbar() {
               <button
                 hidden={user === null}
                 onClick={() => (window.location.href = "/products")}
-                className="font-inter w-full text-center px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
+                className="font-inter w-full text-left px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
               >
                 <FontAwesomeIcon
                   className="text-lg pr-2"
@@ -130,7 +130,7 @@ export function Navbar() {
               {user ? (
                 <button
                   onClick={() => (window.location.href = "/user-profile")}
-                  className="font-inter w-full text-center px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
+                  className="font-inter w-full text-left px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
                 >
                   <FontAwesomeIcon className="text-lg pr-2" icon={faUser} aria-label="User Icon" />
                   Your Profile
@@ -141,7 +141,7 @@ export function Navbar() {
               {user ? (
                 <button
                   onClick={signOutFromFirebase}
-                  className="font-inter w-full text-center px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
+                  className="font-inter w-full text-left px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
                 >
                   <FontAwesomeIcon className="text-lg pr-2" icon={faUser} aria-label="User Icon" />
                   Sign Out
