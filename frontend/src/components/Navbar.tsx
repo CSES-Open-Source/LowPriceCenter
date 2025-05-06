@@ -68,7 +68,9 @@ export function Navbar() {
           <li>
             {user ? (
               <button
-                onClick={() => (window.location.href = "/user-profile")}
+                onClick={() => {
+                  if (user.uid) window.location.href = `/user-profile/${user.uid}`;
+                }}
                 className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
               >
                 <FontAwesomeIcon className="text-lg pr-2" icon={faUser} aria-label="User Icon" />
@@ -129,7 +131,9 @@ export function Navbar() {
             <li className="mb-2">
               {user ? (
                 <button
-                  onClick={() => (window.location.href = "/user-profile")}
+                  onClick={() => {
+                    if (user.uid) window.location.href = `/user-profile/${user.uid}`;
+                  }}
                   className="font-inter w-full text-left px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
                 >
                   <FontAwesomeIcon className="text-lg pr-2" icon={faUser} aria-label="User Icon" />

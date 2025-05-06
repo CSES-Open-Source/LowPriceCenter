@@ -13,6 +13,6 @@ router.get("/", getUsers);
 router.get("/:firebaseUid", getUserById);
 router.post("/", addUser);
 router.delete("/:id", deleteUserById);
-router.patch("/:id", updateUserById);
+router.patch("/:firebaseUid", updateUserById);
 
 export default router;

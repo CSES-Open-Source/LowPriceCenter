@@ -1,5 +1,7 @@
+import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Product from "src/components/Product";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
@@ -12,6 +14,7 @@ interface Product {
 }
 
 interface UserProfile {
+  firebaseUid: string;
   displayName?: string;
   email: string;
   productList: Product[];
@@ -24,16 +27,24 @@ export function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [error, setError] = useState<string>("");
   const { user } = useContext(FirebaseContext);
+  const { id } = useParams();
+  const [hasPermissions, setHasPermissions] = useState<boolean>(false);
+
   useEffect(() => {
-    const userUid = user?.uid;
     const fetchUser = async () => {
-      await get(`/api/users/${userUid}`)
+      await get(`/api/users/${id}`)
         .then(async (res) => setProfile(await res.json()))
-        .catch(() => setError("user not found"));
+        .catch(() => setError("User not found"));
     };
-    fetchUser();
-  }, [user]);
-  console.log("profile.productList:", profile?.productList);
+    if (id) fetchUser();
+  }, [id]);
+
+  useEffect(() => {
+    if (user?.uid && profile?.firebaseUid) {
+      setHasPermissions(user.uid === profile.firebaseUid);
+    }
+  }, [user, profile]);
+
   return (
     <>
       <Helmet>
@@ -54,6 +65,14 @@ export function ProfilePage() {
                 >
                   &larr; Return to Marketplace
                 </button>
+                {hasPermissions && (
+                  <button
+                    className="text-lg mb-4 font-inter hover:underline"
+                    onClick={() => navigate(`/edit-profile`)}
+                  >
+                    Edit Profile <FontAwesomeIcon icon={faPenToSquare} />
+                  </button>
+                )}
               </div>
               <div className="flex justify-between mb-2 px-3 gap-10">
                 <div className="flex-1">
@@ -71,8 +90,8 @@ export function ProfilePage() {
                 <div>
                   <img
                     src={profile?.profilePic ? profile?.profilePic : "/profile-pic-default.png"}
-                    alt="Product Image"
-                    className="w-full h-full object-cover"
+                    alt="Profile Image"
+                    className="w-48 h-48 object-cover rounded-full shadow-md"
                   />
                 </div>
               </div>
