@@ -9,6 +9,7 @@ interface Props {
 }
 
 export default function SearchBar({ setProducts, setError }: Props) {
+  const [dropdownHidden, setDropdownHidden] = useState<boolean>(true);
   const [query, setQuery] = useState<string | null>(null);
   const [tagFilters, setTagFilters] = useState<string[]>([]);
   const [priceMax, setPriceMax] = useState<string>();
@@ -66,7 +67,7 @@ export default function SearchBar({ setProducts, setError }: Props) {
         buttonRef.current &&
         !buttonRef.current.contains(event.target as Node)
       ) {
-        dropdownRef.current.hidden = true;
+        setDropdownHidden(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -92,6 +93,7 @@ export default function SearchBar({ setProducts, setError }: Props) {
 
         <div
           ref={dropdownRef}
+          hidden={dropdownHidden}
           className="absolute right-0 top-full z-10 mt-2 mr-1 w-56 px-3 bg-white rounded-md ring-1 shadow-lg ring-black/5 focus:outline-hidden"
         >
           <div className="py-3 max-h-35 overflow-y-auto bg-white rounded-md">
