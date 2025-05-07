@@ -158,51 +158,42 @@ export const updateProductById = [
       if (!mongoose.Types.ObjectId.isValid(id))
         return res.status(400).json({ message: "Invalid ID format" });
 
-      console.log("in the terminal2");
-      console.log(req.user);
-
       const userId = req.user._id;
-      console.log("in the terminal2.5");
       const user = await UserModel.findById(userId);
-      console.log("in the terminal3");
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-
-      console.log("in the terminal4");
 
       if (!user.productList.includes(id)) {
         return res.status(400).json({ message: "User does not own this product" });
       }
 
-      console.log("Imageing...");
+      let existing = req.body.existingImages || [];
+      if (!Array.isArray(existing)) existing = [existing];
 
-      let newImage;
-
-      if (req.file) {
-        const fileName = `${uuidv4()}-${req.file.originalname}`;
-        const file = bucket.file(fileName);
-
-        await file.save(req.file.buffer, {
-          metadata: { contentType: req.file.mimetype },
-        });
-
-        const app = initializeApp(firebaseConfig);
-        const storage = getStorage(app);
-        newImage = await getDownloadURL(ref(storage, fileName));
+      const newUrls: string[] = [];
+      const app = initializeApp(firebaseConfig);
+      const storage = getStorage(app);
+      for (const file of req.files as Express.Multer.File[]) {
+        const name = `${uuidv4()}-${file.originalname}`;
+        const bucketFile = bucket.file(name);
+        await bucketFile.save(file.buffer, { metadata: { contentType: file.mimetype } });
+        newUrls.push(await getDownloadURL(ref(storage, name)));
       }
 
-      const updates = {
-        name: req.body.name,
-        price: req.body.price,
-        description: req.body.description,
-        timeUpdated: new Date(),
-        image: newImage,
-      };
+      const finalImages = [...existing, ...newUrls];
 
-      console.log("Done...");
-
-      const updatedProduct = await ProductModel.findByIdAndUpdate(id, updates, { new: true });
+      const updatedProduct = await ProductModel.findByIdAndUpdate(
+        id,
+        {
+          name: req.body.name,
+          price: req.body.price,
+          description: req.body.description,
+          images: finalImages,
+          timeUpdated: new Date(),
+        },
+        { new: true },
+      );
 
       if (!updatedProduct) {
         return res.status(404).json({ message: "Product not found" });
@@ -212,8 +203,13 @@ export const updateProductById = [
         message: "Product successfully updated",
         updatedProduct,
       });
-    } catch (error) {
-      res.status(500).json({ message: "Error patching product", error });
+    } catch (err: any) {
+      console.error("🔥 updateProductById failed:", err.stack || err);
+      // send the message back so you can see it in the browser
+      return res.status(500).json({
+        message: "Error patching product",
+        error: err.message || err.toString(),
+      });
     }
   },
 ];
