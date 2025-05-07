@@ -179,11 +179,12 @@ export function EditProduct() {
         </div>
 
         {/* Product Images */}
-        <div className="mb-5">
-          <label htmlFor="productImages" className="block mb-2 font-medium font-inter text-black">
-            Images
-          </label>
-          <div className="flex flex-wrap">
+        <label htmlFor="productImages" className="block mb-2 font-medium font-inter text-black">
+          Images
+        </label>
+
+        <div className="text-center mb-2">
+          <div className="inline-flex flex-wrap justify-start gap-2">
             {existingImages.map((url) => (
               <div key={url} className="relative m-1 w-24 h-24">
                 <img src={url} className="w-full h-full object-cover rounded-md" />

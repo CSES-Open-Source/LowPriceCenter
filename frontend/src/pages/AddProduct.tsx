@@ -138,20 +138,21 @@ export function AddProduct() {
             Images
           </label>
 
-          {/* previews, above the input */}
-          <div className="flex flex-wrap mb-2">
-            {newPreviews.map((src, idx) => (
-              <div key={idx} className="relative m-1 w-24 h-24">
-                <img src={src} className="w-full h-full object-cover rounded-md" />
-                <button
-                  type="button"
-                  onClick={() => removePreview(idx)}
-                  className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs px-1"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
+          <div className="text-center mb-2">
+            <div className="inline-flex flex-wrap justify-center gap-2 ">
+              {newPreviews.map((src, idx) => (
+                <div key={idx} className="relative m-1 w-24 h-24">
+                  <img src={src} className="w-full h-full object-cover rounded-md" />
+                  <button
+                    type="button"
+                    onClick={() => removePreview(idx)}
+                    className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs px-1"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
 
           <input

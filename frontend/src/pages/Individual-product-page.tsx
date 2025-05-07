@@ -87,7 +87,7 @@ export function IndividualProductPage() {
           <div className="flex flex-wrap flex-col md:flex-row mb-6 gap-12">
             {/* Image Section */}
             <section className="w-full flex-1 flex justify-center md:h-auto">
-              <div className="max-h-[32rem] h-[32rem] max-w-[32rem] w-[32rem] relative border-8 border-ucsd-blue">
+              <div className="max-h-[32rem] h-[32rem] max-w-[32rem] w-[32rem] relative">
                 <img
                   src={
                     product?.images && product.images.length > 0
@@ -95,7 +95,7 @@ export function IndividualProductPage() {
                       : "/productImages/product-placeholder.webp"
                   }
                   alt={`Image ${currentIndex + 1} of ${product?.name}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
                 {product?.images && product.images.length > 1 && (
                   <>
