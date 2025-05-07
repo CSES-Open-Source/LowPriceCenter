@@ -21,6 +21,11 @@ const userSchema = new Schema({
     required: true,
     default: [],
   },
+  savedProducts: {
+    type: [String],
+    required: true,
+    default: [],
+  },
   firebaseUid: {
     type: String,
     required: true,

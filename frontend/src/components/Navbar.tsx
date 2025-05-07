@@ -1,4 +1,4 @@
-import { faBars, faCartShopping, faUser, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faCartShopping, faUser, faXmark, faHeart } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useRef, useState } from "react";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
@@ -63,6 +63,20 @@ export function Navbar() {
                 aria-label="Shopping Cart"
               />
               Products
+            </button>
+          </li>
+          <li>
+            <button
+              hidden={user === null}
+              onClick={() => (window.location.href = "/saved-products")}
+              className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
+            >
+              <FontAwesomeIcon
+                className="text-lg pr-2"
+                icon={faHeart}
+                aria-label="Heart Icon"
+              />
+              Saved
             </button>
           </li>
           <li>
