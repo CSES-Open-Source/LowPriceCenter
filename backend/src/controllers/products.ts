@@ -41,6 +41,23 @@ export const getProductById = async (req: AuthenticatedRequest, res: Response) =
     res.status(500).json({ message: "Error getting product", error });
   }
 };
+
+/*
+ * search for product by name
+ */
+export const getProductsByName = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const query = req.params.query;
+    const products = await ProductModel.find({ name: { $regex: query, $options: "i" } });
+    if (!products) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: "Error getting product", error });
+  }
+};
+
 /**
  * add product to database thru name, price, description, and userEmail
  */
@@ -49,7 +66,8 @@ export const addProduct = [
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { name, price, description } = req.body;
-      const userId = req.user.id;
+      if (!req.user) return res.status(404).json({ message: "User not found" });
+      const userId = req.user._id;
       const userEmail = req.user.userEmail;
       if (!name || !price || !userEmail) {
         return res.status(400).json({ message: "Name, price, and userEmail are required." });
@@ -95,10 +113,11 @@ export const addProduct = [
 export const deleteProductById = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const id = req.params.id;
+    if (!req.user) return res.status(404).json({ message: "User not found" });
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid ID format" });
     }
-    const userId = req.user.id;
+    const userId = req.user._id;
     const user = await UserModel.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -117,6 +136,7 @@ export const deleteProductById = async (req: AuthenticatedRequest, res: Response
     res.status(500).json({ message: "Error deleting product", error });
   }
 };
+
 // /**
 //  * patch product in database thru id and updated parameters in req
 //  */
@@ -125,26 +145,30 @@ export const updateProductById = [
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const id = req.params.id;
-      if (!mongoose.Types.ObjectId.isValid(id)) {
+      if (!req.user) return res.status(404).json({ message: "User not found" });
+      if (!mongoose.Types.ObjectId.isValid(id))
         return res.status(400).json({ message: "Invalid ID format" });
-      }
 
-      const userId = req.user.id;
+      console.log("in the terminal2");
+      console.log(req.user);
+
+      const userId = req.user._id;
+      console.log("in the terminal2.5");
       const user = await UserModel.findById(userId);
+      console.log("in the terminal3");
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
+
+      console.log("in the terminal4");
 
       if (!user.productList.includes(id)) {
         return res.status(400).json({ message: "User does not own this product" });
       }
 
-      const updates: any = {
-        name: req.body.name,
-        price: req.body.price,
-        description: req.body.description,
-        timeUpdated: new Date(),
-      };
+      console.log("Imageing...");
+
+      let newImage;
 
       if (req.file) {
         const fileName = `${uuidv4()}-${req.file.originalname}`;
@@ -156,14 +180,20 @@ export const updateProductById = [
 
         const app = initializeApp(firebaseConfig);
         const storage = getStorage(app);
-        updates.image = await getDownloadURL(ref(storage, fileName));
+        newImage = await getDownloadURL(ref(storage, fileName));
       }
 
-      const updatedProduct = await ProductModel.findByIdAndUpdate(
-        id,
-        updates,
-        { new: true }
-      );
+      const updates = {
+        name: req.body.name,
+        price: req.body.price,
+        description: req.body.description,
+        timeUpdated: new Date(),
+        image: newImage,
+      };
+
+      console.log("Done...");
+
+      const updatedProduct = await ProductModel.findByIdAndUpdate(id, updates, { new: true });
 
       if (!updatedProduct) {
         return res.status(404).json({ message: "Product not found" });

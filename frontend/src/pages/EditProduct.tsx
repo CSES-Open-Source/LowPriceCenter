@@ -1,11 +1,11 @@
-import { FormEvent, useRef, useContext, useState, useEffect } from "react";
+import { FormEvent, useContext, useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 import { DELETE, get, patch } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 
 export function EditProduct() {
-  let { id } = useParams();
+  const { id } = useParams();
 
   const [product, setProduct] = useState<{
     name: string;

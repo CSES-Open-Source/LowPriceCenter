@@ -53,7 +53,7 @@ export function Navbar() {
         <ul className="hidden md:flex items-center space-x-4 text-xl">
           <li>
             <button
-              hidden={user == null}
+              hidden={user === null}
               onClick={() => (window.location.href = "/products")}
               className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
             >
@@ -103,7 +103,7 @@ export function Navbar() {
           >
             <li className="mb-2">
               <button
-                hidden={user == null}
+                hidden={user === null}
                 onClick={() => (window.location.href = "/products")}
                 className="font-inter w-full text-center px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
               >

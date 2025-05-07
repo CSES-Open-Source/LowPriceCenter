@@ -1,15 +1,15 @@
+import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 import { get } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { post } from "src/api/requests";
 export function IndividualProductPage() {
   const navigate = useNavigate();
   const { user } = useContext(FirebaseContext);
-  let { id } = useParams();
+  const { id } = useParams();
   const [product, setProduct] = useState<{
     name: string;
     price: number;

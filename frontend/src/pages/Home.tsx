@@ -37,7 +37,7 @@ export function Home() {
             </button>
           ) : (
             <button className={buttonStyles} onClick={openGoogleAuthentication}>
-              <img src="/googlebutton.svg" className="w-6 h-6 mr-1" />
+              <img src="/googlebutton.svg" alt="Google sign-in" className="w-6 h-6 mr-1" />
               Sign in with Google
             </button>
           )}
