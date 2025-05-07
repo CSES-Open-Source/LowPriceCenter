@@ -42,10 +42,10 @@ export const handleInterestEmail = async (
     }
 
     const now = new Date();
-    const tenMinAgo = new Date(now.getTime() - 10 * 1000 * 60);
+    const aDayAgo = new Date(now.getTime() - 60 * 24 * 1000 * 60);
     const record = await InterestEmailModel.findOne({ consumerId, productId });
 
-    if (record && record.lastSentAt > tenMinAgo) {
+    if (record && record.lastSentAt > aDayAgo) {
       res
         .status(429)
         .json({ message: "Please wait 10 minutes before sending another interest email." });

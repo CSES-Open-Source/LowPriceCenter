@@ -21,7 +21,7 @@ export function IndividualProductPage() {
   const [isHovered, setIsHovered] = useState(false);
   const [error, setError] = useState<String>();
   const [hasPermissions, setHasPermissions] = useState<boolean>(false);
-  const COOLDOWN = 10 * 1000 * 60;
+  const COOLDOWN = 60 * 24 * 1000 * 60;
   useEffect(() => {
     if (!message) return;
     const t = setTimeout(() => setMessage(""), 3000);
@@ -96,22 +96,24 @@ export function IndividualProductPage() {
     }
   };
   const isCooling = Boolean(cooldownEnd && Date.now() < cooldownEnd);
-  const secondsLeft = isCooling ? Math.ceil((cooldownEnd! - Date.now()) / 1000) : 0;
+  // const secondsLeft = isCooling ? Math.ceil((cooldownEnd! - Date.now()) / 1000) : 0;
+  const msLeft = isCooling ? cooldownEnd! - Date.now() : 0;
+  const totalMinutes = Math.ceil(msLeft / (1000 * 60)); // convert ms → minutes
+  const hoursLeft = Math.floor(totalMinutes / 60);
+  const minutesLeft = totalMinutes % 60;
   const [tick, setTick] = useState(0);
   useEffect(() => {
     if (!isCooling) return;
-    const iv = setInterval(() => {
-      setTick((t) => t + 1);
-    }, 1000);
+    const iv = setInterval(() => setTick((t) => t + 1), 60_000); // 60 000 ms = 1 min
     return () => clearInterval(iv);
   }, [isCooling]);
   let buttonLabel = "Interested?";
   if (message) {
     buttonLabel = message;
   } else if (isCooling && isHovered) {
-    buttonLabel = `Please wait ${Math.floor(secondsLeft / 60)}:${(secondsLeft % 60)
-      .toString()
-      .padStart(2, "0")} minutes`;
+    buttonLabel = `Please wait ${hoursLeft}:${minutesLeft.toString().padStart(2, "0")} hours`;
+  } else if (isCooling && !isHovered) {
+    buttonLabel = "Interest email sent successfully!";
   } else if (!isCooling && isHovered) {
     buttonLabel = "Click to send interest email";
   }
