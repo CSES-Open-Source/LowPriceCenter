@@ -1,44 +1,72 @@
-import { useState } from "react";
+import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
+import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useContext, useState } from "react";
+import { FirebaseContext } from "src/utils/FirebaseProvider";
+import { post } from "src/api/requests";
 
 interface Props {
   productImages: string[];
   productId: string;
   productName: string;
   productPrice: number;
+  isSaved?: boolean;
+  onSaveToggle?: (productId: string, newSavedStatus: boolean) => void;
 }
 
-function Product({ productId, productImages, productName, productPrice }: Props) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+function Product({
+  productId,
+  productImages,
+  productName,
+  productPrice,
+  isSaved: initialIsSaved = false,
+}: Props) {
+  const { user } = useContext(FirebaseContext);
+  const [isSaved, setIsSaved] = useState(initialIsSaved);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const handlePrev = (event: React.MouseEvent) => {
-    event.preventDefault();
-    setCurrentIndex((prevIndex) => (prevIndex === 0 ? productImages.length - 1 : prevIndex - 1));
+  const toggleSave = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user?.uid) return;
+
+    try {
+      setIsSaved((prev) => !prev);
+      await post(`/api/users/${user.uid}/saved-products`, { productId });
+    } catch (error) {
+      setIsSaved((prev) => !prev);
+      console.error("Error saving product:", error);
+    }
   };
-
-  const handleNext = (event: React.MouseEvent) => {
-    event.preventDefault();
-    setCurrentIndex((prevIndex) => (prevIndex === productImages.length - 1 ? 0 : prevIndex + 1));
-  };
-
-  const displayImage =
-    productImages && productImages.length > 0
-      ? productImages[currentIndex]
-      : "/productImages/product-placeholder.webp";
 
   return (
-    <div className="w-full bg-[#F8F8F8] shadow-lg rounded-lg hover:brightness-[96%] transition-all overflow-clip">
-      <a href={`/products/${productId}`}>
-        <div className="relative max-h-[16rem] h-[16rem] overflow-hidden">
-          <img src={displayImage} alt={`Image`} className="w-full h-full object-contain" />
+    <div
+      className="w-full bg-[#F8F8F8] shadow-lg rounded-lg hover:brightness-[96%] transition-all overflow-clip relative"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <a href={`/products/${productId}`} className="block">
+        <div className="max-h-[16rem] h-[16rem] overflow-hidden relative">
+          <img className="w-full h-full object-cover" src={productImages[0]} alt={productName} />
+          {(isHovered || isSaved) && user?.uid && (
+            <button
+              onClick={toggleSave}
+              className="absolute top-2 right-2 bg-white px-2 py-1 rounded-full shadow-lg hover:scale-110 transition-transform z-10"
+            >
+              <FontAwesomeIcon
+                icon={isSaved ? faHeartSolid : faHeartRegular}
+                size="sm"
+                className={isSaved ? "text-red-500" : "text-gray-700"}
+              />
+            </button>
+          )}
         </div>
         <div className="p-2">
           <p className="font-semibold font-inter truncate max-w-44 md:max-w-96" title={productName}>
             {productName}
           </p>
-          <p
-            className="font-light font-inter truncate max-w-44 md:max-w-96"
-            title={productPrice.toFixed(2)}
-          >
+          <p className="font-light font-inter truncate max-w-44 md:max-w-96">
             ${productPrice.toFixed(2)}
           </p>
         </div>
