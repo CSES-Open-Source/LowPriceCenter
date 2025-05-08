@@ -93,7 +93,7 @@ export function IndividualProductPage() {
                   className="w-full h-full object-contain"
                 />
               </div>
-              {product?.images && product.images.length > 0 && (
+              {product?.images && product.images.length > 1 && (
                 <EmblaCarousel
                   slides={product.images}
                   options={OPTIONS}
