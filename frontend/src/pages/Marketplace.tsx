@@ -1,11 +1,52 @@
-import { Key, useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Helmet } from "react-helmet-async";
 import Product from "src/components/Product";
 import SearchBar from "src/components/SearchBar";
+import { FirebaseContext } from "src/utils/FirebaseProvider";
+import { get, post } from "src/api/requests";
 
 export function Marketplace() {
-  const [products, setProducts] = useState<[]>();
+  const [products, setProducts] = useState<
+    Array<{
+      _id: string;
+      name: string;
+      price: number;
+      images: string[];
+    }>
+  >([]);
   const [error, setError] = useState<string>("");
+  const { user } = useContext(FirebaseContext);
+  const [savedProducts, setSavedProducts] = useState<string[]>([]);
+
+  const fetchSavedProducts = async () => {
+    if (!user?.uid) return;
+    try {
+      const res = await get(`/api/users/${user.uid}`);
+      const userData = await res.json();
+      setSavedProducts(userData.savedProducts || []);
+    } catch (err) {
+      console.error("Failed to fetch saved products:", err);
+    }
+  };
+
+  const handleSaveToggle = async (productId: string, newSavedStatus: boolean) => {
+    try {
+      setSavedProducts((prev) =>
+        newSavedStatus ? [...prev, productId] : prev.filter((id) => id !== productId),
+      );
+      await post(`/api/users/${user?.uid}/saved-products`, { productId });
+      await fetchSavedProducts();
+    } catch (err) {
+      console.error("Save operation failed:", err);
+      setSavedProducts((prev) =>
+        newSavedStatus ? prev.filter((id) => id !== productId) : [...prev, productId],
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchSavedProducts();
+  }, [user]);
 
   return (
     <>
@@ -24,37 +65,26 @@ export function Marketplace() {
             </button>
           </div>
           <SearchBar setProducts={setProducts} setError={setError} />
-          {/* Error message if products cannot be displayed */}
           {error && <p className="max-w-[80%] w-full px-3 pt-3 text-red-800">{error}</p>}
-          {/* if no products are available */}
           {!error && products?.length === 0 && (
             <p className="max-w-[80%] font-inter text-lg w-full px-3 pt-3">No products available</p>
           )}
-          {/* Grid of products */}
           <div
             id="grid"
             className="grid sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 xxl:grid-cols-4"
           >
-            {products &&
-              products.map(
-                (
-                  product: { _id: string; name: string; price: number; images: string[] },
-                  index: Key | null | undefined,
-                ) => (
-                  <div key={index} className="px-3 py-3">
-                    <Product
-                      productId={product._id}
-                      productName={product.name}
-                      productPrice={product.price}
-                      productImages={
-                        product.images && product.images.length > 0
-                          ? product.images
-                          : ["/productImages/product-placeholder.webp"]
-                      }
-                    />
-                  </div>
-                ),
-              )}
+            {products.map((product) => (
+              <div key={product._id} className="px-3 py-3">
+                <Product
+                  productId={product._id}
+                  productName={product.name}
+                  productPrice={product.price}
+                  productImages={product.images ? product.images : []}
+                  isSaved={savedProducts.includes(product._id)}
+                  onSaveToggle={handleSaveToggle}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </main>

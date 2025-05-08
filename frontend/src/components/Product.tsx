@@ -6,8 +6,8 @@ import { FirebaseContext } from "src/utils/FirebaseProvider";
 import { post } from "src/api/requests";
 
 interface Props {
-  productImages: string[];
   productId: string;
+  productImages: string[];
   productName: string;
   productPrice: number;
   isSaved?: boolean;
@@ -24,6 +24,8 @@ function Product({
   const { user } = useContext(FirebaseContext);
   const [isSaved, setIsSaved] = useState(initialIsSaved);
   const [isHovered, setIsHovered] = useState(false);
+  const images =
+    productImages.length > 0 ? productImages : ["/productImages/product-placeholder.webp"];
 
   const toggleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -48,7 +50,7 @@ function Product({
     >
       <a href={`/products/${productId}`} className="block">
         <div className="max-h-[16rem] h-[16rem] overflow-hidden relative">
-          <img className="w-full h-full object-cover" src={productImages[0]} alt={productName} />
+          <img className="w-full h-full object-cover" src={images[0]} alt={productName} />
           {(isHovered || isSaved) && user?.uid && (
             <button
               onClick={toggleSave}
