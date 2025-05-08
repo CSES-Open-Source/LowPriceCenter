@@ -11,7 +11,7 @@ export function Marketplace() {
       _id: string;
       name: string;
       price: number;
-      image: string;
+      images: string[];
     }>
   >([]);
   const [error, setError] = useState<string>("");
@@ -79,9 +79,7 @@ export function Marketplace() {
                   productId={product._id}
                   productName={product.name}
                   productPrice={product.price}
-                  productImage={
-                    product.image ? product.image : "/productImages/product-placeholder.webp"
-                  }
+                  productImages={product.images ? product.images : []}
                   isSaved={savedProducts.includes(product._id)}
                   onSaveToggle={handleSaveToggle}
                 />

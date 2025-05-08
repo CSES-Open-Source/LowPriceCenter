@@ -6,6 +6,8 @@ import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 import { get, post } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
+import EmblaCarousel from "src/components/EmblaCarousel";
+import { EmblaOptionsType } from "embla-carousel";
 
 export function IndividualProductPage() {
   const navigate = useNavigate();
@@ -14,12 +16,19 @@ export function IndividualProductPage() {
   const [product, setProduct] = useState<{
     name: string;
     price: number;
-    image: string;
+    images: string[];
     userEmail: string;
     description: string;
   }>();
   const [error, setError] = useState<string>();
   const [hasPermissions, setHasPermissions] = useState<boolean>(false);
+  const OPTIONS: EmblaOptionsType = {
+    loop: false,
+    align: "start",
+    skipSnaps: false,
+  };
+
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isSaved, setIsSaved] = useState<boolean>(false);
 
   useEffect(() => {
@@ -49,16 +58,16 @@ export function IndividualProductPage() {
 
   const toggleSave = async () => {
     if (!user?.uid) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
-  
+
     try {
-      setIsSaved(prev => !prev);
+      setIsSaved((prev) => !prev);
       const response = await post(`/api/users/${user.uid}/saved-products`, { productId: id });
       if (!response.ok) {
-        setIsSaved(prev => !prev);
-        throw new Error('Failed to update saved products');
+        setIsSaved((prev) => !prev);
+        throw new Error("Failed to update saved products");
       }
       const userRes = await get(`/api/users/${user.uid}`);
       const userData = await userRes.json();
@@ -97,24 +106,35 @@ export function IndividualProductPage() {
         {!error && (
           <div className="flex flex-wrap flex-col md:flex-row mb-6 gap-12">
             {/* Image Section */}
-            <section className="w-full flex-1 flex justify-center md:h-auto relative">
-              <div className="max-h-[32rem] h-[32rem] max-w-[32rem] w-[32rem] relative border-8 border-ucsd-blue">
+            <section className="w-full flex-1 flex flex-col items-center space-y-12 md:h-auto">
+              <div className="max-h-[24rem] h-[24rem] max-w-[32rem] w-[32rem] relative">
                 <img
-                  src={product?.image ? product?.image : "/productImages/product-placeholder.webp"}
-                  alt="Product"
-                  className="w-full h-full object-cover"
+                  src={
+                    product?.images && product.images.length > 0
+                      ? product.images[currentIndex]
+                      : "/productImages/product-placeholder.webp"
+                  }
+                  alt={`Image ${currentIndex + 1} of ${product?.name}`}
+                  className="w-full h-full object-contain"
                 />
-                <button 
+                <button
                   onClick={toggleSave}
                   className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
                 >
-                  <FontAwesomeIcon 
-                    icon={isSaved ? faHeartSolid : faHeartRegular} 
-                    size="lg" 
-                    className={isSaved ? "text-red-500" : "text-gray-700"} 
+                  <FontAwesomeIcon
+                    icon={isSaved ? faHeartSolid : faHeartRegular}
+                    size="lg"
+                    className={isSaved ? "text-red-500" : "text-gray-700"}
                   />
                 </button>
               </div>
+              {product?.images && product.images.length > 1 && (
+                <EmblaCarousel
+                  slides={product.images}
+                  options={OPTIONS}
+                  onSelect={(idx) => setCurrentIndex(idx)}
+                />
+              )}
             </section>
 
             {/* Info Section */}
