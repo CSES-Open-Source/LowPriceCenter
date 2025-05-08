@@ -5,6 +5,8 @@ import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 import { get } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
+import EmblaCarousel from "src/components/EmblaCarousel";
+import { EmblaOptionsType } from "embla-carousel";
 
 export function IndividualProductPage() {
   const navigate = useNavigate();
@@ -19,20 +21,13 @@ export function IndividualProductPage() {
   }>();
   const [error, setError] = useState<string>();
   const [hasPermissions, setHasPermissions] = useState<boolean>(false);
+  const OPTIONS: EmblaOptionsType = {
+    loop: false,
+    align: "start",
+    skipSnaps: false,
+  };
 
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  const handlePrev = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 && product?.images?.length ? product.images.length - 1 : prevIndex - 1,
-    );
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prevIndex) =>
-      product?.images && prevIndex === product.images.length - 1 ? 0 : prevIndex + 1,
-    );
-  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -86,8 +81,8 @@ export function IndividualProductPage() {
         {!error && (
           <div className="flex flex-wrap flex-col md:flex-row mb-6 gap-12">
             {/* Image Section */}
-            <section className="w-full flex-1 flex justify-center md:h-auto">
-              <div className="max-h-[32rem] h-[32rem] max-w-[32rem] w-[32rem] relative">
+            <section className="w-full flex-1 flex flex-col items-center space-y-12 md:h-auto">
+              <div className="max-h-[24rem] h-[24rem] max-w-[32rem] w-[32rem] relative">
                 <img
                   src={
                     product?.images && product.images.length > 0
@@ -97,23 +92,14 @@ export function IndividualProductPage() {
                   alt={`Image ${currentIndex + 1} of ${product?.name}`}
                   className="w-full h-full object-contain"
                 />
-                {product?.images && product.images.length > 1 && (
-                  <>
-                    <button
-                      className="absolute top-1/2 left-0 px-2 py-1 text-sm"
-                      onClick={handlePrev}
-                    >
-                      ‹
-                    </button>
-                    <button
-                      className="absolute top-1/2 right-0 px-2 py-1 text-sm"
-                      onClick={handleNext}
-                    >
-                      ›
-                    </button>
-                  </>
-                )}
               </div>
+              {product?.images && product.images.length > 0 && (
+                <EmblaCarousel
+                  slides={product.images}
+                  options={OPTIONS}
+                  onSelect={(idx) => setCurrentIndex(idx)}
+                />
+              )}
             </section>
 
             {/* Info Section */}
