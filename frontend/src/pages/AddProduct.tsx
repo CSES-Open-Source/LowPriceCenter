@@ -54,11 +54,28 @@ export function AddProduct() {
     e.preventDefault();
     try {
       if (productName.current && productPrice.current && productDescription.current && user) {
+<<<<<<< HEAD
+=======
+        let images;
+        if (productImages.current && productImages.current.files) {
+          images = productImages.current.files[0];
+        }
+
+>>>>>>> allowing adding of multiple images
         const body = new FormData();
         body.append("name", productName.current.value);
         body.append("price", productPrice.current.value);
         body.append("description", productDescription.current.value);
         if (user.email) body.append("userEmail", user.email);
+<<<<<<< HEAD
+=======
+
+        if (productImages.current && productImages.current.files) {
+          Array.from(productImages.current.files).forEach((file) => {
+            body.append("images", file);
+          });
+        }
+>>>>>>> allowing adding of multiple images
 
         newFiles.forEach((file) => body.append("images", file));
 
@@ -156,6 +173,10 @@ export function AddProduct() {
           </div>
 
           <input
+<<<<<<< HEAD
+=======
+            name="images"
+>>>>>>> allowing adding of multiple images
             id="productImages"
             type="file"
             multiple
