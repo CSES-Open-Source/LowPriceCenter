@@ -6,7 +6,6 @@ import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 import { get, post } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
-
 export function IndividualProductPage() {
   const navigate = useNavigate();
   const { user } = useContext(FirebaseContext);
@@ -18,8 +17,16 @@ export function IndividualProductPage() {
     userEmail: string;
     description: string;
   }>();
-  const [error, setError] = useState<string>();
+  const [message, setMessage] = useState("");
+  const [isHovered, setIsHovered] = useState(false);
+  const [error, setError] = useState<String>();
   const [hasPermissions, setHasPermissions] = useState<boolean>(false);
+  const COOLDOWN = 60 * 24 * 1000 * 60;
+  useEffect(() => {
+    if (!message) return;
+    const t = setTimeout(() => setMessage(""), 3000);
+    return () => clearTimeout(t);
+  }, [message]);
   const [isSaved, setIsSaved] = useState<boolean>(false);
 
   useEffect(() => {
@@ -46,19 +53,86 @@ export function IndividualProductPage() {
     };
     findEditPermission();
   }, []);
+  const [cooldownEnd, setCooldownEnd] = useState<number | null>(null);
 
-  const toggleSave = async () => {
-    if (!user?.uid) {
-      navigate('/login');
+  useEffect(() => {
+    const key = `interest-cooldown-${id}`;
+    const stored = localStorage.getItem(key);
+    if (!stored) return;
+
+    const end = parseInt(stored, 10);
+    if (Date.now() < end) {
+      setCooldownEnd(end);
+      const timer = setTimeout(() => {
+        setCooldownEnd(null);
+        localStorage.removeItem(key);
+      }, end - Date.now());
+      return () => clearTimeout(timer);
+    } else {
+      localStorage.removeItem(key);
+    }
+  }, [id]);
+  const handleSendInterestEmail = async () => {
+    if (cooldownEnd && Date.now() < cooldownEnd) {
+      setMessage("Please wait before sending another interest email.");
       return;
     }
-  
+
     try {
-      setIsSaved(prev => !prev);
+      const response = await post("/api/interestEmail", { consumerId: user?.uid, productId: id });
+      const result = await response.json();
+      if (!response.ok) {
+        setMessage(`Error: ${result.message}`);
+        return;
+      }
+
+      setMessage("Interest email sent successfully!");
+      const end = Date.now() + COOLDOWN;
+      setCooldownEnd(end);
+      const key = `interest-cooldown-${id}`;
+      localStorage.setItem(key, end.toString());
+      setTimeout(() => {
+        setCooldownEnd(null);
+        localStorage.removeItem(key);
+      }, COOLDOWN);
+    } catch {
+      setMessage("An unexpected error occurred.");
+    }
+  };
+  const isCooling = Boolean(cooldownEnd && Date.now() < cooldownEnd);
+  // const secondsLeft = isCooling ? Math.ceil((cooldownEnd! - Date.now()) / 1000) : 0;
+  const msLeft = isCooling ? cooldownEnd! - Date.now() : 0;
+  const totalMinutes = Math.ceil(msLeft / (1000 * 60)); // convert ms → minutes
+  const hoursLeft = Math.floor(totalMinutes / 60);
+  const minutesLeft = totalMinutes % 60;
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    if (!isCooling) return;
+    const iv = setInterval(() => setTick((t) => t + 1), 60_000); // 60 000 ms = 1 min
+    return () => clearInterval(iv);
+  }, [isCooling]);
+  let buttonLabel = "Interested?";
+  if (message) {
+    buttonLabel = message;
+  } else if (isCooling && isHovered) {
+    buttonLabel = `Please wait ${hoursLeft}:${minutesLeft.toString().padStart(2, "0")} hours`;
+  } else if (isCooling && !isHovered) {
+    buttonLabel = "Interest email sent successfully!";
+  } else if (!isCooling && isHovered) {
+    buttonLabel = "Click to send interest email";
+  }
+  const toggleSave = async () => {
+    if (!user?.uid) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      setIsSaved((prev) => !prev);
       const response = await post(`/api/users/${user.uid}/saved-products`, { productId: id });
       if (!response.ok) {
-        setIsSaved(prev => !prev);
-        throw new Error('Failed to update saved products');
+        setIsSaved((prev) => !prev);
+        throw new Error("Failed to update saved products");
       }
       const userRes = await get(`/api/users/${user.uid}`);
       const userData = await userRes.json();
@@ -91,9 +165,7 @@ export function IndividualProductPage() {
             </button>
           )}
         </div>
-        {/* Error message if product not found */}
         {error && <p className="max-w-[80%] w-full px-3 text-red-800">{error}</p>}
-        {/* Display product */}
         {!error && (
           <div className="flex flex-wrap flex-col md:flex-row mb-6 gap-12">
             {/* Image Section */}
@@ -104,20 +176,19 @@ export function IndividualProductPage() {
                   alt="Product"
                   className="w-full h-full object-cover"
                 />
-                <button 
+                <button
                   onClick={toggleSave}
                   className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
                 >
-                  <FontAwesomeIcon 
-                    icon={isSaved ? faHeartSolid : faHeartRegular} 
-                    size="lg" 
-                    className={isSaved ? "text-red-500" : "text-gray-700"} 
+                  <FontAwesomeIcon
+                    icon={isSaved ? faHeartSolid : faHeartRegular}
+                    size="lg"
+                    className={isSaved ? "text-red-500" : "text-gray-700"}
                   />
                 </button>
               </div>
             </section>
 
-            {/* Info Section */}
             <section className="max-w-[100%] md:max-w-[50%] flex-1 flex flex-col">
               <h1 className="pt-2 font-jetbrains text-black font-bold text-4xl break-words">
                 {product?.name}
@@ -129,20 +200,33 @@ export function IndividualProductPage() {
                 USD ${product?.price?.toFixed(2)}
               </h2>
               {product?.description && (
-                <div className="bg-[#F5F0E6] p-5 mb-6">
+                <div className="bg-[#F5F0E6] p-5">
                   <p className="font-inter text-black text-base md:text-xl font-normal break-words">
                     {product.description}
                   </p>
                 </div>
               )}
-              <div className="mt-0">
-                <p className="font-inter text-black text-base md:text-xl font-light">
-                  Interested? Contact them here:
-                </p>
-                <p className="font-inter text-black hover:text-ucsd-darkblue text-base md:text-xl font-medium break-words transition-colors">
-                  <a href={`mailto:${product?.userEmail}`}>{product?.userEmail}</a>
-                </p>
-              </div>
+              {!hasPermissions && (
+                <div
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                >
+                  <button
+                    onClick={!isCooling ? handleSendInterestEmail : undefined}
+                    className={`
+        font-inter text-[#00629B]
+        text-base md:text-xl font-light mt-6
+        bg-white border border-[#00629B]
+        px-4 py-2 rounded-lg
+        transition-colors duration-200 ease-in-out
+        ${!isCooling ? "hover:bg-blue-100" : ""}
+        ${isCooling ? "opacity-50 cursor-not-allowed" : ""}
+      `}
+                  >
+                    {buttonLabel}
+                  </button>
+                </div>
+              )}
             </section>
           </div>
         )}
