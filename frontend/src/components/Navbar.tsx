@@ -69,7 +69,7 @@ export function Navbar() {
             {user ? (
               <button
                 onClick={() => {
-                  if (user.uid) window.location.href = `/user-profile/${user.uid}`;
+                  if (user.uid) window.location.href = `/profile/${user.uid}`;
                 }}
                 className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
               >
@@ -132,7 +132,7 @@ export function Navbar() {
               {user ? (
                 <button
                   onClick={() => {
-                    if (user.uid) window.location.href = `/user-profile/${user.uid}`;
+                    if (user.uid) window.location.href = `/profile/${user.uid}`;
                   }}
                   className="font-inter w-full text-left px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
                 >

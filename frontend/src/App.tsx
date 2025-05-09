@@ -56,7 +56,7 @@ const router = createBrowserRouter([
     element: <PageNotFound />,
   },
   {
-    path: "/user-profile/:id",
+    path: "/profile/:id",
     element: (
       <PrivateRoute>
         <ProfilePage />
