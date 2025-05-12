@@ -87,7 +87,6 @@ export function IndividualProductPage() {
       const result = await response.json();
       if (!response.ok) {
         setMessage(`Error: ${result.message}`);
-        setIsSubmitting(false);
         return;
       }
 
@@ -102,6 +101,7 @@ export function IndividualProductPage() {
       }, COOLDOWN);
     } catch {
       setMessage("An unexpected error occurred.");
+    } finally {
       setIsSubmitting(false);
     }
   };
