@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { get } from "src/api/requests";
 import { FaFilter } from "react-icons/fa6";
 import { tags } from "../utils/constants.tsx";
+import { orderMethods } from "../utils/constants.tsx";
 
 interface Props {
   setProducts: (products: []) => void;
@@ -13,6 +14,7 @@ export default function SearchBar({ setProducts, setError }: Props) {
   const [query, setQuery] = useState<string | null>(null);
   const [tagFilters, setTagFilters] = useState<string[]>([]);
   const [priceMax, setPriceMax] = useState<string>();
+  const [orderBy, setOrderBy] = useState<string>("Most Recent");
 
   useEffect(() => {
     /*
@@ -21,7 +23,12 @@ export default function SearchBar({ setProducts, setError }: Props) {
      */
     const search = async () => {
       try {
-        if ((query && query.trim().length > 0) || tagFilters.length > 0 || priceMax) {
+        if (
+          (query && query.trim().length > 0) ||
+          tagFilters.length > 0 ||
+          priceMax ||
+          orderBy !== "Most Recent"
+        ) {
           const selectedTags = tagFilters.length > 0 ? tagFilters.join(",") : "";
           let keyword = "";
           if (query) {
@@ -31,7 +38,7 @@ export default function SearchBar({ setProducts, setError }: Props) {
           if (priceMax) price = String(priceMax);
 
           await get(
-            `/api/products/search?keyword=${keyword}&tags=${selectedTags}&price=${price}`,
+            `/api/products/search?keyword=${keyword}&tags=${selectedTags}&price=${price}&order=${orderMethods[orderBy]}`,
           ).then((res) => {
             if (res.ok) {
               res.json().then((data) => {
@@ -54,7 +61,7 @@ export default function SearchBar({ setProducts, setError }: Props) {
       }
     };
     search();
-  }, [query, tagFilters, priceMax]);
+  }, [query, tagFilters, priceMax, orderBy]);
 
   // handle dropdown display
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -146,6 +153,28 @@ export default function SearchBar({ setProducts, setError }: Props) {
                 onChange={(event) => setPriceMax(event.target.value)}
                 className="w-1/3 p-1 border border-gray-300 text-black text-sm rounded-md"
               />
+            </div>
+            <div className="my-3 mt-4 border-[0.5px] border-ucsd-blue rounded-2xl" />
+            <p className="font-semibold font-inter text-base">Sort By</p>
+            <div>
+              {Object.keys(orderMethods).map((method, index) => (
+                <div key={index} className="flex flex-row gap-2">
+                  <input
+                    type="radio"
+                    id={method}
+                    name="orderBy"
+                    value={method}
+                    checked={orderBy === method}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setOrderBy(method);
+                      }
+                    }}
+                  />
+                  <label className="font-inter"> {method}</label>
+                  <br />
+                </div>
+              ))}
             </div>
           </div>
         </div>

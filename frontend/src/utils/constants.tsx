@@ -6,3 +6,9 @@ export const tags = [
   "Clothes",
   "Miscellaneous",
 ];
+
+export const orderMethods = {
+  "Most Recent": "timeUpdated",
+  "Price (low-high)": "price",
+  "Alphabetical (A-Z)": "name",
+} as { [key: string]: string };

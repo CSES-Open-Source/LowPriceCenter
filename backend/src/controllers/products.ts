@@ -17,7 +17,7 @@ const upload = multer({ storage: multer.memoryStorage() });
  */
 export const getProducts = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const products = await ProductModel.find();
+    const products = await ProductModel.find().sort({"timeUpdated": -1});
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: "Error fetching products", error });
@@ -53,6 +53,9 @@ export const getProductsByQuery = async (req: AuthenticatedRequest, res: Respons
       tags = req.query.tags.split(",");
     }
     const price = req.query.price;
+    const sortField : string = String(req.query.order) ?? "";
+    let sortOrder = 1
+    if (sortField === 'timeUpdated') sortOrder = -1
 
     let query: any = {}
     if (typeof keyword === "string"  && keyword.length > 0){
@@ -63,7 +66,7 @@ export const getProductsByQuery = async (req: AuthenticatedRequest, res: Respons
     }
     if (price) query.price = {$lte: price};
 
-    const products = await ProductModel.find(query);
+    const products = await ProductModel.find(query).sort({[sortField]: sortOrder === 1 ? 'asc' : 'desc'});
     if (!products) {
       return res.status(404).json({ message: "Product not found" });
     }
