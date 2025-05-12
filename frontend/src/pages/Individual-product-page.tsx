@@ -22,6 +22,7 @@ export function IndividualProductPage() {
   const [error, setError] = useState<String>();
   const [hasPermissions, setHasPermissions] = useState<boolean>(false);
   const COOLDOWN = 60 * 24 * 1000 * 60;
+  const [isSubmitting, setIsSubmitting] = useState(false);
   useEffect(() => {
     if (!message) return;
     const t = setTimeout(() => setMessage(""), 3000);
@@ -77,12 +78,16 @@ export function IndividualProductPage() {
       setMessage("Please wait before sending another interest email.");
       return;
     }
-
+    if (isSubmitting) {
+      return;
+    }
+    setIsSubmitting(true);
     try {
       const response = await post("/api/interestEmail", { consumerId: user?.uid, productId: id });
       const result = await response.json();
       if (!response.ok) {
         setMessage(`Error: ${result.message}`);
+        setIsSubmitting(false);
         return;
       }
 
@@ -97,6 +102,7 @@ export function IndividualProductPage() {
       }, COOLDOWN);
     } catch {
       setMessage("An unexpected error occurred.");
+      setIsSubmitting(false);
     }
   };
   const isCooling = Boolean(cooldownEnd && Date.now() < cooldownEnd);
