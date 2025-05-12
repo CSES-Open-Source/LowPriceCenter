@@ -10,6 +10,7 @@ import { AddProduct } from "../src/pages/AddProduct";
 import { EditProduct } from "../src/pages/EditProduct";
 import { IndividualProductPage } from "../src/pages/Individual-product-page";
 import { PageNotFound } from "../src/pages/PageNotFound";
+import { AboutUsPage } from "../src/pages/AboutUs";
 import FirebaseProvider from "../src/utils/FirebaseProvider";
 import { SavedProducts } from "./pages/SavedProducts";
 
@@ -58,6 +59,7 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
   },
+  { path: "/about-us", element: <AboutUsPage /> },
   {
     path: "*",
     element: <PageNotFound />,
