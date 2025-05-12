@@ -1,4 +1,5 @@
-import { faPenToSquare, faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
+import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useState } from "react";
@@ -29,7 +30,7 @@ export function IndividualProductPage() {
   };
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isSaved, setIsSaved] = useState<boolean>(false);
+  const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
