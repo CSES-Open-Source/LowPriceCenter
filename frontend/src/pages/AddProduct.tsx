@@ -1,5 +1,6 @@
 import { FormEvent, useContext, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { useNavigate } from "react-router-dom";
 import { post } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 
@@ -16,6 +17,8 @@ export function AddProduct() {
   const [fileError, setFileError] = useState<string | null>(null);
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const [newPreviews, setNewPreviews] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
@@ -37,11 +40,9 @@ export function AddProduct() {
       setFileError(null);
     }
 
-    // append, not replace
     setNewFiles((prev) => [...prev, ...validFiles]);
     setNewPreviews((prev) => [...prev, ...previews]);
 
-    // allow re-selecting same file
     if (productImages.current) productImages.current.value = "";
   };
 
@@ -51,6 +52,8 @@ export function AddProduct() {
   };
 
   const handleSubmit = async (e: FormEvent) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     e.preventDefault();
     try {
       if (productName.current && productPrice.current && productDescription.current && user) {
@@ -149,22 +152,24 @@ export function AddProduct() {
             Images
           </label>
 
-          <div className="text-center mb-2">
-            <div className="inline-flex flex-wrap justify-center gap-2 ">
-              {newPreviews.map((src, idx) => (
-                <div key={idx} className="relative m-1 w-24 h-24">
-                  <img src={src} className="w-full h-full object-cover rounded-md" />
-                  <button
-                    type="button"
-                    onClick={() => removePreview(idx)}
-                    className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs px-1"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
+          {newPreviews.length > 0 && (
+            <div className="text-center mb-2">
+              <div className="inline-flex flex-wrap justify-center gap-2 ">
+                {newPreviews.map((src, idx) => (
+                  <div key={idx} className="relative m-1 w-24 h-24">
+                    <img src={src} className="w-full h-full object-cover rounded-md" />
+                    <button
+                      type="button"
+                      onClick={() => removePreview(idx)}
+                      className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs px-1"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <input
             name="images"
@@ -178,7 +183,14 @@ export function AddProduct() {
           />
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => navigate(`/products`)}
+            className="bg-[#00629B] text-white font-semibold font-inter py-2 px-4 shadow-lg hover:brightness-90 transition-all"
+          >
+            Cancel
+          </button>
           <button
             type="submit"
             className="bg-[#00629B] text-white font-semibold font-inter py-2 px-4 shadow-lg hover:brightness-90 transition-all"

@@ -4,7 +4,7 @@ import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { get, post } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 import EmblaCarousel from "src/components/EmblaCarousel";
@@ -31,6 +31,13 @@ export function IndividualProductPage() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
+
+  const location = useLocation() as {
+    state?: { from?: "saved" | "marketplace" };
+  };
+
+  const from = location.state?.from ?? "marketplace";
+  const backPath = from === "saved" ? "/saved-products" : "/products";
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -87,9 +94,9 @@ export function IndividualProductPage() {
         <div className="flex justify-between">
           <button
             className="text-lg mb-4 font-inter hover:underline"
-            onClick={() => navigate("/products")}
+            onClick={() => navigate(backPath)}
           >
-            &larr; Return to Marketplace
+            &larr; Return to {from === "saved" ? "Saved Products" : "Marketplace"}
           </button>
 
           {hasPermissions && (

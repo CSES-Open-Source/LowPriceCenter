@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { Helmet } from "react-helmet-async";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Product from "src/components/Product";
 import { get, post } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
@@ -88,22 +88,24 @@ export function SavedProducts() {
           >
             {products.map((product) => (
               <div key={product._id} className="px-3 py-3">
-                <Product
-                  productId={product._id}
-                  productName={product.name}
-                  productPrice={product.price}
-                  productImages={
-                    product.images && product.images.length > 0
-                      ? product.images
-                      : ["/productImages/product-placeholder.webp"]
-                  }
-                  isSaved={true}
-                  onSaveToggle={(productId, newSavedStatus) => {
-                    if (!newSavedStatus) {
-                      handleProductUnsave(productId);
+                <Link to={`/products/${product._id}`} state={{ from: "saved" as const }}>
+                  <Product
+                    productId={product._id}
+                    productName={product.name}
+                    productPrice={product.price}
+                    productImages={
+                      product.images && product.images.length > 0
+                        ? product.images
+                        : ["/productImages/product-placeholder.webp"]
                     }
-                  }}
-                />
+                    isSaved={true}
+                    onSaveToggle={(productId, newSavedStatus) => {
+                      if (!newSavedStatus) {
+                        handleProductUnsave(productId);
+                      }
+                    }}
+                  />
+                </Link>
               </div>
             ))}
           </div>

@@ -125,7 +125,6 @@ export function EditProduct() {
         <p className="text-3xl text-center font-jetbrains font-medium">Edit Product</p>
       </div>
       <form className="max-w-sm mx-auto p-4" onSubmit={handleEdit}>
-        {/* Product Name */}
         <div className="mb-5">
           <label htmlFor="productName" className="block mb-2 font-medium font-inter text-black">
             Name
@@ -141,7 +140,6 @@ export function EditProduct() {
           />
         </div>
 
-        {/* Product Price */}
         <div className="mb-5">
           <label htmlFor="productPrice" className="block mb-2 font-medium font-inter text-black">
             Price
@@ -160,7 +158,6 @@ export function EditProduct() {
           />
         </div>
 
-        {/* Product Description */}
         <div className="mb-5">
           <label
             htmlFor="productDescription"
@@ -178,39 +175,41 @@ export function EditProduct() {
           />
         </div>
 
-        {/* Product Images */}
-        <label htmlFor="productImages" className="block mb-2 font-medium font-inter text-black">
-          Images
-        </label>
+        <div className="mb-5">
+          <label htmlFor="productImages" className="block mb-2 font-medium font-inter text-black">
+            Images
+          </label>
 
-        <div className="text-center mb-2">
-          <div className="inline-flex flex-wrap justify-start gap-2">
-            {existingImages.map((url) => (
-              <div key={url} className="relative m-1 w-24 h-24">
-                <img src={url} className="w-full h-full object-cover rounded-md" />
-                <button
-                  type="button"
-                  onClick={() => removeExisting(url)}
-                  className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs px-1"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
+          {(newPreviews.length > 0 || existingImages.length > 0) && (
+            <div className="inline-flex flex-wrap justify-start gap-2">
+              {existingImages.map((url) => (
+                <div key={url} className="relative m-1 w-24 h-24">
+                  <img src={url} className="w-full h-full object-cover rounded-md" />
+                  <button
+                    type="button"
+                    onClick={() => removeExisting(url)}
+                    className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs px-1"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
 
-            {newPreviews.map((src, idx) => (
-              <div key={src} className="relative m-1 w-24 h-24">
-                <img src={src} className="w-full h-full object-cover rounded-md" />
-                <button
-                  type="button"
-                  onClick={() => removeNew(idx)}
-                  className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs px-1"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
+              {newPreviews.map((src, idx) => (
+                <div key={src} className="relative m-1 w-24 h-24">
+                  <img src={src} className="w-full h-full object-cover rounded-md" />
+                  <button
+                    type="button"
+                    onClick={() => removeNew(idx)}
+                    className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs px-1"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
           <input
             name="images"
             id="productImages"
@@ -219,7 +218,7 @@ export function EditProduct() {
             accept="image/png, image/jpeg"
             onChange={handleImageChange}
             ref={productImages}
-            className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5 mt-2"
+            className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
           />
         </div>
 
@@ -227,7 +226,7 @@ export function EditProduct() {
           <button
             type="button"
             onClick={() => navigate(`/products/${id}`)}
-            className="bg-[#00629B] text-white font-semibold font-inter py-2 px-4 shadow-lg"
+            className="bg-[#00629B] text-white font-semibold font-inter py-2 px-4 shadow-lg hover:brightness-90 transition-all"
           >
             Cancel
           </button>
@@ -235,13 +234,13 @@ export function EditProduct() {
             <button
               type="button"
               onClick={handleDelete}
-              className="bg-[#DC3545] text-white font-semibold font-inter py-2 px-4 shadow-lg"
+              className="bg-[#DC3545] text-white font-semibold font-inter py-2 px-4 shadow-lg hover:brightness-90 transition-all"
             >
               Delete
             </button>
             <button
               type="submit"
-              className="bg-[#00629B] text-white font-semibold font-inter py-2 px-4 shadow-lg"
+              className="bg-[#00629B] text-white font-semibold font-inter py-2 px-4 shadow-lg hover:brightness-90 transition-all"
             >
               Done
             </button>
