@@ -54,9 +54,7 @@ export function IndividualProductPage() {
       if (uid)
         await get(`/api/users/${uid}`).then(async (res) => {
           const ownedByUser = await res.json().then((data) => {
-            const canEdit = data.productList.includes(id);
-            setIsSaved(data.savedProducts?.includes(id));
-            return canEdit;
+            return data.productList.includes(id);
           });
           setHasPermissions(ownedByUser);
         });
