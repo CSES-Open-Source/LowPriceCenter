@@ -60,10 +60,10 @@ export function ProfilePage() {
             <>
               <div className="flex justify-between mb-2 px-3">
                 <button
-                  className="text-lg mb-4 font-inter hover:underline"
-                  onClick={() => navigate("/products")}
+                  className="text-lg text-left mb-4 font-inter hover:underline"
+                  onClick={() => navigate(-1)}
                 >
-                  &larr; Return to Marketplace
+                  &larr; Back
                 </button>
                 {hasPermissions && (
                   <button
@@ -74,11 +74,21 @@ export function ProfilePage() {
                   </button>
                 )}
               </div>
-              <div className="flex justify-between mb-2 px-3 gap-10">
+              <div className="flex flex-col md:flex-row justify-between mb-2 px-3 gap-10">
                 <div className="flex-1">
-                  <p className="text-2xl sm:text-3xl font-jetbrains font-bold mb-6">
-                    {profile?.displayName || profile?.email}
-                  </p>
+                  {/* Name */}
+                  <div className="flex flex-row justify-between mb-6">
+                    <p className="flex items-center text-2xl sm:text-3xl font-jetbrains font-bold">
+                      {profile?.displayName || profile?.email}
+                    </p>
+                    <div className="md:hidden items-end">
+                      <img
+                        src={profile?.profilePic ? profile?.profilePic : "/profile-pic-default.png"}
+                        alt="Profile Image"
+                        className="w-20 h-20 md:w-48 md:h-48 object-cover rounded-full shadow-md"
+                      />
+                    </div>
+                  </div>
                   {/* Biography */}
                   <div className="bg-[#F5F0E6] p-5 mb-6">
                     <p className="font-inter text-black text-base md:text-xl font-normal break-words">
@@ -86,17 +96,17 @@ export function ProfilePage() {
                     </p>
                   </div>
                 </div>
-                {/* Profile Image */}
-                <div>
+                {/* Profile Image on Desktop View*/}
+                <div className="hidden md:flex">
                   <img
                     src={profile?.profilePic ? profile?.profilePic : "/profile-pic-default.png"}
                     alt="Profile Image"
-                    className="w-48 h-48 object-cover rounded-full shadow-md"
+                    className="w-24 h-24 md:w-48 md:h-48 object-cover rounded-full shadow-md"
                   />
                 </div>
               </div>
               <div className="flex justify-between mb-2 px-3">
-                <p className="text-lg sm:text-3xl font-jetbrains font-medium">Products</p>
+                <p className="text-2xl sm:text-3xl font-jetbrains font-medium">Products</p>
               </div>
               {profile?.productList.length === 0 && (
                 <p className="font-inter text-lg px-3 pt-3">No listed products yet.</p>

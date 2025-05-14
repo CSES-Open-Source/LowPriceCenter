@@ -1,4 +1,10 @@
-import { faBars, faCartShopping, faUser, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBars,
+  faCartShopping,
+  faUser,
+  faXmark,
+  faDoorOpen,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useRef, useState } from "react";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
@@ -84,7 +90,11 @@ export function Navbar() {
                 onClick={signOutFromFirebase}
                 className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
               >
-                <FontAwesomeIcon className="text-lg pr-2" icon={faUser} aria-label="User Icon" />
+                <FontAwesomeIcon
+                  className="text-lg pr-2"
+                  icon={faDoorOpen}
+                  aria-label="User Icon"
+                />
                 Sign Out
               </button>
             ) : (
@@ -92,7 +102,11 @@ export function Navbar() {
                 onClick={openGoogleAuthentication}
                 className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
               >
-                <FontAwesomeIcon className="text-lg pr-2" icon={faUser} aria-label="User Icon" />
+                <FontAwesomeIcon
+                  className="text-lg pr-2"
+                  icon={faDoorOpen}
+                  aria-label="User Icon"
+                />
                 Sign In
               </button>
             )}
@@ -147,7 +161,11 @@ export function Navbar() {
                   onClick={signOutFromFirebase}
                   className="font-inter w-full text-left px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
                 >
-                  <FontAwesomeIcon className="text-lg pr-2" icon={faUser} aria-label="User Icon" />
+                  <FontAwesomeIcon
+                    className="text-lg pr-2"
+                    icon={faDoorOpen}
+                    aria-label="User Icon"
+                  />
                   Sign Out
                 </button>
               ) : (
@@ -155,7 +173,11 @@ export function Navbar() {
                   onClick={openGoogleAuthentication}
                   className="font-inter w-full text-center px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
                 >
-                  <FontAwesomeIcon className="text-lg pr-2" icon={faUser} aria-label="User Icon" />
+                  <FontAwesomeIcon
+                    className="text-lg pr-2"
+                    icon={faDoorOpen}
+                    aria-label="User Icon"
+                  />
                   Sign In
                 </button>
               )}
