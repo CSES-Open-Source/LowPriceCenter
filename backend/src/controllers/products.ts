@@ -10,7 +10,10 @@ import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "src/config/firebaseConfig";
 import multer from "multer";
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
+}).array("images", 10);
 
 /**
  * get all the products in database
@@ -23,6 +26,7 @@ export const getProducts = async (req: AuthenticatedRequest, res: Response) => {
     res.status(500).json({ message: "Error fetching products", error });
   }
 };
+
 /**
  * get individual product thru product id
  */
@@ -81,7 +85,7 @@ export const getProductsByQuery = async (req: AuthenticatedRequest, res: Respons
  * add product to database thru name, price, description, and userEmail
  */
 export const addProduct = [
-  upload.single("image"),
+  upload,
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { name, price, description, tags } = req.body;
@@ -92,18 +96,22 @@ export const addProduct = [
         return res.status(400).json({ message: "Name, price, and userEmail are required." });
       }
 
-      let image = "";
-      if (req.file) {
-        const fileName = `${uuidv4()}-${req.file.originalname}`;
-        const file = bucket.file(fileName);
-
-        await file.save(req.file.buffer, {
-          metadata: { contentType: req.file.mimetype },
-        });
-
+      const images: string[] = [];
+      if (req.files && Array.isArray(req.files)) {
         const app = initializeApp(firebaseConfig);
         const storage = getStorage(app);
-        image = await getDownloadURL(ref(storage, fileName));
+
+        for (const file of req.files as Express.Multer.File[]) {
+          const fileName = `${uuidv4()}-${file.originalname}`;
+          const firebaseFile = bucket.file(fileName);
+
+          await firebaseFile.save(file.buffer, {
+            metadata: { contentType: file.mimetype },
+          });
+
+          const imageUrl = await getDownloadURL(ref(storage, fileName));
+          images.push(imageUrl);
+        }
       }
 
       const newProduct = new ProductModel({
@@ -111,8 +119,8 @@ export const addProduct = [
         price,
         description,
         userEmail,
-        image,
         tags,
+        images,
         timeCreated: new Date(),
         timeUpdated: new Date(),
       });
@@ -127,6 +135,7 @@ export const addProduct = [
     }
   },
 ];
+
 /**
  * delete product from database thru id
  */
@@ -161,7 +170,7 @@ export const deleteProductById = async (req: AuthenticatedRequest, res: Response
 //  * patch product in database thru id and updated parameters in req
 //  */
 export const updateProductById = [
-  upload.single("image"),
+  upload,
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const id = req.params.id;
@@ -169,52 +178,43 @@ export const updateProductById = [
       if (!mongoose.Types.ObjectId.isValid(id))
         return res.status(400).json({ message: "Invalid ID format" });
 
-      console.log("in the terminal2");
-      console.log(req.user);
-
       const userId = req.user._id;
-      console.log("in the terminal2.5");
       const user = await UserModel.findById(userId);
-      console.log("in the terminal3");
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-
-      console.log("in the terminal4");
 
       if (!user.productList.includes(id)) {
         return res.status(400).json({ message: "User does not own this product" });
       }
 
-      console.log("Imageing...");
+      let existing = req.body.existingImages || [];
+      if (!Array.isArray(existing)) existing = [existing];
 
-      let newImage;
-
-      if (req.file) {
-        const fileName = `${uuidv4()}-${req.file.originalname}`;
-        const file = bucket.file(fileName);
-
-        await file.save(req.file.buffer, {
-          metadata: { contentType: req.file.mimetype },
-        });
-
-        const app = initializeApp(firebaseConfig);
-        const storage = getStorage(app);
-        newImage = await getDownloadURL(ref(storage, fileName));
+      const newUrls: string[] = [];
+      const app = initializeApp(firebaseConfig);
+      const storage = getStorage(app);
+      for (const file of req.files as Express.Multer.File[]) {
+        const name = `${uuidv4()}-${file.originalname}`;
+        const bucketFile = bucket.file(name);
+        await bucketFile.save(file.buffer, { metadata: { contentType: file.mimetype } });
+        newUrls.push(await getDownloadURL(ref(storage, name)));
       }
 
-      const updates = {
-        name: req.body.name,
-        price: req.body.price,
-        description: req.body.description,
-        timeUpdated: new Date(),
-        image: newImage,
-        tags: req.body.tags ?? []
-      };
+      const finalImages = [...existing, ...newUrls];
 
-      console.log("Done...");
-
-      const updatedProduct = await ProductModel.findByIdAndUpdate(id, updates, { new: true });
+      const updatedProduct = await ProductModel.findByIdAndUpdate(
+        id,
+        {
+          name: req.body.name,
+          price: req.body.price,
+          description: req.body.description,
+          images: finalImages,
+          tags: req.body.tags ?? [],
+          timeUpdated: new Date(),
+        },
+        { new: true },
+      );
 
       if (!updatedProduct) {
         return res.status(404).json({ message: "Product not found" });
@@ -224,8 +224,13 @@ export const updateProductById = [
         message: "Product successfully updated",
         updatedProduct,
       });
-    } catch (error) {
-      res.status(500).json({ message: "Error patching product", error });
+    } catch (err: any) {
+      console.error("🔥 updateProductById failed:", err.stack || err);
+      // send the message back so you can see it in the browser
+      return res.status(500).json({
+        message: "Error patching product",
+        error: err.message || err.toString(),
+      });
     }
   },
 ];
