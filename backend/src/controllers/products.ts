@@ -15,12 +15,15 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
 }).array("images", 10);
 
+const pageSize = 12;
+
 /**
  * get all the products in database
  */
 export const getProducts = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const products = await ProductModel.find().sort({"timeUpdated": -1});
+    const page = Number(req.query.page) - 1;
+    const products = await ProductModel.find().skip(pageSize * page).limit(pageSize).sort({"timeUpdated": -1});
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: "Error fetching products", error });
@@ -51,6 +54,7 @@ export const getProductById = async (req: AuthenticatedRequest, res: Response) =
  */
 export const getProductsByQuery = async (req: AuthenticatedRequest, res: Response) => {
   try {
+    const page = Number(req.query.page) - 1;
     const keyword = req.query.keyword;
     let tags: string[] = [];
     if (typeof req.query.tags === "string" && req.query.tags.length > 0) {
@@ -70,7 +74,7 @@ export const getProductsByQuery = async (req: AuthenticatedRequest, res: Respons
     }
     if (price) query.price = {$lte: price};
 
-    const products = await ProductModel.find(query).sort({[sortField]: sortOrder === 1 ? 'asc' : 'desc'});
+    const products = await ProductModel.find(query).skip(pageSize * page).limit(pageSize).sort({[sortField]: sortOrder === 1 ? 'asc' : 'desc'});
     if (!products) {
       return res.status(404).json({ message: "Product not found" });
     }

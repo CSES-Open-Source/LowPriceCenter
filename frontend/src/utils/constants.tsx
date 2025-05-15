@@ -12,3 +12,5 @@ export const orderMethods = {
   "Price (low-high)": "price",
   "Alphabetical (A-Z)": "name",
 } as { [key: string]: string };
+
+export const pageSize = 12;

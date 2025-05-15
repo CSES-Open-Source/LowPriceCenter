@@ -7,6 +7,7 @@ import { FirebaseContext } from "src/utils/FirebaseProvider";
 import { get, post } from "src/api/requests";
 
 export function Marketplace() {
+  const [page, setPage] = useState<number>(1);
   const [products, setProducts] = useState<
     Array<{
       _id: string;
@@ -65,7 +66,7 @@ export function Marketplace() {
               Add Product
             </button>
           </div>
-          <SearchBar setProducts={setProducts} setError={setError} />
+          <SearchBar setProducts={setProducts} setError={setError} page={page} />
           {error && <p className="max-w-[80%] w-full px-3 pt-3 text-red-800">{error}</p>}
           {!error && products?.length === 0 && (
             <p className="max-w-[80%] font-inter text-lg w-full px-3 pt-3">No products available</p>
@@ -89,7 +90,7 @@ export function Marketplace() {
           </div>
         </div>
         <div className="flex justify-center mt-6">
-          <PaginationBar />
+          <PaginationBar page={page} setPage={setPage} />
         </div>
       </main>
     </>

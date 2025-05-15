@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { get } from "src/api/requests";
 import { FaFilter } from "react-icons/fa6";
-import { tags } from "../utils/constants.tsx";
-import { orderMethods } from "../utils/constants.tsx";
+import { orderMethods, tags } from "../utils/constants.tsx";
 
 interface Props {
   setProducts: (products: []) => void;
   setError: (error: string) => void;
+  page: number;
 }
 
-export default function SearchBar({ setProducts, setError }: Props) {
+export default function SearchBar({ setProducts, setError, page }: Props) {
   const [dropdownHidden, setDropdownHidden] = useState<boolean>(true);
   const [query, setQuery] = useState<string | null>(null);
   const [tagFilters, setTagFilters] = useState<string[]>([]);
@@ -38,7 +38,7 @@ export default function SearchBar({ setProducts, setError }: Props) {
           if (priceMax) price = String(priceMax);
 
           await get(
-            `/api/products/search?keyword=${keyword}&tags=${selectedTags}&price=${price}&order=${orderMethods[orderBy]}`,
+            `/api/products/search?page=${page}&keyword=${keyword}&tags=${selectedTags}&price=${price}&order=${orderMethods[orderBy]}`,
           ).then((res) => {
             if (res.ok) {
               res.json().then((data) => {
@@ -47,7 +47,7 @@ export default function SearchBar({ setProducts, setError }: Props) {
             }
           });
         } else {
-          await get(`/api/products/`).then((res) => {
+          await get(`/api/products?page=${page}`).then((res) => {
             if (res.ok) {
               res.json().then((data) => {
                 setProducts(data);
@@ -61,7 +61,7 @@ export default function SearchBar({ setProducts, setError }: Props) {
       }
     };
     search();
-  }, [query, tagFilters, priceMax, orderBy]);
+  }, [query, tagFilters, priceMax, orderBy, page]);
 
   // handle dropdown display
   const dropdownRef = useRef<HTMLDivElement>(null);

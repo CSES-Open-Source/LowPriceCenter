@@ -1,10 +1,14 @@
 import { useMediaQuery, useTheme, Pagination } from "@mui/material";
 
-export default function PaginationBar() {
+interface Props {
+  page: number;
+  setPage: (page: number) => void;
+}
+export default function PaginationBar({ page, setPage }: Props) {
   const theme = useTheme();
-  const isSm = useMediaQuery(theme.breakpoints.down("sm")); // e.g. <600px
-  const isMd = useMediaQuery(theme.breakpoints.between("sm", "md")); // e.g. 600–900px
-  const isLgUp = useMediaQuery(theme.breakpoints.up("md")); // >900px
+  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMd = useMediaQuery(theme.breakpoints.between("sm", "md"));
+  const isLgUp = useMediaQuery(theme.breakpoints.up("md"));
 
   let size: "small" | "medium" | "large" = "medium";
   let siblingCount = 1;
@@ -28,6 +32,8 @@ export default function PaginationBar() {
       showFirstButton
       showLastButton
       siblingCount={siblingCount}
+      page={page}
+      onChange={(_, newPage: number) => setPage(newPage)}
     />
   );
 }
