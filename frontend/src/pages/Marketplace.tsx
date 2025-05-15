@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { Helmet } from "react-helmet-async";
 import Product from "src/components/Product";
 import SearchBar from "src/components/SearchBar";
+import PaginationBar from "src/components/Pagination";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 import { get, post } from "src/api/requests";
 
@@ -53,7 +54,7 @@ export function Marketplace() {
       <Helmet>
         <title>Low-Price Center Marketplace</title>
       </Helmet>
-      <main className="w-full flex justify-center items-center mt-12 mb-20">
+      <main className="w-full flex flex-col justify-center items-center mt-12 mb-20">
         <div className="max-w-[80%] w-full">
           <div id="grid-header" className="flex justify-between flex-wrap mb-2 px-3">
             <p className="text-lg sm:text-3xl font-jetbrains font-medium">Marketplace</p>
@@ -86,6 +87,9 @@ export function Marketplace() {
               </div>
             ))}
           </div>
+        </div>
+        <div className="flex justify-center mt-6">
+          <PaginationBar />
         </div>
       </main>
     </>
