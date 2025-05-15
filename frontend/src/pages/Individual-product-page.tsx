@@ -20,6 +20,7 @@ export function IndividualProductPage() {
     images: string[];
     userEmail: string;
     description: string;
+    tags: string[];
   }>();
   const [error, setError] = useState<string>();
   const [hasPermissions, setHasPermissions] = useState<boolean>(false);
@@ -159,6 +160,18 @@ export function IndividualProductPage() {
                   <p className="font-inter text-black text-base md:text-xl font-normal break-words">
                     {product.description}
                   </p>
+                </div>
+              )}
+              {product?.tags && (
+                <div className="flex flex-row flex-wrap gap-2 py-4">
+                  {product.tags.map((tag) => (
+                    <div
+                      key={tag}
+                      className="flex items-center gap-2 p-1 px-2 w-fit bg-slate-200 rounded-2xl"
+                    >
+                      <span className="text-sm font-medium">{tag}</span>
+                    </div>
+                  ))}
                 </div>
               )}
               <div className="mt-0">

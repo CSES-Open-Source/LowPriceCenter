@@ -1,8 +1,9 @@
-import { FormEvent, useContext, useRef, useState } from "react";
+import { FormEvent, useRef, useContext, useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { post } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
+import { tags } from "../utils/constants.tsx";
 
 export function AddProduct() {
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
@@ -11,6 +12,7 @@ export function AddProduct() {
   const productPrice = useRef<HTMLInputElement>(null);
   const productDescription = useRef<HTMLTextAreaElement>(null);
   const productImages = useRef<HTMLInputElement>(null);
+  const [productTags, setProductTags] = useState<Array<string>>([]);
 
   const { user } = useContext(FirebaseContext);
   const [error, setError] = useState<boolean>(false);
@@ -51,6 +53,23 @@ export function AddProduct() {
     setNewPreviews((p) => p.filter((_, i) => i !== idx));
   };
 
+  // handle dropdown display
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        dropdownRef.current.hidden = true;
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleSubmit = async (e: FormEvent) => {
     if (isSubmitting) return;
     setIsSubmitting(true);
@@ -66,6 +85,9 @@ export function AddProduct() {
         body.append("name", productName.current.value);
         body.append("price", productPrice.current.value);
         body.append("description", productDescription.current.value);
+        productTags.forEach((tag) => {
+          body.append("tags[]", tag);
+        });
         if (user.email) body.append("userEmail", user.email);
 
         if (productImages.current && productImages.current.files) {
@@ -144,6 +166,63 @@ export function AddProduct() {
             className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
             placeholder="Tell us more about this product..."
           />
+        </div>
+
+        {/* Product Tags */}
+        <div className="mb-5">
+          <label htmlFor="productTags" className="block mb-2 font-medium font-inter text-black">
+            Tags
+          </label>
+          <div
+            id="productTags"
+            className="flex flex-row max-w-full flex-wrap gap-2 border border-gray-300 text-black text-sm rounded-md w-full p-2.5 min-h-10 hover:cursor-pointer"
+            onClick={() => {
+              if (dropdownRef.current) dropdownRef.current.hidden = false;
+            }}
+            ref={buttonRef}
+          >
+            {productTags.map((tag) => (
+              <div
+                key={tag}
+                className="flex items-center gap-2 p-1 px-2 w-fit bg-slate-200 rounded-2xl"
+              >
+                <span className="text-sm font-medium">{tag}</span>
+                <button
+                  className="flex items-center justify-center p-1 h-5 w-5 bg-slate-300 text-md rounded-full hover:bg-blue-400 hover:text-white transition-colors duration-200"
+                  onClick={() => {
+                    setProductTags(productTags.filter((t) => t !== tag));
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+          {/* Product Tags Dropdown */}
+          {productTags.length !== tags.length && (
+            <div
+              ref={dropdownRef}
+              className="z-10 mt-2 min-w-64 origin-top-right rounded-md ring-1 shadow-lg ring-black/5 focus:outline-hidden"
+            >
+              <div className="py-1 max-h-35 overflow-y-auto">
+                {tags.map((tag) => {
+                  if (!productTags.includes(tag)) {
+                    return (
+                      <p
+                        onClick={() => {
+                          setProductTags([...productTags, tag]);
+                        }}
+                        key={tag}
+                        className="px-4 py-2 text-sm text-gray-700 hover:cursor-pointer"
+                      >
+                        {tag}
+                      </p>
+                    );
+                  }
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Images */}

@@ -20,7 +20,7 @@ const upload = multer({
  */
 export const getProducts = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const products = await ProductModel.find();
+    const products = await ProductModel.find().sort({"timeUpdated": -1});
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: "Error fetching products", error });
@@ -47,17 +47,36 @@ export const getProductById = async (req: AuthenticatedRequest, res: Response) =
 };
 
 /*
- * search for product by name
+ * search for product by name, tags, price
  */
-export const getProductsByName = async (req: AuthenticatedRequest, res: Response) => {
+export const getProductsByQuery = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const query = req.params.query;
-    const products = await ProductModel.find({ name: { $regex: query, $options: "i" } });
+    const keyword = req.query.keyword;
+    let tags: string[] = [];
+    if (typeof req.query.tags === "string" && req.query.tags.length > 0) {
+      tags = req.query.tags.split(",");
+    }
+    const price = req.query.price;
+    const sortField : string = String(req.query.order) ?? "";
+    let sortOrder = 1
+    if (sortField === 'timeUpdated') sortOrder = -1
+
+    let query: any = {}
+    if (typeof keyword === "string"  && keyword.length > 0){
+      query.name = { $regex: keyword || "", $options: "i" }
+    }
+    if (tags.length > 0) {
+      query.tags = { $in: tags };
+    }
+    if (price) query.price = {$lte: price};
+
+    const products = await ProductModel.find(query).sort({[sortField]: sortOrder === 1 ? 'asc' : 'desc'});
     if (!products) {
       return res.status(404).json({ message: "Product not found" });
     }
     res.status(200).json(products);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Error getting product", error });
   }
 };
@@ -69,7 +88,7 @@ export const addProduct = [
   upload,
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const { name, price, description } = req.body;
+      const { name, price, description, tags } = req.body;
       if (!req.user) return res.status(404).json({ message: "User not found" });
       const userId = req.user._id;
       const userEmail = req.user.userEmail;
@@ -100,6 +119,7 @@ export const addProduct = [
         price,
         description,
         userEmail,
+        tags,
         images,
         timeCreated: new Date(),
         timeUpdated: new Date(),
@@ -190,6 +210,7 @@ export const updateProductById = [
           price: req.body.price,
           description: req.body.description,
           images: finalImages,
+          tags: req.body.tags ?? [],
           timeUpdated: new Date(),
         },
         { new: true },
