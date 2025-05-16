@@ -24,7 +24,8 @@ export const getProducts = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const page = Number(req.query.page) - 1;
     const products = await ProductModel.find().skip(pageSize * page).limit(pageSize).sort({"timeUpdated": -1});
-    res.status(200).json(products);
+    const totalCount = await ProductModel.countDocuments().then((count) => Math.ceil(count / pageSize))
+    res.status(200).json({products, totalCount});
   } catch (error) {
     res.status(500).json({ message: "Error fetching products", error });
   }
@@ -75,10 +76,9 @@ export const getProductsByQuery = async (req: AuthenticatedRequest, res: Respons
     if (price) query.price = {$lte: price};
 
     const products = await ProductModel.find(query).skip(pageSize * page).limit(pageSize).sort({[sortField]: sortOrder === 1 ? 'asc' : 'desc'});
-    if (!products) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-    res.status(200).json(products);
+    const totalCount = await ProductModel.countDocuments(query).then((count) => Math.ceil(count / pageSize))
+
+    res.status(200).json({products, totalCount});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error getting product", error });

@@ -5,11 +5,12 @@ import { orderMethods, tags } from "../utils/constants.tsx";
 
 interface Props {
   setProducts: (products: []) => void;
+  setTotalPages: (totalPages: number) => void;
   setError: (error: string) => void;
   page: number;
 }
 
-export default function SearchBar({ setProducts, setError, page }: Props) {
+export default function SearchBar({ setProducts, setTotalPages, setError, page }: Props) {
   const [dropdownHidden, setDropdownHidden] = useState<boolean>(true);
   const [query, setQuery] = useState<string | null>(null);
   const [tagFilters, setTagFilters] = useState<string[]>([]);
@@ -42,7 +43,9 @@ export default function SearchBar({ setProducts, setError, page }: Props) {
           ).then((res) => {
             if (res.ok) {
               res.json().then((data) => {
-                setProducts(data);
+                setProducts(data.products);
+                console.log(data.totalCount);
+                setTotalPages(data.totalCount);
               });
             }
           });
@@ -50,7 +53,9 @@ export default function SearchBar({ setProducts, setError, page }: Props) {
           await get(`/api/products?page=${page}`).then((res) => {
             if (res.ok) {
               res.json().then((data) => {
-                setProducts(data);
+                setProducts(data.products);
+                console.log(data.totalCount);
+                setTotalPages(data.totalCount);
               });
             }
           });
@@ -101,7 +106,7 @@ export default function SearchBar({ setProducts, setError, page }: Props) {
         <div
           ref={dropdownRef}
           hidden={dropdownHidden}
-          className="absolute right-0 top-full z-10 mt-2 mr-1 w-56 px-3 bg-white rounded-md ring-1 shadow-lg ring-black/5 focus:outline-hidden"
+          className="absolute right-0 top-full z-20 mt-2 mr-1 w-56 px-3 bg-white rounded-md ring-1 shadow-lg ring-black/5 focus:outline-hidden"
         >
           <div className="py-3 max-h-35 overflow-y-auto bg-white rounded-md">
             <p className="font-semibold font-inter text-base">Category</p>

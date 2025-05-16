@@ -1,10 +1,11 @@
 import { useMediaQuery, useTheme, Pagination } from "@mui/material";
 
 interface Props {
+  totalPages: number;
   page: number;
   setPage: (page: number) => void;
 }
-export default function PaginationBar({ page, setPage }: Props) {
+export default function PaginationBar({ totalPages, page, setPage }: Props) {
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   const isMd = useMediaQuery(theme.breakpoints.between("sm", "md"));
@@ -26,7 +27,7 @@ export default function PaginationBar({ page, setPage }: Props) {
 
   return (
     <Pagination
-      count={30}
+      count={totalPages}
       color="primary"
       size={size}
       showFirstButton
