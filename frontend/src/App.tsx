@@ -12,7 +12,7 @@ import { IndividualProductPage } from "../src/pages/Individual-product-page";
 import { PageNotFound } from "../src/pages/PageNotFound";
 import FirebaseProvider from "../src/utils/FirebaseProvider";
 import { SavedProducts } from "./pages/SavedProducts";
-
+import { FaqPage } from "../src/pages/FaqPage";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -58,6 +58,7 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
   },
+  { path: "/faq", element: <FaqPage /> },
   {
     path: "*",
     element: <PageNotFound />,
