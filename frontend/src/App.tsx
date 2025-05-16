@@ -13,6 +13,7 @@ import { PageNotFound } from "../src/pages/PageNotFound";
 import { ProfilePage } from "../src/pages/ProfilePage";
 import { EditProfile } from "../src/pages/EditProfile";
 import FirebaseProvider from "../src/utils/FirebaseProvider";
+import { SavedProducts } from "./pages/SavedProducts";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,14 @@ const router = createBrowserRouter([
     element: (
       <PrivateRoute>
         <IndividualProductPage />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/saved-products",
+    element: (
+      <PrivateRoute>
+        <SavedProducts />
       </PrivateRoute>
     ),
   },

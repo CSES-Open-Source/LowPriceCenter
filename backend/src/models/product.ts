@@ -24,7 +24,7 @@ const productSchema = new Schema({
     type: String,
     required: true,
   },
-  image: { type: String },
+  images: [{ type: String }],
 });
 
 export type Product = HydratedDocument<InferSchemaType<typeof productSchema>>;

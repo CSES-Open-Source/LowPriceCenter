@@ -6,12 +6,14 @@ import {
   deleteUserById,
   updateUserById,
 } from "src/controllers/users";
+import { toggleSavedProduct } from "src/controllers/savedProducts";
 
 const router = express.Router();
 
 router.get("/", getUsers);
 router.get("/:firebaseUid", getUserById);
 router.post("/", addUser);
+router.post("/:userId/saved-products", toggleSavedProduct);
 router.delete("/:id", deleteUserById);
 router.patch("/:firebaseUid", updateUserById);
 
