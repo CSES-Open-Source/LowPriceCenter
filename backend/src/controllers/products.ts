@@ -191,6 +191,7 @@ export const updateProductById = [
           description: req.body.description,
           images: finalImages,
           timeUpdated: new Date(),
+          isSold: req.body.isSold,
         },
         { new: true },
       );

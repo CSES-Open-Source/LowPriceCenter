@@ -1,4 +1,4 @@
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,6 +20,7 @@ export function IndividualProductPage() {
     images: string[];
     userEmail: string;
     description: string;
+    isSold: boolean;
   }>();
   const [error, setError] = useState<string>();
   const [hasPermissions, setHasPermissions] = useState<boolean>(false);
@@ -62,6 +63,10 @@ export function IndividualProductPage() {
     findEditPermission();
   }, []);
 
+  const handleMarkSold = () => {
+    setProduct({ ...product, isSold: !product?.isSold } as typeof product);
+  };
+
   const toggleSave = async () => {
     if (!user?.uid) {
       navigate("/login");
@@ -98,12 +103,22 @@ export function IndividualProductPage() {
           </button>
 
           {hasPermissions && (
-            <button
-              className="text-lg mb-4 font-inter hover:underline"
-              onClick={() => navigate(`/edit-product/${id}`)}
-            >
-              Edit Product <FontAwesomeIcon icon={faPenToSquare} />
-            </button>
+            <div className="flex flex-col items-end">
+              <button
+                className="text-lg mb-1 font-inter hover:underline"
+                onClick={() => navigate(`/edit-product/${id}`)}
+              >
+                Edit Product <FontAwesomeIcon icon={faPenToSquare} />
+              </button>
+              <button
+                onClick={handleMarkSold}
+                className={`text-lg mb-4 font-inter hover:underline ${
+                  product?.isSold && "text-red-800 font-semibold"
+                }`}
+              >
+                {product?.isSold ? "Sold" : "Mark as Sold"} <FontAwesomeIcon icon={faCheck} />
+              </button>
+            </div>
           )}
         </div>
         {/* Error message if product not found */}
