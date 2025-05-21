@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { get, post } from "src/api/requests";
+import { get, patch, post } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 import EmblaCarousel from "src/components/EmblaCarousel";
 import { EmblaOptionsType } from "embla-carousel";
@@ -64,7 +64,31 @@ export function IndividualProductPage() {
   }, []);
 
   const handleMarkSold = () => {
-    setProduct({ ...product, isSold: !product?.isSold } as typeof product);
+    const updateProduct = async () => {
+      try {
+        if (product) {
+          const body = new FormData();
+          body.append("name", product?.name);
+          body.append("price", String(product?.price));
+          body.append("description", product?.description);
+          body.append("userEmail", product?.userEmail);
+          body.append("isSold", String(!product?.isSold));
+
+          // append existing image URLs
+          product.images.forEach((url) => body.append("existingImages", url));
+
+          const res = await patch(`/api/products/${id}`, body);
+
+          if (res.ok) {
+            setError("");
+            setProduct({ ...product, isSold: !product?.isSold } as typeof product);
+          } else throw Error();
+        } else throw Error();
+      } catch (err) {
+        setError("Unable to mark product as sold");
+      }
+    };
+    updateProduct();
   };
 
   const toggleSave = async () => {
