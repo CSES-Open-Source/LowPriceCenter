@@ -13,4 +13,4 @@ export const orderMethods = {
   "Alphabetical (A-Z)": "name",
 } as { [key: string]: string };
 
-export const pageSize = 12;
+export const pageSize = 24;

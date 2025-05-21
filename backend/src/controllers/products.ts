@@ -15,7 +15,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
 }).array("images", 10);
 
-const pageSize = 12;
+const pageSize = 24;
 
 /**
  * get all the products in database
