@@ -9,6 +9,7 @@ export const tags = [
 
 export const orderMethods = {
   "Most Recent": "timeUpdated",
-  "Price (low-high)": "price",
+  "Price (low-high)": "priceAsc",
+  "Price (high-low)": "priceDesc",
   "Alphabetical (A-Z)": "name",
 } as { [key: string]: string };

@@ -101,7 +101,7 @@ export default function SearchBar({ setProducts, setError }: Props) {
         <div
           ref={dropdownRef}
           hidden={dropdownHidden}
-          className="absolute right-0 top-full z-10 mt-2 mr-1 w-56 px-3 bg-white rounded-md ring-1 shadow-lg ring-black/5 focus:outline-hidden"
+          className="absolute right-0 top-full z-20 mt-2 mr-1 w-56 px-3 bg-white rounded-md ring-1 shadow-lg ring-black/5 focus:outline-hidden"
         >
           <div className="py-3 max-h-35 overflow-y-auto bg-white rounded-md">
             <p className="font-semibold font-inter text-base">Category</p>
@@ -120,7 +120,9 @@ export default function SearchBar({ setProducts, setError }: Props) {
                     }
                   }}
                 />
-                <label className="font-inter"> {tag}</label>
+                <label htmlFor={tag} className="font-inter">
+                  {tag}
+                </label>
                 <br />
               </div>
             ))}
@@ -171,7 +173,10 @@ export default function SearchBar({ setProducts, setError }: Props) {
                       }
                     }}
                   />
-                  <label className="font-inter"> {method}</label>
+                  <label htmlFor={method} className="font-inter">
+                    {" "}
+                    {method}
+                  </label>
                   <br />
                 </div>
               ))}
