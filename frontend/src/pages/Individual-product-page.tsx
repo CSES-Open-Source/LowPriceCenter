@@ -32,6 +32,7 @@ export function IndividualProductPage() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
+  const [hoverMarkSold, setHoverMarkSold] = useState(false);
 
   const location = useLocation() as {
     state?: { from?: "saved" | "marketplace" };
@@ -136,11 +137,14 @@ export function IndividualProductPage() {
               </button>
               <button
                 onClick={handleMarkSold}
+                onMouseEnter={() => setHoverMarkSold(true)}
+                onMouseLeave={() => setHoverMarkSold(false)}
                 className={`text-lg mb-4 font-inter hover:underline ${
                   product?.isSold && "text-red-800 font-semibold"
                 }`}
               >
-                {product?.isSold ? "Sold" : "Mark as Sold"} <FontAwesomeIcon icon={faCheck} />
+                {product?.isSold ? (hoverMarkSold ? "Unmark as Sold" : "Sold") : "Mark as Sold"}{" "}
+                <FontAwesomeIcon icon={faCheck} />
               </button>
             </div>
           )}
