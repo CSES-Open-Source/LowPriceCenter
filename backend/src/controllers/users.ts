@@ -1,6 +1,15 @@
 import { Request, Response } from "express";
 import UserModel from "src/models/user";
 import { getAuth } from "firebase-admin/auth";
+import multer from "multer";
+import { v4 as uuidv4 } from "uuid";
+import { bucket } from "src/config/firebase";
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "src/config/firebaseConfig";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import user from "src/models/user";
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 export const getUsers = async (req: Request, res: Response) => {
   try {
@@ -16,7 +25,7 @@ export const getUserById = async (req: Request, res: Response) => {
   try {
     const firebaseUid = req.params.firebaseUid;
 
-    const user = await UserModel.findOne({ firebaseUid: firebaseUid });
+    const user = await UserModel.findOne({ firebaseUid: firebaseUid }).populate("productList");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -94,37 +103,74 @@ export const deleteUserById = async (req: Request, res: Response) => {
 };
 
 // id: firebase user id
-export const updateUserById = async (req: Request, res: Response) => {
-  try {
-    const { displayName, deactivateAccount } = req.body;
-    const firebaseUid = req.params.firebaseUid;
-    const updatedUser = await UserModel.findOne({ firebaseUid: firebaseUid });
-    if (!updatedUser) {
-      throw new Error("User not found");
+export const updateUserById = [
+  upload.single("profilePic"),
+  async (req: Request, res: Response) => {
+    try {
+      const { displayName, deactivateAccount, biography } = req.body;
+      const firebaseUid = req.params.firebaseUid;
+      const updatedUser = await UserModel.findOne({ firebaseUid: firebaseUid });
+      if (!updatedUser) {
+        throw new Error("User not found");
+      }
+
+      let newProfilePic;
+
+      // Handle optional image uplaod
+      if (req.file) {
+        const fileName = `${uuidv4()}-${req.file.originalname}`;
+        const file = bucket.file(fileName);
+
+        await file.save(req.file.buffer, {
+          metadata: { contentType: req.file.mimetype },
+        });
+
+        const app = initializeApp(firebaseConfig);
+        const storage = getStorage(app);
+        newProfilePic = await getDownloadURL(ref(storage, fileName));
+      }
+
+      // Update fields if provided
+      if (displayName !== undefined) {
+        updatedUser.displayName = displayName;
+      }
+
+      if (deactivateAccount !== undefined) {
+        updatedUser.activeUser = false;
+      }
+
+      if (biography !== undefined) {
+        updatedUser.biography = biography;
+      }
+
+      if (newProfilePic) {
+        updatedUser.profilePic = newProfilePic;
+      }
+
+      // Update Firebase user
+      const firebaseUser = await getAuth().getUserByEmail(updatedUser.userEmail);
+      if (deactivateAccount) {
+        if (firebaseUser) {
+          await getAuth().updateUser(firebaseUser.uid, { disabled: true });
+        }
+      } else {
+        if (firebaseUser) {
+          await getAuth().updateUser(firebaseUser.uid, { disabled: false });
+        }
+      }
+
+      await updatedUser.save();
+
+      res.status(200).json({
+        message: "User successfully updated",
+        updatedUser,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        message: "Error updating user",
+        error: error instanceof Error ? error.message : error,
+      });
     }
-
-    // Update fields if provided
-    if (displayName != undefined) {
-      updatedUser.displayName = displayName;
-    }
-
-    if (deactivateAccount != undefined) {
-      updatedUser.activeUser = false;
-    }
-
-    // Update Firebase user
-    const firebaseUser = await getAuth().getUserByEmail(updatedUser.userEmail);
-    if (firebaseUser) {
-      await getAuth().updateUser(firebaseUser.uid, { disabled: true });
-    }
-
-    await updatedUser.save();
-
-    res.status(200).json({
-      message: "User successfully updated",
-      updatedUser,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Error updating user", error });
-  }
-};
+  },
+];
