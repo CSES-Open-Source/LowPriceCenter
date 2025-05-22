@@ -68,7 +68,42 @@ export function FaqPage() {
             </p>
           }
         />
-
+        <FaqItem
+          question="Is Low-Price Center Officially Affiliated with UCSD?"
+          answer={
+            <p>
+              No, Low-Price Center is an independent entity and is not officially affiliated with
+              UCSD.
+            </p>
+          }
+        />
+        <FaqItem
+          question="Is Low-Price Center Officially Affiliated with UCSD?"
+          answer={
+            <p>
+              No, Low-Price Center is an independent entity and is not officially affiliated with
+              UCSD.
+            </p>
+          }
+        />
+        <FaqItem
+          question="Is Low-Price Center Officially Affiliated with UCSD?"
+          answer={
+            <p>
+              No, Low-Price Center is an independent entity and is not officially affiliated with
+              UCSD.
+            </p>
+          }
+        />
+        <FaqItem
+          question="Is Low-Price Center Officially Affiliated with UCSD?"
+          answer={
+            <p>
+              No, Low-Price Center is an independent entity and is not officially affiliated with
+              UCSD.
+            </p>
+          }
+        />
         <FaqItem
           question="How to Buy?"
           answer={
