@@ -4,6 +4,7 @@ import { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Product from "src/components/Product";
+import BackButton from "src/components/BackButton";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 import { get } from "src/api/requests";
 interface Product {
@@ -59,12 +60,7 @@ export function ProfilePage() {
           {!error && (
             <>
               <div className="flex justify-between mb-2 px-3">
-                <button
-                  className="text-lg text-left mb-4 font-inter hover:underline"
-                  onClick={() => navigate(-1)}
-                >
-                  &larr; Back
-                </button>
+                <BackButton />
                 {hasPermissions && (
                   <button
                     className="text-lg mb-4 font-inter hover:underline"
@@ -120,8 +116,10 @@ export function ProfilePage() {
                         productId={product._id}
                         productName={product.name}
                         productPrice={product.price}
-                        productImage={
-                          product.image ? product.image : "/productImages/product-placeholder.webp"
+                        productImages={
+                          product.image
+                            ? [product.image]
+                            : ["/productImages/product-placeholder.webp"]
                         }
                       />
                     </div>

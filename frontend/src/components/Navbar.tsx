@@ -78,11 +78,7 @@ export function Navbar() {
               onClick={() => (window.location.href = "/saved-products")}
               className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
             >
-              <FontAwesomeIcon
-                className="text-lg pr-2"
-                icon={faHeart}
-                aria-label="Heart Icon"
-              />
+              <FontAwesomeIcon className="text-lg pr-2" icon={faHeart} aria-label="Heart Icon" />
               Saved
             </button>
           </li>
@@ -155,6 +151,16 @@ export function Navbar() {
                   aria-label="Shopping Cart"
                 />
                 Products
+              </button>
+            </li>
+            <li className="mb-2">
+              <button
+                hidden={user === null}
+                onClick={() => (window.location.href = "/saved-products")}
+                className="font-inter w-full text-left px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
+              >
+                <FontAwesomeIcon className="text-lg pr-2" icon={faHeart} aria-label="Heart Icon" />
+                Saved
               </button>
             </li>
             <li className="mb-2">
