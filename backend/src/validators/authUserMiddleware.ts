@@ -11,9 +11,7 @@ export interface AuthenticatedRequest extends Request {
 
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(
-      JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT as string)
-    ),
+    credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT as string)),
   });
 }
 
@@ -24,7 +22,7 @@ export const authenticateUser = async (
 ) => {
   try {
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ message: "Access denied. No token provided." });
     }
@@ -45,9 +43,9 @@ export const authenticateUser = async (
     next();
   } catch (error) {
     console.error("Authentication error:", error);
-    return res.status(401).json({ 
+    return res.status(401).json({
       message: "Invalid or expired token",
-      error: error instanceof Error ? error.message : String(error)
+      error: error instanceof Error ? error.message : String(error),
     });
   }
 };
@@ -65,9 +63,9 @@ export const requireAdmin = async (
       return res.status(403).json({ message: "User not authenticated." });
     }
 
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ 
-        message: "Access denied. Admin privileges required." 
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        message: "Access denied. Admin privileges required.",
       });
     }
 
@@ -88,12 +86,35 @@ export const requireStaff = async (
       return res.status(403).json({ message: "User not authenticated." });
     }
 
-    if (!['staff', 'admin'].includes(req.user.role)) {
-      return res.status(403).json({ 
-        message: "Access denied. Staff or admin privileges required." 
+    if (!["staff", "admin"].includes(req.user.role)) {
+      return res.status(403).json({
+        message: "Access denied. Staff or admin privileges required.",
       });
     }
 
     next();
   });
+};
+
+export const requireOwnershipOrStaff = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  const user = req.user;
+  const targetUserId = req.params.userId;
+
+  if (!user) {
+    return res.status(401).json({ message: "User not authenticated." });
+  }
+
+  if (user.firebaseUid === targetUserId) {
+    return next();
+  }
+
+  if (["staff", "admin"].includes(user.role)) {
+    return next();
+  }
+
+  return res.status(403).json({ message: "Access denied. Must be owner or staff/admin." });
 };

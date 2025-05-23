@@ -157,11 +157,7 @@ export const changeUserRole = async (req: Request, res: Response) => {
     }
 
     // Find and update user in MongoDB
-    const user = await UserModel.findOneAndUpdate(
-      { firebaseUid },
-      { role },
-      { new: true }
-    );
+    const user = await UserModel.findOneAndUpdate({ firebaseUid }, { role }, { new: true });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
