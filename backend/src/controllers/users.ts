@@ -128,3 +128,53 @@ export const updateUserById = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error updating user", error });
   }
 };
+
+export const getAllStaff = async (req: Request, res: Response) => {
+  try {
+    const staffUsers = await UserModel.find({ role: { $in: ["staff", "admin"] } });
+    res.status(200).json(staffUsers);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching staff users", error });
+  }
+};
+
+export const getAllCustomers = async (req: Request, res: Response) => {
+  try {
+    const customerUsers = await UserModel.find({ role: "user" });
+    res.status(200).json(customerUsers);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching customer users", error });
+  }
+};
+
+export const changeUserRole = async (req: Request, res: Response) => {
+  try {
+    const { firebaseUid } = req.params;
+    const { role } = req.body;
+
+    if (!["user", "staff", "admin"].includes(role)) {
+      return res.status(400).json({ message: "Invalid role" });
+    }
+
+    // Find and update user in MongoDB
+    const user = await UserModel.findOneAndUpdate(
+      { firebaseUid },
+      { role },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    try {
+      await getAuth().setCustomUserClaims(firebaseUid, { role });
+    } catch (firebaseError) {
+      console.error("Failed to update Firebase claims:", firebaseError);
+    }
+
+    res.status(200).json({ message: "Role updated successfully", user });
+  } catch (error) {
+    res.status(500).json({ message: "Error changing user role", error });
+  }
+};

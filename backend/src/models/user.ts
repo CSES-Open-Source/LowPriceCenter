@@ -12,6 +12,12 @@ const userSchema = new Schema({
     type: Boolean,
     required: true,
   },
+  role: {
+    type: String,
+    enum: ["user", "staff", "admin"],
+    required: true,
+    default: "user",
+  },
   lastLogin: {
     type: Date,
     required: true,
@@ -29,6 +35,7 @@ const userSchema = new Schema({
   firebaseUid: {
     type: String,
     required: true,
+    unique: true,
   },
 });
 
