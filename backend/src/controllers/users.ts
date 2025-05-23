@@ -174,3 +174,36 @@ export const changeUserRole = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error changing user role", error });
   }
 };
+
+export const changeUserActiveStatus = async (req: Request, res: Response) => {
+  try {
+    const { firebaseUid } = req.params;
+    const { activeUser } = req.body;
+
+    if (typeof activeUser !== "boolean") {
+      return res.status(400).json({ message: "`activeUser` must be boolean." });
+    }
+
+    const user = await UserModel.findOne({ firebaseUid });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    user.activeUser = activeUser;
+    await user.save();
+
+    try {
+      await getAuth().updateUser(firebaseUid, { disabled: !activeUser });
+    } catch (firebaseErr) {
+      console.error("Failed to sync disabled flag in Firebase:", firebaseErr);
+    }
+
+    return res.status(200).json({
+      message: `User has been ${activeUser ? "activated" : "deactivated"}.`,
+      user,
+    });
+  } catch (err) {
+    console.error("Error in changeUserActiveStatus:", err);
+    return res.status(500).json({ message: "Internal error changing active status.", err });
+  }
+};
