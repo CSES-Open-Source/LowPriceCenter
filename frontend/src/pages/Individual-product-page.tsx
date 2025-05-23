@@ -56,13 +56,15 @@ export function IndividualProductPage() {
       if (uid)
         await get(`/api/users/${uid}`).then(async (res) => {
           const ownedByUser = await res.json().then((data) => {
-            return data.productList.includes(id);
+            return data.productList
+              .map((product: { _id: string }) => String(product._id))
+              .includes(String(id));
           });
           setHasPermissions(ownedByUser);
         });
     };
     findEditPermission();
-  }, []);
+  }, [user, id]);
 
   const handleMarkSold = () => {
     const updateProduct = async () => {

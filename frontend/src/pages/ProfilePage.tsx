@@ -12,6 +12,7 @@ interface Product {
   name: string;
   price: number;
   image: string;
+  isSold: boolean;
 }
 
 interface UserProfile {
@@ -92,7 +93,7 @@ export function ProfilePage() {
                     </p>
                   </div>
                 </div>
-                {/* Profile Image on Desktop View*/}
+                {/* Profile Image on Desktop View */}
                 <div className="hidden md:flex">
                   <img
                     src={profile?.profilePic ? profile?.profilePic : "/profile-pic-default.png"}
@@ -101,16 +102,17 @@ export function ProfilePage() {
                   />
                 </div>
               </div>
+              {/* Products Section */}
               <div className="flex justify-between mb-2 px-3">
                 <p className="text-2xl sm:text-3xl font-jetbrains font-medium">Products</p>
               </div>
-              {profile?.productList.length === 0 && (
-                <p className="font-inter text-lg px-3 pt-3">No listed products yet.</p>
+              {profile?.productList.filter((product) => !product.isSold).length === 0 && (
+                <p className="font-inter text-lg px-3 pt-3">No listed products.</p>
               )}
-
               <div className="grid sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 xxl:grid-cols-4">
-                {profile?.productList.map(
-                  (product: { _id: string; name: string; price: number; image: string }) => (
+                {profile?.productList
+                  .filter((product) => !product.isSold)
+                  .map((product) => (
                     <div key={product._id} className="px-3 py-3">
                       <Product
                         productId={product._id}
@@ -123,8 +125,33 @@ export function ProfilePage() {
                         }
                       />
                     </div>
-                  ),
-                )}
+                  ))}
+              </div>
+
+              {/* Sold Products Section */}
+              <div className="flex justify-between mt-10 mb-2 px-3">
+                <p className="text-2xl sm:text-3xl font-jetbrains font-medium">Sold Products</p>
+              </div>
+              {profile?.productList.filter((product) => product.isSold).length === 0 && (
+                <p className="font-inter text-lg px-3 pt-3">No sold products yet.</p>
+              )}
+              <div className="grid sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 xxl:grid-cols-4">
+                {profile?.productList
+                  .filter((product) => product.isSold)
+                  .map((product) => (
+                    <div key={product._id} className="px-3 py-3">
+                      <Product
+                        productId={product._id}
+                        productName={product.name}
+                        productPrice={product.price}
+                        productImages={
+                          product.image
+                            ? [product.image]
+                            : ["/productImages/product-placeholder.webp"]
+                        }
+                      />
+                    </div>
+                  ))}
               </div>
             </>
           )}
