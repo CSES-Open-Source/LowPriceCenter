@@ -62,9 +62,10 @@ export const getProductsByQuery = async (req: AuthenticatedRequest, res: Respons
       tags = req.query.tags.split(",");
     }
     const price = req.query.price;
-    const sortField : string = String(req.query.order) ?? "";
+    let sortField : string = String(req.query.order) ?? "";
     let sortOrder = 1
-    if (sortField === 'timeUpdated') sortOrder = -1
+    if (sortField === 'timeUpdated' || sortField === 'priceDesc') sortOrder = -1
+    if (sortField === 'priceAsc' || sortField === 'priceDesc') sortField = 'price'
 
     let query: any = {}
     if (typeof keyword === "string"  && keyword.length > 0){

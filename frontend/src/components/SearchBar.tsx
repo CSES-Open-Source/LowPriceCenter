@@ -79,7 +79,7 @@ export default function SearchBar({ setProducts, setTotalPages, setError, page }
         buttonRef.current &&
         !buttonRef.current.contains(event.target as Node)
       ) {
-        setDropdownHidden(false);
+        setDropdownHidden(true);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -97,7 +97,7 @@ export default function SearchBar({ setProducts, setTotalPages, setError, page }
         <div ref={buttonRef}>
           <FaFilter
             onClick={() => {
-              if (dropdownRef.current) dropdownRef.current.hidden = !dropdownRef.current?.hidden;
+              setDropdownHidden((prev) => !prev);
             }}
             className="absolute right-6 top-1/2 transform -translate-y-1/2 text-[#00629B] text-[1.2rem] cursor-pointer"
           />
@@ -125,7 +125,9 @@ export default function SearchBar({ setProducts, setTotalPages, setError, page }
                     }
                   }}
                 />
-                <label className="font-inter"> {tag}</label>
+                <label htmlFor={tag} className="font-inter">
+                  {tag}
+                </label>
                 <br />
               </div>
             ))}
@@ -176,7 +178,10 @@ export default function SearchBar({ setProducts, setTotalPages, setError, page }
                       }
                     }}
                   />
-                  <label className="font-inter"> {method}</label>
+                  <label htmlFor={method} className="font-inter">
+                    {" "}
+                    {method}
+                  </label>
                   <br />
                 </div>
               ))}
