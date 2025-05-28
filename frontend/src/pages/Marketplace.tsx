@@ -2,10 +2,13 @@ import { useState, useEffect, useContext } from "react";
 import { Helmet } from "react-helmet-async";
 import Product from "src/components/Product";
 import SearchBar from "src/components/SearchBar";
+import PaginationBar from "src/components/Pagination";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 import { get, post } from "src/api/requests";
 
 export function Marketplace() {
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const [products, setProducts] = useState<
     Array<{
       _id: string;
@@ -53,7 +56,7 @@ export function Marketplace() {
       <Helmet>
         <title>Low-Price Center Marketplace</title>
       </Helmet>
-      <main className="w-full flex justify-center items-center mt-12 mb-20">
+      <main className="w-full flex flex-col justify-center items-center mt-12 mb-20">
         <div className="max-w-[80%] w-full">
           <div id="grid-header" className="flex justify-between flex-wrap mb-2 px-3">
             <p className="text-lg sm:text-3xl font-jetbrains font-medium">Marketplace</p>
@@ -64,7 +67,12 @@ export function Marketplace() {
               Add Product
             </button>
           </div>
-          <SearchBar setProducts={setProducts} setError={setError} />
+          <SearchBar
+            setProducts={setProducts}
+            setTotalPages={setTotalPages}
+            setError={setError}
+            page={page}
+          />
           {error && <p className="max-w-[80%] w-full px-3 pt-3 text-red-800">{error}</p>}
           {!error && products?.length === 0 && (
             <p className="max-w-[80%] font-inter text-lg w-full px-3 pt-3">No products available</p>
@@ -86,6 +94,9 @@ export function Marketplace() {
               </div>
             ))}
           </div>
+        </div>
+        <div className={`${totalPages === 0 ? "hidden" : "flex"} justify-center mt-6`}>
+          <PaginationBar page={page} setPage={setPage} totalPages={totalPages} />
         </div>
       </main>
     </>
