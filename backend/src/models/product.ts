@@ -24,6 +24,11 @@ const productSchema = new Schema({
     type: String,
     required: true,
   },
+  tags: {
+    type: [String], 
+    enum: ['Electronics', 'School Supplies', 'Dorm Essentials', 'Furniture', 'Clothes', 'Miscellaneous'], 
+    required: false
+  },
   images: [{ type: String }],
 });
 

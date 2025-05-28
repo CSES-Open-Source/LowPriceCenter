@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 import { DELETE, get, patch } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
+import { tags } from "src/utils/constants";
 
 export function EditProduct() {
   const { id } = useParams();
@@ -14,12 +15,14 @@ export function EditProduct() {
     images: string[];
     userEmail: string;
     description: string;
+    tags: string[];
   }>();
 
   const productName = useRef<HTMLInputElement>(null);
   const productPrice = useRef<HTMLInputElement>(null);
   const productDescription = useRef<HTMLTextAreaElement>(null);
   const productImages = useRef<HTMLInputElement>(null);
+  const [productTags, setProductTags] = useState<Array<string>>([]);
 
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [newFiles, setNewFiles] = useState<File[]>([]);
@@ -36,6 +39,7 @@ export function EditProduct() {
       .then((r) => r.json())
       .then((data) => {
         setProduct(data);
+        setProductTags(data.tags);
         setExistingImages(data.images);
       })
       .catch(() => setError(true));
@@ -83,6 +87,9 @@ export function EditProduct() {
         body.append("name", productName.current.value);
         body.append("price", productPrice.current.value);
         body.append("description", productDescription.current.value);
+        productTags.forEach((tag) => {
+          body.append("tags[]", tag);
+        });
         body.append("userEmail", user.email || "");
 
         // append existing image URLs
@@ -115,6 +122,23 @@ export function EditProduct() {
       setError(true);
     }
   };
+
+  // handle dropdown display
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        dropdownRef.current.hidden = true;
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <>
@@ -173,6 +197,63 @@ export function EditProduct() {
             className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
             placeholder="Tell us more about this product..."
           />
+        </div>
+
+        {/* Product Tags */}
+        <div className="mb-5">
+          <label htmlFor="productTags" className="block mb-2 font-medium font-inter text-black">
+            Tags
+          </label>
+          <div
+            id="productTags"
+            className="flex flex-row max-w-full flex-wrap gap-2 border border-gray-300 text-black text-sm rounded-md w-full p-2.5 min-h-10 hover:cursor-pointer"
+            onClick={() => {
+              if (dropdownRef.current) dropdownRef.current.hidden = false;
+            }}
+            ref={buttonRef}
+          >
+            {productTags.map((tag) => (
+              <div
+                key={tag}
+                className="flex items-center gap-2 p-1 px-2 w-fit bg-slate-200 rounded-2xl"
+              >
+                <span className="text-sm font-medium">{tag}</span>
+                <button
+                  className="flex items-center justify-center p-1 h-5 w-5 bg-slate-300 text-md rounded-full hover:bg-blue-400 hover:text-white transition-colors duration-200"
+                  onClick={() => {
+                    setProductTags(productTags.filter((t) => t !== tag));
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+          {/* Product Tags Dropdown */}
+          {productTags.length !== tags.length && (
+            <div
+              ref={dropdownRef}
+              className="z-10 mt-2 min-w-64 origin-top-right rounded-md ring-1 shadow-lg ring-black/5 focus:outline-hidden"
+            >
+              <div className="py-1 max-h-35 overflow-y-auto">
+                {tags.map((tag) => {
+                  if (!productTags.includes(tag)) {
+                    return (
+                      <p
+                        onClick={() => {
+                          setProductTags([...productTags, tag]);
+                        }}
+                        key={tag}
+                        className="px-4 py-2 text-sm text-gray-700 hover:cursor-pointer"
+                      >
+                        {tag}
+                      </p>
+                    );
+                  }
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="mb-5">
