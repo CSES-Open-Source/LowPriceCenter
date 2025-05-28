@@ -229,8 +229,6 @@ export const updateProductById = [
         updatedProduct,
       });
     } catch (err: any) {
-      console.error("🔥 updateProductById failed:", err.stack || err);
-      // send the message back so you can see it in the browser
       return res.status(500).json({
         message: "Error patching product",
         error: err.message || err.toString(),
