@@ -31,7 +31,18 @@ export function IndividualProductPage() {
   };
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isSaved, setIsSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState<boolean>(false);
+  const [message, setMessage] = useState("");
+  const [isHovered, setIsHovered] = useState(false);
+  const COOLDOWN = 60 * 24 * 1000 * 60;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cooldownEnd, setCooldownEnd] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!message) return;
+    const t = setTimeout(() => setMessage(""), 3000);
+    return () => clearTimeout(t);
+  }, [message]);
 
   const location = useLocation() as {
     state?: { from?: "saved" | "marketplace" };
@@ -62,6 +73,78 @@ export function IndividualProductPage() {
     };
     findEditPermission();
   }, []);
+
+  useEffect(() => {
+    const key = `interest-cooldown-${id}`;
+    const stored = localStorage.getItem(key);
+    if (!stored) return;
+
+    const end = parseInt(stored, 10);
+    if (Date.now() < end) {
+      setCooldownEnd(end);
+      const timer = setTimeout(() => {
+        setCooldownEnd(null);
+        localStorage.removeItem(key);
+      }, end - Date.now());
+      return () => clearTimeout(timer);
+    } else {
+      localStorage.removeItem(key);
+    }
+  }, [id]);
+  const handleSendInterestEmail = async () => {
+    if (cooldownEnd && Date.now() < cooldownEnd) {
+      setMessage("Please wait before sending another interest email.");
+      return;
+    }
+    if (isSubmitting) {
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const response = await post("/api/interestEmail", { consumerId: user?.uid, productId: id });
+      const result = await response.json();
+      if (!response.ok) {
+        setMessage(`Error: ${result.message}`);
+        return;
+      }
+
+      setMessage("Interest email sent successfully!");
+      const end = Date.now() + COOLDOWN;
+      setCooldownEnd(end);
+      const key = `interest-cooldown-${id}`;
+      localStorage.setItem(key, end.toString());
+      setTimeout(() => {
+        setCooldownEnd(null);
+        localStorage.removeItem(key);
+      }, COOLDOWN);
+    } catch {
+      setMessage("An unexpected error occurred.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  const isCooling = Boolean(cooldownEnd && Date.now() < cooldownEnd);
+  // const secondsLeft = isCooling ? Math.ceil((cooldownEnd! - Date.now()) / 1000) : 0;
+  const msLeft = isCooling ? cooldownEnd! - Date.now() : 0;
+  const totalMinutes = Math.ceil(msLeft / (1000 * 60)); // convert ms → minutes
+  const hoursLeft = Math.floor(totalMinutes / 60);
+  const minutesLeft = totalMinutes % 60;
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    if (!isCooling) return;
+    const iv = setInterval(() => setTick((t) => t + 1), 60_000); // 60 000 ms = 1 min
+    return () => clearInterval(iv);
+  }, [isCooling]);
+  let buttonLabel = "Interested?";
+  if (message) {
+    buttonLabel = message;
+  } else if (isCooling && isHovered) {
+    buttonLabel = `Please wait ${hoursLeft}:${minutesLeft.toString().padStart(2, "0")} hours`;
+  } else if (isCooling && !isHovered) {
+    buttonLabel = "Interest email sent successfully!";
+  } else if (!isCooling && isHovered) {
+    buttonLabel = "Click to send interest email";
+  }
 
   const toggleSave = async () => {
     if (!user?.uid) {
@@ -174,14 +257,27 @@ export function IndividualProductPage() {
                   ))}
                 </div>
               )}
-              <div className="mt-0">
-                <p className="font-inter text-black text-base md:text-xl font-light">
-                  Interested? Contact them here:
-                </p>
-                <p className="font-inter text-black hover:text-ucsd-darkblue text-base md:text-xl font-medium break-words transition-colors">
-                  <a href={`mailto:${product?.userEmail}`}>{product?.userEmail}</a>
-                </p>
-              </div>
+              {!hasPermissions && (
+                <div
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                >
+                  <button
+                    onClick={!isCooling ? handleSendInterestEmail : undefined}
+                    className={`
+                      font-inter text-[#00629B]
+                      text-base md:text-xl font-light mt-6
+                      bg-white border border-[#00629B]
+                      px-4 py-2 rounded-lg
+                      transition-colors duration-200 ease-in-out
+                      ${!isCooling ? "hover:bg-blue-100" : ""}
+                      ${isCooling ? "opacity-50 cursor-not-allowed" : ""}
+                      `}
+                  >
+                    {buttonLabel}
+                  </button>
+                </div>
+              )}
             </section>
           </div>
         )}
