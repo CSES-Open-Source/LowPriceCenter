@@ -1,4 +1,11 @@
-import { faBars, faCartShopping, faUser, faXmark, faHeart } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBars,
+  faCartShopping,
+  faUser,
+  faXmark,
+  faHeart,
+  faQuestion,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useRef, useState } from "react";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
@@ -71,12 +78,22 @@ export function Navbar() {
               onClick={() => (window.location.href = "/saved-products")}
               className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
             >
+              <FontAwesomeIcon className="text-lg pr-2" icon={faHeart} aria-label="Heart Icon" />
+              Saved
+            </button>
+          </li>
+          <li>
+            <button
+              hidden={user === null}
+              onClick={() => (window.location.href = "/faq")}
+              className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
+            >
               <FontAwesomeIcon
                 className="text-lg pr-2"
-                icon={faHeart}
-                aria-label="Heart Icon"
+                icon={faQuestion}
+                aria-label="Question Mark"
               />
-              Saved
+              FAQ
             </button>
           </li>
           <li>
@@ -127,6 +144,20 @@ export function Navbar() {
                   aria-label="Shopping Cart"
                 />
                 Products
+              </button>
+            </li>
+            <li className="mb-2">
+              <button
+                hidden={user === null}
+                onClick={() => (window.location.href = "/faq")}
+                className="font-inter w-full text-center px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
+              >
+                <FontAwesomeIcon
+                  className="text-lg pr-2"
+                  icon={faQuestion}
+                  aria-label="Question Mark"
+                />
+                FAQ
               </button>
             </li>
             <li>
