@@ -10,6 +10,8 @@ import { AddProduct } from "../src/pages/AddProduct";
 import { EditProduct } from "../src/pages/EditProduct";
 import { IndividualProductPage } from "../src/pages/Individual-product-page";
 import { PageNotFound } from "../src/pages/PageNotFound";
+import { ProfilePage } from "../src/pages/ProfilePage";
+import { EditProfile } from "../src/pages/EditProfile";
 import FirebaseProvider from "../src/utils/FirebaseProvider";
 import { SavedProducts } from "./pages/SavedProducts";
 
@@ -61,6 +63,22 @@ const router = createBrowserRouter([
   {
     path: "*",
     element: <PageNotFound />,
+  },
+  {
+    path: "/profile/:id",
+    element: (
+      <PrivateRoute>
+        <ProfilePage />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/edit-profile",
+    element: (
+      <PrivateRoute>
+        <EditProfile />
+      </PrivateRoute>
+    ),
   },
 ]);
 

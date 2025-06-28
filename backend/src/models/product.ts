@@ -30,6 +30,10 @@ const productSchema = new Schema({
     required: false
   },
   images: [{ type: String }],
+  isSold: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 export type Product = HydratedDocument<InferSchemaType<typeof productSchema>>;

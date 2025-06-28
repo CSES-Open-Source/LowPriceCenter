@@ -25,7 +25,9 @@ function Product({
   const [isSaved, setIsSaved] = useState(initialIsSaved);
   const [isHovered, setIsHovered] = useState(false);
   const images =
-    productImages.length > 0 ? productImages : ["/productImages/product-placeholder.webp"];
+    Array.isArray(productImages) && productImages.length > 0
+      ? productImages
+      : ["/productImages/product-placeholder.webp"];
 
   const toggleSave = async (e: React.MouseEvent) => {
     e.preventDefault();

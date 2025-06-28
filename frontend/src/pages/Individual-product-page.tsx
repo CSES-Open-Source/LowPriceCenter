@@ -1,11 +1,11 @@
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { get, post } from "src/api/requests";
+import { get, patch, post } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 import EmblaCarousel from "src/components/EmblaCarousel";
 import { EmblaOptionsType } from "embla-carousel";
@@ -21,6 +21,7 @@ export function IndividualProductPage() {
     userEmail: string;
     description: string;
     tags: string[];
+    isSold: boolean;
   }>();
   const [error, setError] = useState<string>();
   const [hasPermissions, setHasPermissions] = useState<boolean>(false);
@@ -43,6 +44,7 @@ export function IndividualProductPage() {
     const t = setTimeout(() => setMessage(""), 3000);
     return () => clearTimeout(t);
   }, [message]);
+  const [hoverMarkSold, setHoverMarkSold] = useState(false);
 
   const location = useLocation() as {
     state?: { from?: "saved" | "marketplace" };
@@ -66,13 +68,43 @@ export function IndividualProductPage() {
       if (uid)
         await get(`/api/users/${uid}`).then(async (res) => {
           const ownedByUser = await res.json().then((data) => {
-            return data.productList.includes(id);
+            return data.productList
+              .map((product: { _id: string }) => String(product._id))
+              .includes(String(id));
           });
           setHasPermissions(ownedByUser);
         });
     };
     findEditPermission();
-  }, []);
+  }, [user, id]);
+
+  const handleMarkSold = () => {
+    const updateProduct = async () => {
+      try {
+        if (product) {
+          const body = new FormData();
+          body.append("name", product?.name);
+          body.append("price", String(product?.price));
+          body.append("description", product?.description);
+          body.append("userEmail", product?.userEmail);
+          body.append("isSold", String(!product?.isSold));
+
+          // append existing image URLs
+          product.images.forEach((url) => body.append("existingImages", url));
+
+          const res = await patch(`/api/products/${id}`, body);
+
+          if (res.ok) {
+            setError("");
+            setProduct({ ...product, isSold: !product?.isSold } as typeof product);
+          } else throw Error();
+        } else throw Error();
+      } catch (err) {
+        setError("Unable to mark product as sold");
+      }
+    };
+    updateProduct();
+  };
 
   useEffect(() => {
     const key = `interest-cooldown-${id}`;
@@ -182,12 +214,25 @@ export function IndividualProductPage() {
           </button>
 
           {hasPermissions && (
-            <button
-              className="text-lg mb-4 font-inter hover:underline"
-              onClick={() => navigate(`/edit-product/${id}`)}
-            >
-              Edit Product <FontAwesomeIcon icon={faPenToSquare} />
-            </button>
+            <div className="flex flex-col items-end">
+              <button
+                className="text-lg mb-1 font-inter hover:underline"
+                onClick={() => navigate(`/edit-product/${id}`)}
+              >
+                Edit Product <FontAwesomeIcon icon={faPenToSquare} />
+              </button>
+              <button
+                onClick={handleMarkSold}
+                onMouseEnter={() => setHoverMarkSold(true)}
+                onMouseLeave={() => setHoverMarkSold(false)}
+                className={`text-lg mb-4 font-inter hover:underline ${
+                  product?.isSold && "text-red-800 font-semibold"
+                }`}
+              >
+                {product?.isSold ? (hoverMarkSold ? "Unmark as Sold" : "Sold") : "Mark as Sold"}{" "}
+                <FontAwesomeIcon icon={faCheck} />
+              </button>
+            </div>
           )}
         </div>
         {/* Error message if product not found */}

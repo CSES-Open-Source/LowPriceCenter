@@ -15,6 +15,6 @@ router.get("/:firebaseUid", getUserById);
 router.post("/", addUser);
 router.post("/:userId/saved-products", toggleSavedProduct);
 router.delete("/:id", deleteUserById);
-router.patch("/:id", updateUserById);
+router.patch("/:firebaseUid", updateUserById);
 
 export default router;
