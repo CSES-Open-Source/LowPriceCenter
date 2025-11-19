@@ -20,7 +20,7 @@ const upload = multer({
  */
 export const getProducts = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const products = await ProductModel.find();
+    const products = await ProductModel.find({ isMarkedSold: {$in: [false, null]} });
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: "Error fetching products", error });
@@ -191,6 +191,7 @@ export const updateProductById = [
           description: req.body.description,
           images: finalImages,
           timeUpdated: new Date(),
+          isMarkedSold: req.body.isMarkedSold ?? false,
         },
         { new: true },
       );

@@ -1,11 +1,11 @@
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faPenToSquare, faCheck, faArrowUp } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { get, post } from "src/api/requests";
+import { get, patch, post } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 import EmblaCarousel from "src/components/EmblaCarousel";
 import { EmblaOptionsType } from "embla-carousel";
@@ -20,6 +20,7 @@ export function IndividualProductPage() {
     images: string[];
     userEmail: string;
     description: string;
+    isMarkedSold: boolean;
   }>();
   const [error, setError] = useState<string>();
   const [hasPermissions, setHasPermissions] = useState<boolean>(false);
@@ -122,6 +123,34 @@ export function IndividualProductPage() {
       setIsSubmitting(false);
     }
   };
+
+  const handleMarkSold = async () => {
+    console.log(product);
+    if (!product) return;
+    const body = new FormData();
+    body.append("name", product.name);
+    body.append("price", product.price.toString());
+    body.append("description", product.description);
+    body.append("userEmail", product.userEmail);
+    product.images.forEach((url) => body.append("existingImages", url));
+    body.append("isMarkedSold", String(!product.isMarkedSold));
+
+    await patch(`/api/products/${id}`, body)
+      .then(async (res) => {
+        const response = await res.json();
+        if (res.ok) {
+          setProduct(response.updatedProduct);
+          navigate(`/products/${id}`);
+        } else {
+          alert("Failed to update product");
+          console.log(response);
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
   const isCooling = Boolean(cooldownEnd && Date.now() < cooldownEnd);
   // const secondsLeft = isCooling ? Math.ceil((cooldownEnd! - Date.now()) / 1000) : 0;
   const msLeft = isCooling ? cooldownEnd! - Date.now() : 0;
@@ -234,9 +263,35 @@ export function IndividualProductPage() {
 
               <hr className="my-6 w-full mx-auto h-0 border-[1px] border-solid border-gray-300" />
 
+              {hasPermissions &&
+                (product?.isMarkedSold ? (
+                  <button
+                    className="text-lg font-inter py-4 mb-6 font-bold border border-ucsd-blue text-ucsd-blue rounded-md"
+                    onClick={handleMarkSold}
+                  >
+                    Renew on Marketplace <FontAwesomeIcon icon={faArrowUp} />
+                  </button>
+                ) : (
+                  <button
+                    className="text-lg font-inter py-4 mb-6 font-bold bg-ucsd-blue hover:bg-ucsd-darkblue text-white rounded-md transition-colors"
+                    onClick={handleMarkSold}
+                  >
+                    Mark as Sold <FontAwesomeIcon icon={faCheck} />
+                  </button>
+                ))}
+
               <h2 className="font-inter text-[#35393C] text-base md:text-xl font-normal pb-6">
                 USD ${product?.price?.toFixed(2)}
               </h2>
+              {product?.isMarkedSold && (
+                <div className="bg-red-100 p-5 mb-6">
+                  <p className="font-inter text-black text-base md:text-xl font-normal break-words">
+                    {hasPermissions
+                      ? "This product has been marked as sold. It will not appear on the marketplace, but others can still be find it under your profile."
+                      : "This product is no longer available."}
+                  </p>
+                </div>
+              )}
               {product?.description && (
                 <div className="bg-[#F5F0E6] p-5 mb-6">
                   <p className="font-inter text-black text-base md:text-xl font-normal break-words">

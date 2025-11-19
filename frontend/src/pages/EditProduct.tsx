@@ -14,6 +14,7 @@ export function EditProduct() {
     images: string[];
     userEmail: string;
     description: string;
+    isMarkedSold: boolean;
   }>();
 
   const productName = useRef<HTMLInputElement>(null);
@@ -84,6 +85,7 @@ export function EditProduct() {
         body.append("price", productPrice.current.value);
         body.append("description", productDescription.current.value);
         body.append("userEmail", user.email || "");
+        body.append("isMarkedSold", String(product?.isMarkedSold));
 
         // append existing image URLs
         existingImages.forEach((url) => body.append("existingImages", url));
