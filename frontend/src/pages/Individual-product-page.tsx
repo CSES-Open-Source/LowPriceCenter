@@ -125,7 +125,6 @@ export function IndividualProductPage() {
   };
 
   const handleMarkSold = async () => {
-    console.log(product);
     if (!product) return;
     const body = new FormData();
     body.append("name", product.name);
