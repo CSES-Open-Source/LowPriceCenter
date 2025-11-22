@@ -24,6 +24,11 @@ const productSchema = new Schema({
     type: String,
     required: true,
   },
+  isMarkedSold: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
   images: [{ type: String }],
 });
 

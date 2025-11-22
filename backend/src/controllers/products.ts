@@ -20,7 +20,7 @@ const upload = multer({
  */
 export const getProducts = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const products = await ProductModel.find();
+    const products = await ProductModel.find({ isMarkedSold: { $in: [false, null] } });
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: "Error fetching products", error });
@@ -52,7 +52,10 @@ export const getProductById = async (req: AuthenticatedRequest, res: Response) =
 export const getProductsByName = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const query = req.params.query;
-    const products = await ProductModel.find({ name: { $regex: query, $options: "i" } });
+    const products = await ProductModel.find({
+      name: { $regex: query, $options: "i" },
+      isMarkedSold: { $in: [false, null] },
+    });
     if (!products) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -191,6 +194,7 @@ export const updateProductById = [
           description: req.body.description,
           images: finalImages,
           timeUpdated: new Date(),
+          isMarkedSold: req.body.isMarkedSold ?? false,
         },
         { new: true },
       );
