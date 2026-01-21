@@ -12,7 +12,7 @@ import { IndividualProductPage } from "../src/pages/Individual-product-page";
 import { PageNotFound } from "../src/pages/PageNotFound";
 import FirebaseProvider from "../src/utils/FirebaseProvider";
 import { SavedProducts } from "./pages/SavedProducts";
-import Profile from "./pages/Profile";
+import Profile from "./pages/Profile"; //not sure how to fix this, but where I last left off
 
 const router = createBrowserRouter([
   {

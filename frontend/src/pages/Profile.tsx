@@ -3,7 +3,7 @@ import { FirebaseContext } from "src/utils/FirebaseProvider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle, faEnvelope, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
 
-export default function Profile() {
+export function Profile() {
   const { user } = useContext(FirebaseContext);
 
   if (!user) {
