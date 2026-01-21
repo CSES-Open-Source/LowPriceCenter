@@ -4,6 +4,7 @@ import { Footer } from "src/components/Footer";
 import { Navbar } from "src/components/Navbar";
 import { Home } from "src/pages";
 import { Marketplace } from "src/pages/Marketplace";
+import { Profile } from "src/pages/Profile";
 
 import { PrivateRoute } from "../src/components/PrivateRoute";
 import { AddProduct } from "../src/pages/AddProduct";
@@ -12,7 +13,6 @@ import { IndividualProductPage } from "../src/pages/Individual-product-page";
 import { PageNotFound } from "../src/pages/PageNotFound";
 import FirebaseProvider from "../src/utils/FirebaseProvider";
 import { SavedProducts } from "./pages/SavedProducts";
-import Profile from "./pages/Profile";
 
 const router = createBrowserRouter([
   {
