@@ -96,12 +96,12 @@ export function Navbar() {
                 {/* Dropdown Menu */}
                 {isProfileDropdownOpen && (
                   <div className="absolute right-0 top-full w-40 bg-white text-black shadow-xl rounded-b-md py-2 z-[60]">
-                    <button 
-                      onClick={() => (window.location.href = "/profile")}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                    <a 
+                      href="/profile"
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors block"
                     >
                       My Profile
-                    </button>
+                    </a>
                     <hr className="my-1 border-gray-200" />
                     <button 
                       onClick={signOutFromFirebase}
