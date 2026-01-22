@@ -14,12 +14,28 @@ export function EditProduct() {
     images: string[];
     userEmail: string;
     description: string;
+    year: number;
+    category: string;
+    condition: string;
+    location: string;
   }>();
 
   const productName = useRef<HTMLInputElement>(null);
   const productPrice = useRef<HTMLInputElement>(null);
   const productDescription = useRef<HTMLTextAreaElement>(null);
+  const productYear = useRef<HTMLSelectElement>(null);
+  const productCategory = useRef<HTMLSelectElement>(null);
+  const productCondition = useRef<HTMLSelectElement>(null);
+  const productLocation = useRef<HTMLInputElement>(null);
   const productImages = useRef<HTMLInputElement>(null);
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 1950 }, (_, i) => currentYear - i);
+
+  // Placeholder categories (letters for now)
+  const categories = ["A", "B", "C", "D", "E", "F"];
+
+  const conditions = ["New", "Used"];
 
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [newFiles, setNewFiles] = useState<File[]>([]);
@@ -78,11 +94,24 @@ export function EditProduct() {
   const handleEdit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      if (productName.current && productPrice.current && productDescription.current && user) {
+      if (
+        productName.current &&
+        productPrice.current &&
+        productDescription.current &&
+        productYear.current &&
+        productCategory.current &&
+        productCondition.current &&
+        productLocation.current &&
+        user
+      ) {
         const body = new FormData();
         body.append("name", productName.current.value);
         body.append("price", productPrice.current.value);
         body.append("description", productDescription.current.value);
+        body.append("year", productYear.current.value);
+        body.append("category", productCategory.current.value);
+        body.append("condition", productCondition.current.value);
+        body.append("location", productLocation.current.value);
         body.append("userEmail", user.email || "");
 
         // append existing image URLs
@@ -172,6 +201,84 @@ export function EditProduct() {
             ref={productDescription}
             className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
             placeholder="Tell us more about this product..."
+          />
+        </div>
+
+        <div className="mb-5">
+          <label htmlFor="productYear" className="block mb-2 font-medium font-inter text-black">
+            Year
+          </label>
+          <select
+            id="productYear"
+            ref={productYear}
+            key={`year-${product?.year}`}
+            defaultValue={product?.year || ""}
+            className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
+            required
+          >
+            <option value="">Select Year</option>
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mb-5">
+          <label htmlFor="productCategory" className="block mb-2 font-medium font-inter text-black">
+            Category
+          </label>
+          <select
+            id="productCategory"
+            ref={productCategory}
+            key={`category-${product?.category}`}
+            defaultValue={product?.category || ""}
+            className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
+            required
+          >
+            <option value="">Select Category</option>
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mb-5">
+          <label htmlFor="productCondition" className="block mb-2 font-medium font-inter text-black">
+            Condition
+          </label>
+          <select
+            id="productCondition"
+            ref={productCondition}
+            key={`condition-${product?.condition}`}
+            defaultValue={product?.condition || ""}
+            className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
+            required
+          >
+            <option value="">Select Condition</option>
+            {conditions.map((condition) => (
+              <option key={condition} value={condition}>
+                {condition}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mb-5">
+          <label htmlFor="productLocation" className="block mb-2 font-medium font-inter text-black">
+            Location
+          </label>
+          <input
+            id="productLocation"
+            type="text"
+            defaultValue={product?.location}
+            ref={productLocation}
+            className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
+            placeholder="Location"
+            required
           />
         </div>
 

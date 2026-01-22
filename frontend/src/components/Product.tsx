@@ -10,6 +10,10 @@ interface Props {
   productImages: string[];
   productName: string;
   productPrice: number;
+  productYear: number;
+  productCategory: string;
+  productCondition: string;
+  productLocation: string;
   isSaved?: boolean;
   onSaveToggle?: (productId: string, newSavedStatus: boolean) => void;
 }

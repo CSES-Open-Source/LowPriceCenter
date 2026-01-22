@@ -10,7 +10,20 @@ export function AddProduct() {
   const productName = useRef<HTMLInputElement>(null);
   const productPrice = useRef<HTMLInputElement>(null);
   const productDescription = useRef<HTMLTextAreaElement>(null);
+  const productYear = useRef<HTMLSelectElement>(null);
+  const productCategory = useRef<HTMLSelectElement>(null);
+  const productCondition = useRef<HTMLSelectElement>(null);
+  const productLocation = useRef<HTMLInputElement>(null);
   const productImages = useRef<HTMLInputElement>(null);
+
+  
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 1950 }, (_, i) => currentYear - i);
+
+  // Placeholder categories (letters for now)
+  const categories = ["A", "B", "C", "D", "E", "F"];
+
+  const conditions = ["New", "Used"];
 
   const { user } = useContext(FirebaseContext);
   const [error, setError] = useState<boolean>(false);
@@ -56,7 +69,7 @@ export function AddProduct() {
     setIsSubmitting(true);
     e.preventDefault();
     try {
-      if (productName.current && productPrice.current && productDescription.current && user) {
+      if (productName.current && productPrice.current && productDescription.current && productYear.current && productCategory.current && productCondition.current && productLocation.current && user) {
         let images;
         if (productImages.current && productImages.current.files) {
           images = productImages.current.files[0];
@@ -66,6 +79,10 @@ export function AddProduct() {
         body.append("name", productName.current.value);
         body.append("price", productPrice.current.value);
         body.append("description", productDescription.current.value);
+        body.append("year", productYear.current.value);
+        body.append("category", productCategory.current.value);
+        body.append("condition", productCondition.current.value);
+        body.append("location", productLocation.current.value);
         if (user.email) body.append("userEmail", user.email);
 
         if (productImages.current && productImages.current.files) {
@@ -143,6 +160,81 @@ export function AddProduct() {
             ref={productDescription}
             className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
             placeholder="Tell us more about this product..."
+          />
+        </div>
+
+        {/* Year */}
+        <div className="mb-5">
+          <label htmlFor="productYear" className="block mb-2 font-medium font-inter text-black">
+            Year
+          </label>
+          <select
+            id="productYear"
+            ref={productYear}
+            className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
+            required
+          >
+            <option value="">Select Year</option>
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Category */}
+        <div className="mb-5">
+          <label htmlFor="productCategory" className="block mb-2 font-medium font-inter text-black">
+            Category
+          </label>
+          <select
+            id="productCategory"
+            ref={productCategory}
+            className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
+            required
+          >
+            <option value="">Select Category</option>
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Condition */}
+        <div className="mb-5">
+          <label htmlFor="productCondition" className="block mb-2 font-medium font-inter text-black">
+            Condition
+          </label>
+          <select
+            id="productCondition"
+            ref={productCondition}
+            className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
+            required
+          >
+            <option value="">Select Condition</option>
+            {conditions.map((condition) => (
+              <option key={condition} value={condition}>
+                {condition}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Location */}
+        <div className="mb-5">
+          <label htmlFor="productLocation" className="block mb-2 font-medium font-inter text-black">
+            Location
+          </label>
+          <input
+            id="productLocation"
+            type="text"
+            ref={productLocation}
+            className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
+            placeholder="Location"
+            required
           />
         </div>
 

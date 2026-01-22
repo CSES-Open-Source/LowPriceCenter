@@ -11,6 +11,10 @@ export function SavedProducts() {
       _id: string;
       name: string;
       price: number;
+      year: number;
+      category: string;
+      condition: string;
+      location: string;
       images: string[];
     }>
   >([]);
@@ -93,6 +97,10 @@ export function SavedProducts() {
                     productId={product._id}
                     productName={product.name}
                     productPrice={product.price}
+                    productYear={product.year}
+                    productCategory={product.category}
+                    productCondition={product.condition}
+                    productLocation={product.location}
                     productImages={
                       product.images && product.images.length > 0
                         ? product.images

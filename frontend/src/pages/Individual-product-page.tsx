@@ -17,6 +17,10 @@ export function IndividualProductPage() {
   const [product, setProduct] = useState<{
     name: string;
     price: number;
+    year: number;
+    category: string;
+    condition: string;
+    location: string;
     images: string[];
     userEmail: string;
     description: string;
@@ -244,6 +248,21 @@ export function IndividualProductPage() {
                   </p>
                 </div>
               )}
+              <div className="bg-[#F5F0E6] p-5 mb-6">
+                <p className="font-inter text-black text-base md:text-xl font-normal break-words">
+                  {product?.year}
+                </p>
+              </div>
+              <div className="bg-[#F5F0E6] p-5 mb-6">
+                <p className="font-inter text-black text-base md:text-xl font-normal break-words">
+                  {product?.category}
+                </p>
+              </div>
+              <div className="bg-[#F5F0E6] p-5 mb-6">
+                <p className="font-inter text-black text-base md:text-xl font-normal break-words">
+                  {product?.condition}
+                </p>
+              </div>
               {!hasPermissions && (
                 <div
                   onMouseEnter={() => setIsHovered(true)}
