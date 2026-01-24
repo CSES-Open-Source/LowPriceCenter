@@ -1,8 +1,8 @@
-import { useEffect, useState, useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "react-router-dom";
-import Product from "src/components/Product";
 import { get, post } from "src/api/requests";
+import Product from "src/components/Product";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 
 export function SavedProducts() {

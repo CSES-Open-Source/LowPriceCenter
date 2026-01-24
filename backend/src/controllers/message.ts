@@ -17,9 +17,9 @@ type PersistMessageRequest = {
 const getConversationsByUser = async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user) return res.status(404).json({ message: "User not found" });
-    const conversation = await ConversationModel.find({ participants: req.user._id }).populate(
-      "lastMessage",
-    );
+    const conversation = await ConversationModel.find({ participants: req.user._id })
+      .populate("lastMessage")
+      .populate("participants");
     return res.status(200).json(conversation);
   } catch (e) {
     return res.status(500).json({ message: "Error getting conversation:", e });

@@ -11,4 +11,5 @@ export default cleanEnv(process.env, {
   MONGODB_URI: str(),
   FIREBASE_PRIVATE_KEY_BASE64: str(),
   FIREBASE_PROJECT_ID: str(),
+  SOCKET_PORT: port(),
 });
