@@ -1,6 +1,7 @@
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
+import { faCalendar, faTag, faCheckCircle, faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
@@ -232,37 +233,67 @@ export function IndividualProductPage() {
 
             {/* Info Section */}
             <section className="max-w-[100%] md:max-w-[50%] flex-1 flex flex-col">
-              <h1 className="pt-2 font-jetbrains text-black font-bold text-4xl break-words">
+              <h1 className="pt-2 font-jetbrains text-black font-bold text-4xl break-words mb-4">
                 {product?.name}
               </h1>
 
-              <hr className="my-6 w-full mx-auto h-0 border-[1px] border-solid border-gray-300" />
+              {/* Price - Prominent Display */}
+              <div className="mb-6">
+                <h2 className="font-jetbrains text-[#00629B] text-3xl md:text-4xl font-bold">
+                  ${product?.price?.toFixed(2)}
+                </h2>
+                <p className="font-inter text-gray-500 text-sm mt-1">USD</p>
+              </div>
 
-              <h2 className="font-inter text-[#35393C] text-base md:text-xl font-normal pb-6">
-                USD ${product?.price?.toFixed(2)}
-              </h2>
+              {/* Product Details Grid */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FontAwesomeIcon icon={faCalendar} className="text-[#00629B] text-sm" />
+                    <span className="font-inter text-gray-500 text-xs uppercase tracking-wide">Year</span>
+                  </div>
+                  <p className="font-inter text-black text-lg font-semibold">{product?.year}</p>
+                </div>
+
+                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FontAwesomeIcon icon={faTag} className="text-[#00629B] text-sm" />
+                    <span className="font-inter text-gray-500 text-xs uppercase tracking-wide">Category</span>
+                  </div>
+                  <p className="font-inter text-black text-lg font-semibold">{product?.category}</p>
+                </div>
+
+                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FontAwesomeIcon icon={faCheckCircle} className="text-[#00629B] text-sm" />
+                    <span className="font-inter text-gray-500 text-xs uppercase tracking-wide">Condition</span>
+                  </div>
+                  <p className="font-inter text-black text-lg font-semibold">{product?.condition}</p>
+                </div>
+
+                {product?.location && (
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-2 mb-2">
+                      <FontAwesomeIcon icon={faMapMarkerAlt} className="text-[#00629B] text-sm" />
+                      <span className="font-inter text-gray-500 text-xs uppercase tracking-wide">Location</span>
+                    </div>
+                    <p className="font-inter text-black text-lg font-semibold">{product.location}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Description */}
               {product?.description && (
-                <div className="bg-[#F5F0E6] p-5 mb-6">
-                  <p className="font-inter text-black text-base md:text-xl font-normal break-words">
+                <div className="bg-gradient-to-br from-[#F5F0E6] to-[#F9F7F3] border border-gray-200 rounded-lg p-6 mb-6 shadow-sm">
+                  <h3 className="font-inter text-gray-700 text-sm uppercase tracking-wide mb-3 font-semibold">
+                    Description
+                  </h3>
+                  <p className="font-inter text-black text-base md:text-lg leading-relaxed break-words whitespace-pre-wrap">
                     {product.description}
                   </p>
                 </div>
               )}
-              <div className="bg-[#F5F0E6] p-5 mb-6">
-                <p className="font-inter text-black text-base md:text-xl font-normal break-words">
-                  {product?.year}
-                </p>
-              </div>
-              <div className="bg-[#F5F0E6] p-5 mb-6">
-                <p className="font-inter text-black text-base md:text-xl font-normal break-words">
-                  {product?.category}
-                </p>
-              </div>
-              <div className="bg-[#F5F0E6] p-5 mb-6">
-                <p className="font-inter text-black text-base md:text-xl font-normal break-words">
-                  {product?.condition}
-                </p>
-              </div>
+
               {!hasPermissions && (
                 <div
                   onMouseEnter={() => setIsHovered(true)}

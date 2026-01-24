@@ -20,8 +20,8 @@ export function AddProduct() {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: currentYear - 1950 }, (_, i) => currentYear - i);
 
-  // Placeholder categories (letters for now)
-  const categories = ["A", "B", "C", "D", "E", "F"];
+
+  const categories = ["Electronics", "School Supplies", "Dorm", "Furniture", "Clothes"];
 
   const conditions = ["New", "Used"];
 
