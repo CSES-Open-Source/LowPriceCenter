@@ -6,9 +6,9 @@ const MessageSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
-    authorId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+    // refers to firebase uid
+    authorUid: {
+      type: String,
     },
     // text only for now, do images later
     content: String,

@@ -1,9 +1,17 @@
+export type ChatUser = {
+  userEmail: string;
+  displayName: string;
+  firebaseUid: string;
+};
+
 export type UserMessage = {
   content: string;
   sender: boolean;
-  sendDate: Date;
+  authorUid: string;
+  updatedAt: string;
 };
 export type Conversation = {
-  participants: User[];
+  _id: string;
+  participants: ChatUser[];
   lastMessage: UserMessage;
 };

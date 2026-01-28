@@ -3,7 +3,7 @@ import http from "http";
 import { Server } from "socket.io";
 import socketlog from "src/util/socketlogger";
 import { validateToken } from "src/validators/socketAuthValidation";
-import { onConnect } from "./controllers/socket";
+import { onSendMessage, onJoinConversation } from "src/controllers/socket";
 
 const httpServer = http.createServer();
 
@@ -19,6 +19,7 @@ io.use(async (socket, next) => {
   const token = socket.handshake.auth.token;
 
   if (!token) {
+    socketlog("Error: No token provided");
     return next(new Error("No token provided"));
   }
 
@@ -29,10 +30,24 @@ io.use(async (socket, next) => {
     socket.data.user = user;
     next();
   } catch (err) {
+    socketlog("Error: Authentication error");
     next(new Error("Authentication Error"));
   }
 });
 
-io.on("connection", onConnect);
+io.on("connection", (socket) => {
+  socketlog("Socket connected: ", socket.data.user.displayName, " id: ", socket.id);
+  socket.onAny((eventName, payload) => {
+    socketlog(
+      `User: ${socket.data.user.displayName}; Event: ${eventName}; Payload: ${JSON.stringify(
+        payload,
+      )}`,
+    );
+  });
+
+  // event handling
+  socket.on("conversation:join", onJoinConversation(socket));
+  socket.on("message:send", onSendMessage(socket));
+});
 
 export default httpServer;
