@@ -9,6 +9,8 @@ import { isHttpError } from "http-errors";
 import productRoutes from "src/routes/product";
 import userRoutes from "src/routes/user";
 import interestEmailRoute from "src/routes/interestEmail";
+import studentOrganizationRoutes from "src/routes/studentOrganization";
+import merchRoutes from "src/routes/merch";
 const app = express();
 
 // initializes Express to accept JSON in the request/response body
@@ -28,6 +30,8 @@ app.use(
 app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/interestEmail", interestEmailRoute);
+app.use("/api/student-organizations", studentOrganizationRoutes);
+app.use("/api/merch", merchRoutes);
 /**
  * Error handler; all errors thrown by server are handled here.
  * Explicit typings required here because TypeScript cannot infer the argument types.
