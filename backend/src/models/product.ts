@@ -24,10 +24,6 @@ const productSchema = new Schema({
     type: String,
     required: true,
   },
-  location: {
-    type: String,
-    required: true,
-  },
   timeCreated: {
     type: Date,
     required: true,

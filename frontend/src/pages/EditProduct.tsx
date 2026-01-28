@@ -17,7 +17,6 @@ export function EditProduct() {
     year: number;
     category: string;
     condition: string;
-    location: string;
   }>();
 
   const productName = useRef<HTMLInputElement>(null);
@@ -26,13 +25,18 @@ export function EditProduct() {
   const productYear = useRef<HTMLSelectElement>(null);
   const productCategory = useRef<HTMLSelectElement>(null);
   const productCondition = useRef<HTMLSelectElement>(null);
-  const productLocation = useRef<HTMLInputElement>(null);
   const productImages = useRef<HTMLInputElement>(null);
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: currentYear - 1950 }, (_, i) => currentYear - i);
 
-  const categories = ["Electronics", "School Supplies", "Dorm", "Furniture", "Clothes"];
+  const categories = [
+  'Electronics',
+  'School Supplies',
+  'Dorm Essentials',
+  'Furniture',
+  'Clothes',
+  'Miscellaneous'];
 
   const conditions = ["New", "Used"];
 
@@ -100,7 +104,6 @@ export function EditProduct() {
         productYear.current &&
         productCategory.current &&
         productCondition.current &&
-        productLocation.current &&
         user
       ) {
         const body = new FormData();
@@ -110,7 +113,6 @@ export function EditProduct() {
         body.append("year", productYear.current.value);
         body.append("category", productCategory.current.value);
         body.append("condition", productCondition.current.value);
-        body.append("location", productLocation.current.value);
         body.append("userEmail", user.email || "");
 
         // append existing image URLs
@@ -153,6 +155,79 @@ export function EditProduct() {
         <p className="text-3xl text-center font-jetbrains font-medium">Edit Product</p>
       </div>
       <form className="max-w-sm mx-auto p-4" onSubmit={handleEdit}>
+        {/* Images */}
+        <div className="mb-5">
+          <label htmlFor="productImages" className="block mb-2 font-medium font-inter text-black">
+            Images
+          </label>
+          <p className="text-sm text-gray-600 mb-3">Upload up to 10 photos</p>
+
+          {(newPreviews.length > 0 || existingImages.length > 0) && (
+            <div className="inline-flex flex-wrap justify-start gap-2">
+              {existingImages.map((url) => (
+                <div key={url} className="relative m-1 w-24 h-24">
+                  <img src={url} className="w-full h-full object-cover rounded-md" />
+                  <button
+                    type="button"
+                    onClick={() => removeExisting(url)}
+                    className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs px-1"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+
+              {newPreviews.map((src, idx) => (
+                <div key={src} className="relative m-1 w-24 h-24">
+                  <img src={src} className="w-full h-full object-cover rounded-md" />
+                  <button
+                    type="button"
+                    onClick={() => removeNew(idx)}
+                    className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs px-1"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <label
+            htmlFor="productImages"
+            className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors"
+          >
+            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+              <svg
+                className="w-10 h-10 mb-3 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                />
+              </svg>
+              <p className="mb-2 text-sm text-gray-500">
+                <span className="font-semibold">Click to upload</span>
+              </p>
+              <p className="text-xs text-gray-500">PNG or JPG (MAX. 5MB per image)</p>
+            </div>
+          <input
+            name="images"
+            id="productImages"
+            type="file"
+            multiple
+            accept="image/png, image/jpeg"
+            onChange={handleImageChange}
+            ref={productImages}
+            className="hidden"
+          />
+        </label>
+        </div>
+        
         <div className="mb-5">
           <label htmlFor="productName" className="block mb-2 font-medium font-inter text-black">
             Name
@@ -264,68 +339,6 @@ export function EditProduct() {
               </option>
             ))}
           </select>
-        </div>
-
-        <div className="mb-5">
-          <label htmlFor="productLocation" className="block mb-2 font-medium font-inter text-black">
-            Location
-          </label>
-          <input
-            id="productLocation"
-            type="text"
-            defaultValue={product?.location}
-            ref={productLocation}
-            className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
-            placeholder="Location"
-            required
-          />
-        </div>
-
-        <div className="mb-5">
-          <label htmlFor="productImages" className="block mb-2 font-medium font-inter text-black">
-            Images
-          </label>
-
-          {(newPreviews.length > 0 || existingImages.length > 0) && (
-            <div className="inline-flex flex-wrap justify-start gap-2">
-              {existingImages.map((url) => (
-                <div key={url} className="relative m-1 w-24 h-24">
-                  <img src={url} className="w-full h-full object-cover rounded-md" />
-                  <button
-                    type="button"
-                    onClick={() => removeExisting(url)}
-                    className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs px-1"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-
-              {newPreviews.map((src, idx) => (
-                <div key={src} className="relative m-1 w-24 h-24">
-                  <img src={src} className="w-full h-full object-cover rounded-md" />
-                  <button
-                    type="button"
-                    onClick={() => removeNew(idx)}
-                    className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs px-1"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <input
-            name="images"
-            id="productImages"
-            type="file"
-            multiple
-            accept="image/png, image/jpeg"
-            onChange={handleImageChange}
-            ref={productImages}
-            className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
-          />
         </div>
 
         <div className="flex justify-between gap-3">
