@@ -6,8 +6,11 @@ import "module-alias/register";
 import mongoose from "mongoose";
 import app from "src/app";
 import env from "src/util/validateEnv";
+import socketServer from "src/socket";
+import socketlog from "src/util/socketlogger";
 
 const PORT = env.PORT;
+const SOCKET_PORT = env.SOCKET_PORT;
 const MONGODB_URI = env.MONGODB_URI;
 
 mongoose
@@ -19,3 +22,7 @@ mongoose
     });
   })
   .catch(console.error);
+
+socketServer.listen(SOCKET_PORT, () => {
+  socketlog(`Server listening on ${SOCKET_PORT}`);
+});
