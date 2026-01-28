@@ -1,4 +1,4 @@
-import { faBars, faCartShopping, faUser, faXmark, faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faCartShopping, faUser, faXmark, faHeart, faUsers, faStore, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useRef, useState } from "react";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
@@ -6,8 +6,10 @@ import { FirebaseContext } from "src/utils/FirebaseProvider";
 export function Navbar() {
   const { user, signOutFromFirebase, openGoogleAuthentication } = useContext(FirebaseContext);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isStudentOrgDropdownOpen, setStudentOrgDropdownOpen] = useState(false);
   const menuRef = useRef<HTMLUListElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!isMobileMenuOpen);
@@ -22,6 +24,12 @@ export function Navbar() {
         !buttonRef.current.contains(event.target as Node)
       ) {
         setMobileMenuOpen(false);
+      }
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setStudentOrgDropdownOpen(false);
       }
     };
 
@@ -79,6 +87,57 @@ export function Navbar() {
               Saved
             </button>
           </li>
+          <li className="relative" ref={dropdownRef}>
+            <button
+              hidden={user === null}
+              onClick={() => setStudentOrgDropdownOpen(!isStudentOrgDropdownOpen)}
+              className="font-inter px-4 py-1 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors flex items-center"
+            >
+              <FontAwesomeIcon
+                className="text-lg pr-2"
+                icon={faUsers}
+                aria-label="Student Organizations"
+              />
+              Student Organizations
+              <FontAwesomeIcon
+                className="text-sm pl-2"
+                icon={faChevronDown}
+                aria-label="Dropdown"
+              />
+            </button>
+            {isStudentOrgDropdownOpen && (
+              <div className="absolute top-full left-0 mt-1 bg-ucsd-blue text-white rounded-lg shadow-lg min-w-[200px] z-50">
+                <button
+                  onClick={() => {
+                    window.location.href = "/student-org-profile";
+                    setStudentOrgDropdownOpen(false);
+                  }}
+                  className="font-inter w-full text-left px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors flex items-center"
+                >
+                  <FontAwesomeIcon
+                    className="text-lg pr-2"
+                    icon={faUsers}
+                    aria-label="My Organization"
+                  />
+                  My Organization
+                </button>
+                <button
+                  onClick={() => {
+                    window.location.href = "/student-organizations";
+                    setStudentOrgDropdownOpen(false);
+                  }}
+                  className="font-inter w-full text-left px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors flex items-center"
+                >
+                  <FontAwesomeIcon
+                    className="text-lg pr-2"
+                    icon={faStore}
+                    aria-label="Browse Organizations"
+                  />
+                  Browse Organizations
+                </button>
+              </div>
+            )}
+          </li>
           <li>
             {user ? (
               <button
@@ -128,6 +187,75 @@ export function Navbar() {
                 />
                 Products
               </button>
+            </li>
+            <li className="mb-2">
+              <button
+                hidden={user === null}
+                onClick={() => (window.location.href = "/saved-products")}
+                className="font-inter w-full text-center px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors"
+              >
+                <FontAwesomeIcon
+                  className="text-lg pr-2"
+                  icon={faHeart}
+                  aria-label="Heart Icon"
+                />
+                Saved
+              </button>
+            </li>
+            <li className="mb-2">
+              <div className="relative">
+                <button
+                  hidden={user === null}
+                  onClick={() => setStudentOrgDropdownOpen(!isStudentOrgDropdownOpen)}
+                  className="font-inter w-full text-center px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors flex items-center justify-center"
+                >
+                  <FontAwesomeIcon
+                    className="text-lg pr-2"
+                    icon={faUsers}
+                    aria-label="Student Organizations"
+                  />
+                  Student Organizations
+                  <FontAwesomeIcon
+                    className="text-sm pl-2"
+                    icon={faChevronDown}
+                    aria-label="Dropdown"
+                  />
+                </button>
+                {isStudentOrgDropdownOpen && (
+                  <div className="absolute top-full left-0 mt-1 w-full bg-ucsd-blue text-white rounded-lg shadow-lg z-50">
+                    <button
+                      onClick={() => {
+                        window.location.href = "/student-org-profile";
+                        setStudentOrgDropdownOpen(false);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="font-inter w-full text-center px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors flex items-center justify-center"
+                    >
+                      <FontAwesomeIcon
+                        className="text-lg pr-2"
+                        icon={faUsers}
+                        aria-label="My Organization"
+                      />
+                      My Organization
+                    </button>
+                    <button
+                      onClick={() => {
+                        window.location.href = "/student-organizations";
+                        setStudentOrgDropdownOpen(false);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="font-inter w-full text-center px-4 py-2 bg-transparent border-transparent rounded hover:bg-ucsd-darkblue transition-colors flex items-center justify-center"
+                    >
+                      <FontAwesomeIcon
+                        className="text-lg pr-2"
+                        icon={faStore}
+                        aria-label="Browse Organizations"
+                      />
+                      Browse Organizations
+                    </button>
+                  </div>
+                )}
+              </div>
             </li>
             <li>
               {user ? (

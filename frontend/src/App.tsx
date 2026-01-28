@@ -12,6 +12,8 @@ import { IndividualProductPage } from "../src/pages/Individual-product-page";
 import { PageNotFound } from "../src/pages/PageNotFound";
 import FirebaseProvider from "../src/utils/FirebaseProvider";
 import { SavedProducts } from "./pages/SavedProducts";
+import { StudentOrgProfile } from "./pages/StudentOrgProfile";
+import { StudentOrganizations } from "./pages/StudentOrganizations";
 
 const router = createBrowserRouter([
   {
@@ -55,6 +57,22 @@ const router = createBrowserRouter([
     element: (
       <PrivateRoute>
         <SavedProducts />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/student-org-profile",
+    element: (
+      <PrivateRoute>
+        <StudentOrgProfile />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/student-organizations",
+    element: (
+      <PrivateRoute>
+        <StudentOrganizations />
       </PrivateRoute>
     ),
   },
