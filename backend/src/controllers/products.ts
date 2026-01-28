@@ -16,11 +16,76 @@ const upload = multer({
 }).array("images", 10);
 
 /**
- * get all the products in database
+ * get all the products in database (keep filters, sorting in mind)
  */
 export const getProducts = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const products = await ProductModel.find();
+    const { sortBy, order, minPrice, maxPrice, condition, tags } = req.query;
+
+    // object containing different filters we can apply
+    const filters: any = {}; 
+  
+    // Check for filters and add them to object
+    if(minPrice || maxPrice) {
+      filters.price = {};
+      if(minPrice) filters.price.$gte = Number(minPrice);
+      if(maxPrice) filters.price.$lte = Number(maxPrice);
+    }
+
+    // Filter by specific condition
+    if(condition) {
+      filters.condition = condition;
+    }
+
+    // Filter by tags
+    if(tags) {
+      // Handle both single tag and multiple tags
+      let tagArray: string[];
+      
+      if (Array.isArray(tags)) {
+
+        // Already an array: ?tags=Electronics&tags=Furniture
+        tagArray = tags as string[];
+      } else if (typeof tags === 'string') {
+
+        // Single string, could be comma-separated: ?tags=Electronics,Furniture
+        tagArray = tags.includes(',') ? tags.split(',').map(t => t.trim()) : [tags];
+      
+      } else {
+        tagArray = [];
+      }
+
+      if (tagArray.length > 0) {
+        filters.tags = { $in: tagArray };
+      }
+    }
+
+    // sort object for different sorting options
+    const sortTypes: any = {}
+
+    if(sortBy) {
+      const sortOrder = order === "asc" ? 1 : -1;
+      
+      switch(sortBy) {
+        case "price":
+          sortTypes.price = sortOrder;
+          break;
+        case "timeCreated":
+          sortTypes.timeCreated = sortOrder;
+          break;
+        case "condition":
+          sortTypes.condition = sortOrder;
+          break;
+        default:
+          // newest is default
+          sortTypes.timeCreated = -1;
+      }
+    } else {
+      // default sorting by newest
+      sortTypes.timeCreated = -1;
+    }
+
+    const products = await ProductModel.find(filters).sort(sortTypes);
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: "Error fetching products", error });
@@ -63,19 +128,21 @@ export const getProductsByName = async (req: AuthenticatedRequest, res: Response
 };
 
 /**
- * add product to database thru name, price, description, and userEmail
+ * add product to database thru name, price, description, userEmail, and condition
  */
 export const addProduct = [
   upload,
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const { name, price, description } = req.body;
+      const { name, price, description, category, condition } = req.body;
       if (!req.user) return res.status(404).json({ message: "User not found" });
       const userId = req.user._id;
       const userEmail = req.user.userEmail;
-      if (!name || !price || !userEmail) {
-        return res.status(400).json({ message: "Name, price, and userEmail are required." });
+      if (!name || !price || !userEmail || !condition) {
+        return res.status(400).json({ message: "Name, price, userEmail, and condition are required." });
       }
+      
+      const tags = category ? [category] : [];
 
       const images: string[] = [];
       if (req.files && Array.isArray(req.files)) {
@@ -101,6 +168,8 @@ export const addProduct = [
         description,
         userEmail,
         images,
+        condition,
+        tags,
         timeCreated: new Date(),
         timeUpdated: new Date(),
       });
@@ -168,6 +237,12 @@ export const updateProductById = [
         return res.status(400).json({ message: "User does not own this product" });
       }
 
+      // handle tags input
+      let tags: string[] | undefined;
+      if (req.body.category) {
+        tags = [req.body.category];
+      }
+
       let existing = req.body.existingImages || [];
       if (!Array.isArray(existing)) existing = [existing];
 
@@ -183,15 +258,22 @@ export const updateProductById = [
 
       const finalImages = [...existing, ...newUrls];
 
+      const updateData: any = {
+        name: req.body.name,
+        price: req.body.price,
+        description: req.body.description,
+        condition: req.body.condition,
+        images: finalImages,
+        timeUpdated: new Date(),
+      };
+
+      if (tags) {
+        updateData.tags = tags;
+      }
+
       const updatedProduct = await ProductModel.findByIdAndUpdate(
         id,
-        {
-          name: req.body.name,
-          price: req.body.price,
-          description: req.body.description,
-          images: finalImages,
-          timeUpdated: new Date(),
-        },
+        updateData,
         { new: true },
       );
 

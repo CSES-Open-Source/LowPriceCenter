@@ -2,8 +2,18 @@ import { useState, useEffect, useContext } from "react";
 import { Helmet } from "react-helmet-async";
 import Product from "src/components/Product";
 import SearchBar from "src/components/SearchBar";
+import FilterSort from "src/components/FilterSort";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 import { get, post } from "src/api/requests";
+
+interface FilterState {
+  minPrice?: number;
+  maxPrice?: number;
+  condition?: "New" | "Used" | "";
+  tags?: string[];
+  sortBy?: "price" | "timeCreated";
+  order?: "asc" | "desc";
+}
 
 export function Marketplace() {
   const [products, setProducts] = useState<
@@ -15,6 +25,13 @@ export function Marketplace() {
     }>
   >([]);
   const [error, setError] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>(""); 
+  const [filters, setFilters] = useState<FilterState>({
+    sortBy: "timeCreated",
+    order: "desc",
+    tags: [],
+  });
+
   const { user } = useContext(FirebaseContext);
   const [savedProducts, setSavedProducts] = useState<string[]>([]);
 
@@ -44,6 +61,53 @@ export function Marketplace() {
     }
   };
 
+  const fetchProducts = async () => {
+    try {
+      setError("");
+
+      // If there's a search query, use search endpoint
+      if (searchQuery && searchQuery.trim().length > 0) {
+        const res = await get(`/api/products/search/${searchQuery}`);
+        if (res.ok) {
+          const data = await res.json();
+          setProducts(data);
+        } else {
+          setError("Unable to search products. Try again later.");
+        }
+        return;
+      }
+
+      // Otherwise, use filter/sort endpoint
+      const params = new URLSearchParams();
+
+      if (filters.minPrice) params.append("minPrice", filters.minPrice.toString());
+      if (filters.maxPrice) params.append("maxPrice", filters.maxPrice.toString());
+      if (filters.condition) params.append("condition", filters.condition);
+      if (filters.tags && filters.tags.length > 0) {
+        filters.tags.forEach((tag) => params.append("tags", tag));
+      }
+      if (filters.sortBy) params.append("sortBy", filters.sortBy);
+      if (filters.order) params.append("order", filters.order);
+
+      const queryString = params.toString();
+      const res = await get(`/api/products${queryString ? `?${queryString}` : ""}`);
+      
+      if (res.ok) {
+        const data = await res.json();
+        setProducts(data);
+      } else {
+        setError("Unable to display products. Try again later.");
+      }
+    } catch (err) {
+      setError("Unable to display products. Try again later.");
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, [filters, searchQuery]);
+
   useEffect(() => {
     fetchSavedProducts();
   }, [user]);
@@ -64,7 +128,10 @@ export function Marketplace() {
               Add Product
             </button>
           </div>
-          <SearchBar setProducts={setProducts} setError={setError} />
+          <SearchBar setProducts={setSearchQuery} setError={setError} />
+          
+          <FilterSort filters={filters} setFilters={setFilters} />
+
           {error && <p className="max-w-[80%] w-full px-3 pt-3 text-red-800">{error}</p>}
           {!error && products?.length === 0 && (
             <p className="max-w-[80%] font-inter text-lg w-full px-3 pt-3">No products available</p>
