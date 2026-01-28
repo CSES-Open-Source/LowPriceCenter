@@ -12,6 +12,18 @@ const productSchema = new Schema({
   description: {
     type: String,
   },
+  year: {
+    type: Number,
+    required: true,
+  },
+  category: {
+    type: String,
+    required: true,
+  },
+  condition: {
+    type: String,
+    required: true,
+  },
   timeCreated: {
     type: Date,
     required: true,
