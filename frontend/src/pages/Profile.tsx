@@ -1,7 +1,10 @@
-import { useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle, faEnvelope, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
+
+import { Helmet } from "react-helmet-async";
+import { get, post } from "src/api/requests";
 
 export function Profile() {
   const { user } = useContext(FirebaseContext);
@@ -18,7 +21,7 @@ export function Profile() {
     <div className="min-h-screen bg-gray-50 py-10 px-4">
       <div className="max-w-3xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         {/* Profile Header/Cover */}
-        <div className="h-32 bg-ucsd-blue"></div>
+        <div className="h-40 bg-ucsd-blue"></div>
         
         <div className="relative px-6 pb-6">
           {/* Profile Picture */}
@@ -27,7 +30,7 @@ export function Profile() {
               <img 
                 src={user.photoURL} 
                 alt="Profile" 
-                className="w-24 h-24 rounded-full border-4 border-white shadow-lg"
+                className="w-28 h-28 rounded-full border-4 border-white shadow-lg"
               />
             ) : (
               <FontAwesomeIcon 
