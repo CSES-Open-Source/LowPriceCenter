@@ -1,10 +1,10 @@
 import { HelmetProvider } from "react-helmet-async";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { Footer } from "src/components/Footer";
-import { Navbar } from "src/components/Navbar";
-import { Home } from "src/pages";
-import { Marketplace } from "src/pages/Marketplace";
-import { Profile } from "src/pages/Profile";
+import { Footer } from "/src/components/Footer";
+import { Navbar } from "/src/components/Navbar";
+import { Home } from "/src/pages";
+import { Marketplace } from "/src/pages/Marketplace";
+import { Profile } from "/src/pages/Profile";
 
 import { PrivateRoute } from "../src/components/PrivateRoute";
 import { AddProduct } from "../src/pages/AddProduct";

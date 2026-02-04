@@ -1,8 +1,8 @@
 import { FormEvent, useContext, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
-import { post } from "src/api/requests";
-import { FirebaseContext } from "src/utils/FirebaseProvider";
+import { post } from "/src/api/requests";
+import { FirebaseContext } from "/src/utils/FirebaseProvider";
 
 export function AddProduct() {
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB

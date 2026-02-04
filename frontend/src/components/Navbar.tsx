@@ -1,7 +1,7 @@
 import { faBars, faCartShopping, faUser, faXmark, faHeart, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useRef, useState } from "react";
-import { FirebaseContext } from "src/utils/FirebaseProvider";
+import { FirebaseContext } from "/src/utils/FirebaseProvider";
 
 export function Navbar() {
   const { user, signOutFromFirebase, openGoogleAuthentication } = useContext(FirebaseContext);

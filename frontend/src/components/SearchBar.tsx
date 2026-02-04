@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { get } from "src/api/requests";
+import { get } from "/src/api/requests";
 
 interface Props {
   setProducts: (products: []) => void;
