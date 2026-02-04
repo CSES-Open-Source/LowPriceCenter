@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import firebaseConfig from "src/utils/FirebaseConfig";
+import firebaseConfig from "/src/utils/FirebaseConfig";
 
 export function getToken() {
   const app = initializeApp(firebaseConfig);

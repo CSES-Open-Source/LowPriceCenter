@@ -1,8 +1,8 @@
 import { FormEvent, useContext, useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
-import { DELETE, get, patch } from "src/api/requests";
-import { FirebaseContext } from "src/utils/FirebaseProvider";
+import { DELETE, get, patch } from "/src/api/requests";
+import { FirebaseContext } from "/src/utils/FirebaseProvider";
 
 export function EditProduct() {
   const { id } = useParams();

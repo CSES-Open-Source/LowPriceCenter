@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Helmet } from "react-helmet-async";
 import { Navigate } from "react-router-dom";
-import { FirebaseContext } from "src/utils/FirebaseProvider";
+import { FirebaseContext } from "/src/utils/FirebaseProvider";
 
 const buttonStyles =
   "bg-slate-800 text-white py-3 px-4 rounded-md mt-2 hover:bg-slate-900 transition-colors w-full sm:w-fit flex flex-row gap-3 justify-center";

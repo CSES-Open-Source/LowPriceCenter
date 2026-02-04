@@ -5,9 +5,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { get, post } from "src/api/requests";
-import { FirebaseContext } from "src/utils/FirebaseProvider";
-import EmblaCarousel from "src/components/EmblaCarousel";
+import { get, post } from "/src/api/requests";
+import { FirebaseContext } from "/src/utils/FirebaseProvider";
+import EmblaCarousel from "/src/components/EmblaCarousel";
 import { EmblaOptionsType } from "embla-carousel";
 
 export function IndividualProductPage() {

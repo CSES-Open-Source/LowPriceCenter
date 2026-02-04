@@ -3,7 +3,7 @@
  * https://github.com/TritonSE/TSE-Fulcrum/blob/main/frontend/src/api.ts
  */
 
-import { getToken } from "src/utils/User";
+import { getToken } from "/src/utils/User";
 
 /**
  * A custom type defining which HTTP methods we will handle in this file

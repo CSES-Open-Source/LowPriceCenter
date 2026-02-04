@@ -1,9 +1,9 @@
 import { useState, useEffect, useContext } from "react";
 import { Helmet } from "react-helmet-async";
-import Product from "src/components/Product";
-import SearchBar from "src/components/SearchBar";
-import { FirebaseContext } from "src/utils/FirebaseProvider";
-import { get, post } from "src/api/requests";
+import Product from "/src/components/Product";
+import SearchBar from "/src/components/SearchBar";
+import { FirebaseContext } from "/src/utils/FirebaseProvider";
+import { get, post } from "/src/api/requests";
 
 export function Marketplace() {
   const [products, setProducts] = useState<
