@@ -69,12 +69,12 @@ export const addProduct = [
   upload,
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const { name, price, description } = req.body;
+      const { name, price, description, year, category, condition} = req.body;
       if (!req.user) return res.status(404).json({ message: "User not found" });
       const userId = req.user._id;
       const userEmail = req.user.userEmail;
-      if (!name || !price || !userEmail) {
-        return res.status(400).json({ message: "Name, price, and userEmail are required." });
+      if (!name || !price || !userEmail || !year || !category || !condition) {
+        return res.status(400).json({ message: "Name, price, userEmail, year, category, condition, are required." });
       }
 
       const images: string[] = [];
@@ -101,6 +101,9 @@ export const addProduct = [
         description,
         userEmail,
         images,
+        year,
+        category,
+        condition,
         timeCreated: new Date(),
         timeUpdated: new Date(),
       });
@@ -189,6 +192,9 @@ export const updateProductById = [
           name: req.body.name,
           price: req.body.price,
           description: req.body.description,
+          year: req.body.year,
+          category: req.body.category,
+          condition: req.body.condition,
           images: finalImages,
           timeUpdated: new Date(),
         },
