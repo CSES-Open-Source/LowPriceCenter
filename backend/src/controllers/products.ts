@@ -37,7 +37,7 @@ export const getProducts = async (req: AuthenticatedRequest, res: Response) => {
       filters.condition = condition;
     }
 
-    // Filter by tags
+    // Filter by category
     if(tags) {
       // Handle both single tag and multiple tags
       let tagArray: string[];
@@ -117,7 +117,63 @@ export const getProductById = async (req: AuthenticatedRequest, res: Response) =
 export const getProductsByName = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const query = req.params.query;
-    const products = await ProductModel.find({ name: { $regex: query, $options: "i" } });
+    const { sortBy, order, minPrice, maxPrice, condition, tags } = req.query;
+    
+    // Name is now a filter we can apply
+    const filters: any = {
+      name: { $regex: query, $options: "i" }
+    };
+    
+    // price range 
+    if (minPrice || maxPrice) {
+      filters.price = {};
+      if (minPrice) filters.price.$gte = Number(minPrice);
+      if (maxPrice) filters.price.$lte = Number(maxPrice);
+    }
+
+    // condition
+    if (condition) {
+      filters.condition = condition;
+    }
+
+    // filter by category
+    if (tags) {
+      let tagArray: string[];
+      
+      if (Array.isArray(tags)) {
+        tagArray = tags as string[];
+      } else if (typeof tags === 'string') {
+        tagArray = tags.includes(',') ? tags.split(',').map(t => t.trim()) : [tags];
+      } else {
+        tagArray = [];
+      }
+
+      if (tagArray.length > 0) {
+        filters.tags = { $in: tagArray };
+      }
+    }
+
+    // Creates sorting options
+    const sortOptions: any = {};
+    if (sortBy) {
+      const sortOrder = order === "asc" ? 1 : -1;
+      
+      switch (sortBy) {
+        case "price":
+          sortOptions.price = sortOrder;
+          break;
+        case "timeCreated":
+          sortOptions.timeCreated = sortOrder;
+          break;
+        default:
+          sortOptions.timeCreated = -1;
+      }
+    } else {
+      sortOptions.timeCreated = -1;
+    }
+
+    const products = await ProductModel.find(filters).sort(sortOptions);
+
     if (!products) {
       return res.status(404).json({ message: "Product not found" });
     }

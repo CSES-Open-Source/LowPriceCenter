@@ -65,19 +65,7 @@ export function Marketplace() {
     try {
       setError("");
 
-      // If there's a search query, use search endpoint
-      if (searchQuery && searchQuery.trim().length > 0) {
-        const res = await get(`/api/products/search/${searchQuery}`);
-        if (res.ok) {
-          const data = await res.json();
-          setProducts(data);
-        } else {
-          setError("Unable to search products. Try again later.");
-        }
-        return;
-      }
-
-      // Otherwise, use filter/sort endpoint
+      // Search a part of filter/sort endpoint
       const params = new URLSearchParams();
 
       if (filters.minPrice) params.append("minPrice", filters.minPrice.toString());
@@ -90,6 +78,21 @@ export function Marketplace() {
       if (filters.order) params.append("order", filters.order);
 
       const queryString = params.toString();
+
+      // Use in case of search with filters
+      if (searchQuery && searchQuery.trim().length > 0) {
+        const res = await get(
+          `/api/products/search/${searchQuery}${queryString ? `?${queryString}` : ""}`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setProducts(data);
+        } else {
+          setError("Unable to search products. Try again later.");
+        }
+        return;
+      }
+
       const res = await get(`/api/products${queryString ? `?${queryString}` : ""}`);
       
       if (res.ok) {
