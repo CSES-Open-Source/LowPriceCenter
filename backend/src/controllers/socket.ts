@@ -65,6 +65,7 @@ export function onSendMessage(socket: Socket) {
 
       const conversation = await ConversationModel.findById(payload.conversationId);
       if (!conversation) throw new Error("No conversation found");
+      const conversationRoom = `conversation:${payload.conversationId}`;
 
       if (!conversation.participants.some((id) => id.equals(sender._id))) {
         throw new Error("Not in conversation");
@@ -78,6 +79,9 @@ export function onSendMessage(socket: Socket) {
 
       conversation.lastMessage = message._id;
       await conversation.save();
+
+      socket.emit("message:receive", message);
+      socket.to(conversationRoom).emit("message:receive", message);
 
       return callback({ status: "OK" });
     } catch (e) {

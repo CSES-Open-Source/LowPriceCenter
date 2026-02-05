@@ -38,7 +38,8 @@ export function ChatBox({
 
   const handleSendMessage = async () => {
     if (!user) return;
-    if (!input) return;
+    if (!input) return; 
+    setInput("");
     socket?.emit(
       "message:send",
       { conversationId: currConvo?._id, content: input },
@@ -46,13 +47,12 @@ export function ChatBox({
         if (!isOk(response)) {
           alert(`unable to send message ${response.err?.msg}`);
         }
-        setInput("");
       },
     );
-    setMessages((prev) => [
+    /*setMessages((prev) => [
       ...prev,
       { content: input, authorUid: user.uid, sender: true, updatedAt: new Date().toISOString() },
-    ]);
+    ]);*/
   };
   const handleInputResize = async (e: FormEvent) => {
     const target = e.target as HTMLTextAreaElement;

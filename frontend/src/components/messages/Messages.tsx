@@ -12,17 +12,17 @@ type ConvoCardProps = {
 };
 
 export function Messages(): ReactNode {
-  const { socket } = useContext(ChatContext);
+  const { socket, messages, setMessages } = useContext(ChatContext);
   const { user } = useContext(FirebaseContext);
   const [conversations, setConversations] = useState<Conversation[]>();
   const [currConvo, setCurrConvo] = useState<Conversation | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [messages, setMessages] = useState<UserMessage[]>([]);
 
   const joinConversation = (convo: Conversation) => {
     setLoading(true);
     socket?.emit("conversation:join", { id: convo._id }, (response: SocketResponse) => {
       if (!isOk(response)) alert(`Could not find conversation: ${response.err}`); // please please please remember to change this before final push
+      if (!setMessages) return;
 
       setMessages(
         (response.body as UserMessage[]).map((msg) => {
@@ -83,7 +83,9 @@ export function Messages(): ReactNode {
             })}
           </div>
           <div className="w-3/4 h-full">
-            <ChatBox messages={messages} setMessages={setMessages} currConvo={currConvo} />
+            {messages && setMessages && (
+              <ChatBox messages={messages} setMessages={setMessages} currConvo={currConvo} />
+            )}
           </div>
         </div>
       </div>
