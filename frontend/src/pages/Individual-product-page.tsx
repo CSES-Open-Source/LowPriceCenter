@@ -1,6 +1,7 @@
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
+import { faCalendar, faTag, faCheckCircle, faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
@@ -17,6 +18,10 @@ export function IndividualProductPage() {
   const [product, setProduct] = useState<{
     name: string;
     price: number;
+    year: number;
+    category: string;
+    condition: string;
+    location: string;
     images: string[];
     userEmail: string;
     description: string;
@@ -172,14 +177,7 @@ export function IndividualProductPage() {
         <title>{`${product?.name} - Low-Price Center`}</title>
       </Helmet>
       <main className="w-[80%] max-w-screen-2xl mx-auto m-12">
-        <div className="flex justify-between">
-          <button
-            className="text-lg mb-4 font-inter hover:underline"
-            onClick={() => navigate(backPath)}
-          >
-            &larr; Return to {from === "saved" ? "Saved Products" : "Marketplace"}
-          </button>
-
+        <div className="flex justify-end">
           {hasPermissions && (
             <button
               className="text-lg mb-4 font-inter hover:underline"
@@ -196,26 +194,28 @@ export function IndividualProductPage() {
           <div className="flex flex-wrap flex-col md:flex-row mb-6 gap-12">
             {/* Image Section */}
             <section className="w-full flex-1 flex flex-col items-center space-y-12 md:h-auto">
-              <div className="max-h-[24rem] h-[24rem] max-w-[32rem] w-[32rem] relative">
-                <img
-                  src={
-                    product?.images && product.images.length > 0
-                      ? product.images[currentIndex]
-                      : "/productImages/product-placeholder.webp"
-                  }
-                  alt={`Image ${currentIndex + 1} of ${product?.name}`}
-                  className="w-full h-full object-contain"
-                />
-                <button
-                  onClick={toggleSave}
-                  className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
-                >
-                  <FontAwesomeIcon
-                    icon={isSaved ? faHeartSolid : faHeartRegular}
-                    size="lg"
-                    className={isSaved ? "text-red-500" : "text-gray-700"}
+              <div className="bg-[#00629B] p-4 rounded-xl w-full max-w-[40rem]">
+                <div className="max-h-[24rem] h-[24rem] w-full relative">
+                  <img
+                    src={
+                      product?.images && product.images.length > 0
+                        ? product.images[currentIndex]
+                        : "/productImages/product-placeholder.webp"
+                    }
+                    alt={`Image ${currentIndex + 1} of ${product?.name}`}
+                    className="w-full h-full object-contain"
                   />
-                </button>
+                  <button
+                    onClick={toggleSave}
+                    className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
+                  >
+                    <FontAwesomeIcon
+                      icon={isSaved ? faHeartSolid : faHeartRegular}
+                      size="lg"
+                      className={isSaved ? "text-red-500" : "text-gray-700"}
+                    />
+                  </button>
+                </div>
               </div>
               {product?.images && product.images.length > 1 && (
                 <EmblaCarousel
@@ -224,26 +224,92 @@ export function IndividualProductPage() {
                   onSelect={(idx) => setCurrentIndex(idx)}
                 />
               )}
+              <button
+                className="mt-8 text-black font-inter text-lg px-6 py-3 rounded-lg shadow-md hover:brightness-95 transition self-start"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(135deg, #FFCD00 0%, #ffd94d 100%), url('/bg-light-white-trident.png')",
+                  backgroundBlendMode: "overlay, normal",
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "0 0, -37px -1px",
+                  backgroundSize: "100% 100%, 249px",
+                }}
+                onClick={() => navigate(backPath)}
+              >
+                &larr; Return to {from === "saved" ? "Saved Products" : "Marketplace"}
+              </button>
             </section>
 
             {/* Info Section */}
             <section className="max-w-[100%] md:max-w-[50%] flex-1 flex flex-col">
-              <h1 className="pt-2 font-jetbrains text-black font-bold text-4xl break-words">
+              <h1 className="pt-2 font-jetbrains text-black font-bold text-4xl break-words mb-3">
                 {product?.name}
               </h1>
+              <div className="h-px w-full bg-gray-200 mb-4" />
 
-              <hr className="my-6 w-full mx-auto h-0 border-[1px] border-solid border-gray-300" />
+              {/* Price - Prominent Display */}
+              <div className="mb-6">
+                <h2 className="font-jetbrains text-[#00629B] text-3xl md:text-4xl font-bold">
+                  ${product?.price?.toFixed(2)}
+                </h2>
+                <p className="font-inter text-gray-500 text-sm mt-1">USD</p>
+              </div>
 
-              <h2 className="font-inter text-[#35393C] text-base md:text-xl font-normal pb-6">
-                USD ${product?.price?.toFixed(2)}
-              </h2>
+              {/* Product Details Grid */}
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="bg-white border border-gray-200 rounded-lg p-4 min-h-[96px] shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-2 mb-1">
+                    <FontAwesomeIcon icon={faCalendar} className="text-[#00629B] text-sm" />
+                    <span className="font-inter text-gray-500 text-[11px] uppercase tracking-wide">Year</span>
+                  </div>
+                  <p className="font-inter text-black text-base font-semibold">{product?.year}</p>
+                </div>
+
+                <div className="bg-white border border-gray-200 rounded-lg p-4 min-h-[96px] shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-2 mb-1">
+                    <FontAwesomeIcon icon={faTag} className="text-[#00629B] text-sm" />
+                    <span className="font-inter text-gray-500 text-[11px] uppercase tracking-wide">Category</span>
+                  </div>
+                  <p className="font-inter text-black text-base font-semibold">{product?.category}</p>
+                </div>
+
+                <div className="bg-white border border-gray-200 rounded-lg p-4 min-h-[96px] shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-2 mb-1">
+                    <FontAwesomeIcon icon={faCheckCircle} className="text-[#00629B] text-sm" />
+                    <span className="font-inter text-gray-500 text-[11px] uppercase tracking-wide">Condition</span>
+                  </div>
+                  <p className="font-inter text-black text-base font-semibold">{product?.condition}</p>
+                </div>
+
+              </div>
+
+              {/* Description */}
               {product?.description && (
-                <div className="bg-[#F5F0E6] p-5 mb-6">
-                  <p className="font-inter text-black text-base md:text-xl font-normal break-words">
+                <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6 shadow-sm">
+                  <h3 className="font-inter text-gray-700 text-sm uppercase tracking-wide mb-3 font-semibold">
+                    Description
+                  </h3>
+                  <p className="font-inter text-black text-base md:text-lg leading-relaxed break-words whitespace-pre-wrap">
                     {product.description}
                   </p>
                 </div>
               )}
+
+              {/* Contact Seller Box */}
+              <div className="w-full mb-6">
+                <div className="bg-gradient-to-br from-[#F5F0E6] to-[#F9F7F3] border border-gray-200 rounded-lg shadow-sm p-5 text-black font-inter">
+                  <p className="text-sm font-semibold uppercase tracking-wide mb-3">
+                    Contact Info
+                  </p>
+                  <p className="text-base leading-relaxed">
+                    <span className="font-semibold">Email:</span> {product?.userEmail ?? "placeholder"}
+                  </p>
+                  <p className="text-base leading-relaxed">
+                    <span className="font-semibold">Phone:</span> placeholder
+                  </p>
+                </div>
+              </div>
+
               {!hasPermissions && (
                 <div
                   onMouseEnter={() => setIsHovered(true)}
