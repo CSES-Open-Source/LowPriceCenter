@@ -175,9 +175,9 @@ export function Profile() {
       setAvatarError(null);
 
       const formData = new FormData();
-      formData.append("avatar", selectedFile);
       formData.append("userId", user.uid);
       if (user.email) formData.append("userEmail", user.email);
+      formData.append("avatar", selectedFile);
 
       const response = await post("/api/users/avatar", formData);
 
@@ -261,8 +261,9 @@ export function Profile() {
       setCoverError(null);
 
       const formData = new FormData();
-      formData.append("cover", coverFile);
       formData.append("userId", user.uid);
+      formData.append("cover", coverFile);
+
 
       const res = await post("/api/users/cover", formData);
       const data = await res.json();

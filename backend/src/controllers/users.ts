@@ -139,9 +139,11 @@ const avatarStorage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const userId = req.body.userId;
+    if (!userId) return cb(new Error("Missing userId"), "");
     const ext = path.extname(file.originalname);
     cb(null, `${userId}${ext}`);
   },
+  
 });
 
 const avatarFileFilter = (
@@ -219,9 +221,11 @@ const coverStorage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const userId = req.body.userId;
+    if (!userId) return cb(new Error("Missing userId"), "");
     const ext = path.extname(file.originalname);
     cb(null, `${userId}${ext}`);
   },
+  
 });
 
 const coverFileFilter = (
