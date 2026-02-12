@@ -6,6 +6,7 @@ import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import { isHttpError } from "http-errors";
+import path from "path";
 import productRoutes from "src/routes/product";
 import userRoutes from "src/routes/user";
 import interestEmailRoute from "src/routes/interestEmail";
@@ -25,6 +26,7 @@ app.use(
   }),
 );
 
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/interestEmail", interestEmailRoute);
