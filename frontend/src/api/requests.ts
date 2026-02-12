@@ -3,10 +3,12 @@
  * https://github.com/TritonSE/TSE-Fulcrum/blob/main/frontend/src/api.ts
  */
 
+import { getToken } from "/src/utils/User";
+
 /**
  * A custom type defining which HTTP methods we will handle in this file
  */
-type Method = "GET" | "POST" | "PUT";
+type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 /**
  * The first part of the backend API URL, which we will automatically prepend to
@@ -39,14 +41,19 @@ async function fetchRequest(
   const hasBody = body !== undefined;
 
   const newHeaders = { ...headers };
-  if (hasBody) {
+
+  //add firebase token to request header
+  const token = await getToken();
+  if (token) newHeaders["token"] = token;
+
+  if (hasBody && !(body instanceof FormData)) {
     newHeaders["Content-Type"] = "application/json";
   }
 
   const response = await fetch(url, {
     method,
     headers: newHeaders,
-    body: hasBody ? JSON.stringify(body) : undefined,
+    body: hasBody && !(body instanceof FormData) ? JSON.stringify(body) : body,
   });
 
   return response;
@@ -89,7 +96,9 @@ async function assertOk(response: Response): Promise<void> {
 export async function get(url: string, headers: Record<string, string> = {}): Promise<Response> {
   // GET requests do not have a body
   const response = await fetchRequest("GET", API_BASE_URL + url, undefined, headers);
-  void assertOk(response);
+  void (await assertOk(response).catch((e) => {
+    throw e;
+  }));
   return response;
 }
 
@@ -107,7 +116,7 @@ export async function post(
   headers: Record<string, string> = {},
 ): Promise<Response> {
   const response = await fetchRequest("POST", API_BASE_URL + url, body, headers);
-  void assertOk(response);
+  void (await assertOk(response).catch());
   return response;
 }
 
@@ -125,7 +134,40 @@ export async function put(
   headers: Record<string, string> = {},
 ): Promise<Response> {
   const response = await fetchRequest("PUT", API_BASE_URL + url, body, headers);
-  void assertOk(response);
+  void (await assertOk(response).catch());
+  return response;
+}
+
+/**
+ * Sends a PATCH request to the provided API URL.
+ *
+ * @param url The URL to request
+ * @param body The body of the request, or undefined if there is none
+ * @param headers The headers of the request (optional)
+ * @returns The Response object returned by `fetch()`
+ */
+export async function patch(
+  url: string,
+  body: unknown,
+  headers: Record<string, string> = {},
+): Promise<Response> {
+  const response = await fetchRequest("PATCH", API_BASE_URL + url, body, headers);
+  void (await assertOk(response).catch());
+  return response;
+}
+
+/**
+ * Sends a DELETE request to the provided API URL.
+ *
+ * @param url The URL to request
+ * @param headers The headers of the request (optional)
+ * @returns The Response object returned by `fetch()`
+ */
+export async function DELETE(url: string, headers: Record<string, string> = {}): Promise<Response> {
+  const response = await fetchRequest("DELETE", API_BASE_URL + url, undefined, headers);
+  void (await assertOk(response).catch((e) => {
+    throw e;
+  }));
   return response;
 }
 

@@ -74,6 +74,7 @@ web_modules/
 
 # dotenv environment variable files
 .env
+.env.development
 .env.development.local
 .env.test.local
 .env.production.local
@@ -131,3 +132,12 @@ dist
 
 # Miscellaneous
 .DS_Store
+
+# user uploads
+backend/uploads/
+backend/uploads/**
+
+# (optional) env files
+.env
+frontend/.env
+backend/.env

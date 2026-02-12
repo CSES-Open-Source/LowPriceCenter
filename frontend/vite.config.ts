@@ -1,16 +1,21 @@
-/// <reference types="vitest" />
-import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import * as path from "path";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: {
-      src: "/src",
-    },
+    alias: [
+      {
+        find: /^src\/(.*)/,
+        replacement: path.resolve(__dirname, "src") + "/$1",
+      },
+    ],
   },
-  test: {
-    environment: "jsdom",
+  server: {
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+      "Cross-Origin-Embedder-Policy": "unsafe-none",
+    },
   },
 });
