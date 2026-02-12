@@ -1,82 +1,68 @@
-import { FirebaseApp, initializeApp } from "firebase/app";
-import { GoogleAuthProvider, User, getAuth, signInWithPopup, signOut } from "firebase/auth";
-import { MouseEventHandler, ReactNode, createContext, useEffect, useState } from "react";
-import { get, post } from "src/api/requests";
+import type { FirebaseApp } from "firebase/app";
+import type { User } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import type { MouseEventHandler, ReactNode } from "react";
+import { createContext, useEffect, useState } from "react";
+import { get, post } from "/src/api/requests";
+import { app, auth } from "/src/utils/Firebase";
 
-import { firebaseConfig } from "src/utils/FirebaseConfig";
-
-/**
- * Context used by FirebaseProvider to provide app and user to pages
- */
-const FirebaseContext = createContext<{
-  app: FirebaseApp | undefined;
+export const FirebaseContext = createContext<{
+  app: FirebaseApp;
   user: User | null;
   loading: boolean;
   openGoogleAuthentication: MouseEventHandler<HTMLButtonElement>;
   signOutFromFirebase: MouseEventHandler<HTMLButtonElement>;
 }>({
-  app: undefined,
+  app,
   user: null,
   loading: true,
   openGoogleAuthentication: () => {},
   signOutFromFirebase: () => {},
 });
 
-/**
- * Wraps children in FirebaseContext.Provider to give all
- * children access to sustained Firebase app and user
- * data.
- */
 export default function FirebaseProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-  /*sign in*/
   async function openGoogleAuthentication() {
-    await signInWithPopup(auth, provider).catch((error) => {
-      console.error(error);
-    });
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (e) {
+      console.error("Popup sign-in error:", e);
+    }
   }
 
-  /*sign out*/
   async function signOutFromFirebase() {
     await signOut(auth);
     window.location.href = "/";
   }
 
-  /**
-   * Tracks when the user logs in and out to change
-   * the state of the user.
-   */
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (u) => {
-      if (!u) setUser(null);
-      else {
-        await get(`/api/users/${u.uid}`)
-          .then(() => {
+      try {
+        if (!u) {
+          setUser(null);
+          return;
+        }
+
+        try {
+          await get(`/api/users/${u.uid}`);
+          setUser(u);
+        } catch (e: any) {
+          if (e?.message === '404 Not Found: {"message":"User not found"}') {
+            await post(`/api/users`, { firebaseUid: u.uid });
             setUser(u);
-          })
-          .catch(async (e) => {
-            if (e.message === '404 Not Found: {"message":"User not found"}') {
-              await post(`/api/users`, { firebaseUid: u.uid })
-                .then(() => {
-                  setUser(u);
-                })
-                .catch((e2) => {
-                  signOutFromFirebase();
-                  console.error(e2);
-                });
-            } else {
-              signOutFromFirebase();
-            }
-          });
+          } else {
+            await signOutFromFirebase();
+          }
+        }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
+
     return unsubscribe;
   }, []);
 
@@ -88,5 +74,3 @@ export default function FirebaseProvider({ children }: { children: ReactNode }) 
     </FirebaseContext.Provider>
   );
 }
-
-export { FirebaseContext };

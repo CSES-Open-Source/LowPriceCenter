@@ -2,8 +2,8 @@ import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useState } from "react";
-import { FirebaseContext } from "src/utils/FirebaseProvider";
-import { post } from "src/api/requests";
+import { FirebaseContext } from "/src/utils/FirebaseProvider";
+import { post } from "/src/api/requests";
 
 interface Props {
   productId: string;

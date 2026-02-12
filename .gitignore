@@ -132,3 +132,12 @@ dist
 
 # Miscellaneous
 .DS_Store
+
+# user uploads
+backend/uploads/
+backend/uploads/**
+
+# (optional) env files
+.env
+frontend/.env
+backend/.env
