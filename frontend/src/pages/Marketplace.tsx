@@ -113,8 +113,8 @@ export function Marketplace() {
       <main className="w-full flex justify-center mt-12 mb-20">
         <div className="w-full max-w-[1300px] px-4">
 
-          {/* ── Page header ── */}
-          <div className="flex justify-between items-center mb-8">
+          {/* Outer page header: Marketplace title + Add Product */}
+          <div className="flex justify-between items-center mb-6">
             <p className="text-3xl font-jetbrains font-medium text-ucsd-darkblue">
               Marketplace
             </p>
@@ -127,30 +127,32 @@ export function Marketplace() {
           </div>
 
           {/* ── White card ── */}
-          <div className="bg-white rounded-3xl shadow-lg p-8 flex gap-8">
+          <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
 
-            {/* LEFT SIDEBAR */}
-            <div className="w-[220px] shrink-0 border-r-2 border-ucsd-gold pr-6">
-              <FilterSort filters={filters} setFilters={setFilters} />
-            </div>
+            {/* ── TOP BANNER ROW ──
+                Left:  "Low Price Center" heading blended into white
+                Right: Search bar + sort controls stacked
+            */}
+            <div className="flex items-start justify-between px-8 pt-7 pb-4">
 
-            {/* RIGHT CONTENT */}
-            <div className="flex-1 min-w-0 flex flex-col gap-5">
+              {/* Low Price Center — "Low" in ucsd-blue, "Price Center" in ucsd-gold, blended white bg */}
+              <div className="font-jetbrains font-bold leading-tight">
+                <span className="text-4xl text-ucsd-blue">Low </span>
+                <span className="text-4xl text-ucsd-gold">Price Center</span>
+              </div>
 
-              {/* Search + Sort row */}
-              <div className="flex items-center gap-3">
-                {/* SearchBar expands to fill space */}
-                <div className="flex-1">
+              {/* Search bar + sort stacked on the right */}
+              <div className="flex flex-col items-end gap-2 w-[420px] shrink-0">
+                {/* Search bar */}
+                <div className="w-full">
                   <SearchBar setProducts={setSearchQuery} setError={setError} />
                 </div>
 
-                {/* Sort controls */}
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-sm font-inter text-gray-500 whitespace-nowrap">
-                    Sort:
-                  </span>
+                {/* Sort row — right-aligned, underneath search */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-inter text-gray-500 whitespace-nowrap">Sort:</span>
                   <select
-                    className="border border-gray-200 rounded-lg px-3 py-[7px] text-sm font-inter bg-white
+                    className="border border-gray-200 rounded-lg px-3 py-[6px] text-sm font-inter bg-white
                                focus:ring-2 focus:ring-ucsd-blue focus:border-ucsd-blue outline-none cursor-pointer"
                     value={filters.sortBy || "timeCreated"}
                     onChange={(e) =>
@@ -162,7 +164,7 @@ export function Marketplace() {
                   </select>
 
                   <select
-                    className="border border-gray-200 rounded-lg px-3 py-[7px] text-sm font-inter bg-white
+                    className="border border-gray-200 rounded-lg px-3 py-[6px] text-sm font-inter bg-white
                                focus:ring-2 focus:ring-ucsd-blue focus:border-ucsd-blue outline-none cursor-pointer"
                     value={filters.order || "desc"}
                     onChange={(e) =>
@@ -178,32 +180,46 @@ export function Marketplace() {
                   </select>
                 </div>
               </div>
+            </div>
 
-              {/* Status messages */}
-              {error && (
-                <p className="text-red-500 text-sm font-inter">{error}</p>
-              )}
-              {!error && products?.length === 0 && (
-                <p className="font-inter text-gray-400">No products available</p>
-              )}
+            {/* Thin gold divider under the top banner */}
+            <div className="mx-8 border-t border-gray-100" />
 
-              {/* Product grid */}
-              <div className="grid sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 xxl:grid-cols-4 gap-6">
-                {products.map((product) => (
-                  <Product
-                    key={product._id}
-                    productId={product._id}
-                    productName={product.name}
-                    productPrice={product.price}
-                    productImages={product.images || []}
-                    isSaved={savedProducts.includes(product._id)}
-                    onSaveToggle={handleSaveToggle}
-                  />
-                ))}
+            {/* ── BOTTOM SECTION: Sidebar | Products ── */}
+            <div className="flex">
+
+              {/* LEFT SIDEBAR — fixed width, gold right border */}
+              <div className="w-[220px] shrink-0 px-6 py-6">
+                <FilterSort filters={filters} setFilters={setFilters} />
+              </div>
+
+              {/* RIGHT: Product grid */}
+              <div className="flex-1 min-w-0 px-8 py-6">
+                {error && (
+                  <p className="text-red-500 text-sm font-inter mb-4">{error}</p>
+                )}
+                {!error && products?.length === 0 && (
+                  <p className="font-inter text-gray-400">No products available</p>
+                )}
+
+                <div className="grid sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 xxl:grid-cols-4 gap-6">
+                  {products.map((product) => (
+                    <Product
+                      key={product._id}
+                      productId={product._id}
+                      productName={product.name}
+                      productPrice={product.price}
+                      productImages={product.images || []}
+                      isSaved={savedProducts.includes(product._id)}
+                      onSaveToggle={handleSaveToggle}
+                    />
+                  ))}
+                </div>
               </div>
 
             </div>
           </div>
+
         </div>
       </main>
     </>
