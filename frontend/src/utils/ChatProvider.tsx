@@ -33,6 +33,20 @@ export default function ChatProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<UserMessage[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const currConversationIdRef = useRef<string | undefined>();
+
+  const joinConversation = (id: string) => {
+    socket?.emit("conversation:join", { id }, (response: SocketResponse) => {
+      if (!isOk(response)) alert(`Could not find conversation: ${JSON.stringify(response.err)}`); // please please please remember to change this before final push
+      if (!setMessages) return;
+      setMessages(
+        (response.body as UserMessage[]).map((msg) => {
+          return { ...msg, sender: user?.uid === msg.authorUid };
+        }),
+      );
+      currConversationIdRef.current = id;
+    });
+  };
+
   const fetchConversations = async () => {
     const res = await get(`/api/messages/conversation`);
     const convos = await res.json();
@@ -44,19 +58,11 @@ export default function ChatProvider({ children }: { children: ReactNode }) {
     setConversations(sortedConvos || []);
   };
 
-  const joinConversation = (id: string) => {
-    socket?.emit("conversation:join", { id }, (response: SocketResponse) => {
-      if (!isOk(response)) alert(`Could not find conversation: ${JSON.stringify(response.err)}`); // please please please remember to change this before final push
-      if (!setMessages) return;
-
-      setMessages(
-        (response.body as UserMessage[]).map((msg) => {
-          return { ...msg, sender: user?.uid === msg.authorUid };
-        }),
-      );
-      currConversationIdRef.current = id;
-    });
-  };
+  useEffect(() => {
+    if (!currConversationIdRef.current && conversations.length > 0) {
+      joinConversation(conversations[0]._id);
+    }
+  }, [conversations]);
 
   useEffect(() => {
     const auth = getAuth(app);
@@ -67,6 +73,7 @@ export default function ChatProvider({ children }: { children: ReactNode }) {
           prev?.disconnect();
           return undefined;
         });
+        currConversationIdRef.current = undefined;
         return;
       }
 
@@ -97,6 +104,7 @@ export default function ChatProvider({ children }: { children: ReactNode }) {
         });
       });
 
+      
       fetchConversations();
       setSocket(socketInstance);
     });

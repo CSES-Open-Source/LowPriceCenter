@@ -1,7 +1,6 @@
 import { AuthenticatedRequest } from "src/validators/authUserMiddleware";
 import { Response } from "express";
 import ConversationModel from "src/models/conversation";
-import MessageModel from "src/models/message";
 import UserModel from "src/models/user";
 
 //util and helpers
@@ -63,5 +62,4 @@ const createConversation = async (req: AuthenticatedRequest, res: Response) => {
 export default {
   getConversationsByUser,
   createConversation,
-  getMessagesByConversationId,
 };
