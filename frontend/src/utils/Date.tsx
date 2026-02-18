@@ -7,3 +7,19 @@ export function formatDateMMDDYY(isoString: string) {
 
   return `${month}/${day}/${year}`;
 }
+
+export function formatDateMMDDYYHHMM(isoString: string) {
+  const MMDDYY = formatDateMMDDYY(isoString);
+  const date = new Date(isoString);
+
+  const XM = date.getHours() < 12 ? "AM" : "PM";
+  const hour = (date.getHours() % 12 || 12).toString();
+  const minute = date.getMinutes().toString().padStart(2, "0");
+  return `${MMDDYY} ${hour}:${minute}${XM}`;
+}
+
+export const compareDate = (a: string, b: string) => {
+  const dateA = new Date(a || 0).getTime();
+  const dateB = new Date(b || 0).getTime();
+  return dateB - dateA; // newest first
+};

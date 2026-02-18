@@ -12,6 +12,6 @@ export type UserMessage = {
 };
 export type Conversation = {
   _id: string;
-  participants: ChatUser[];
+  participantsPopulated: ChatUser[];
   lastMessage: UserMessage;
 };

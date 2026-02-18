@@ -29,7 +29,7 @@ app.use(
 app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/interestEmail", interestEmailRoute);
-app.use("/api/message", messageRoutes);
+app.use("/api/messages", messageRoutes);
 /**
  * Error handler; all errors thrown by server are handled here.
  * Explicit typings required here because TypeScript cannot infer the argument types.

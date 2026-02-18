@@ -33,7 +33,7 @@ export function onJoinConversation(socket: Socket) {
 
       if (!user) throw new Error("Unauthenticated Request");
       if (!conversation) throw new Error("No conversation found");
-      if (!conversation.participants.includes(user._id))
+      if (!conversation.participants.includes(user.firebaseUid))
         throw new Error("User is not in this conversation");
 
       const newRoom = `conversation:${id}`;
@@ -65,9 +65,8 @@ export function onSendMessage(socket: Socket) {
 
       const conversation = await ConversationModel.findById(payload.conversationId);
       if (!conversation) throw new Error("No conversation found");
-      const conversationRoom = `conversation:${payload.conversationId}`;
 
-      if (!conversation.participants.some((id) => id.equals(sender._id))) {
+      if (!conversation.participants.some((id) => id === sender.firebaseUid)) {
         throw new Error("Not in conversation");
       }
 
@@ -80,8 +79,12 @@ export function onSendMessage(socket: Socket) {
       conversation.lastMessage = message._id;
       await conversation.save();
 
+      // sending events to participants
+      const participantUids = conversation.participants;
       socket.emit("message:receive", message);
-      socket.to(conversationRoom).emit("message:receive", message);
+      participantUids.forEach((participant) => {
+        socket.to(`user:${participant}`).emit("message:receive", message);
+      });
 
       return callback({ status: "OK" });
     } catch (e) {

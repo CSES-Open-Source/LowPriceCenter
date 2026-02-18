@@ -37,6 +37,7 @@ io.use(async (socket, next) => {
 
 io.on("connection", (socket) => {
   socketlog("Socket connected: ", socket.data.user.displayName, " id: ", socket.id);
+  socket.join(`user:${socket.data.user.firebaseUid}`);
   socket.onAny((eventName, payload) => {
     socketlog(
       `User: ${socket.data.user.displayName}; Event: ${eventName}; Payload: ${JSON.stringify(
