@@ -9,9 +9,13 @@ export default {
         xxl: "1300px",
       },
       colors: {
-        "ucsd-blue": "#00629B",
+        // Figma mockup uses different blue
+        // "ucsd-blue": "#00629B",
+        "ucsd-blue": "#0E7395",
         "ucsd-darkblue": "#182B49",
-        "ucsd-gold": "#FFCD00",
+        // Figma mockup uses different gold
+        // "ucsd-gold": "#FFCD00",
+        "ucsd-gold": "#F6AE2D",
       },
       fontFamily: {
         jetbrains: ["JetBrains Mono", "monospace"],
