@@ -25,7 +25,7 @@ export function Marketplace() {
     }>
   >([]);
   const [error, setError] = useState<string>("");
-  const [searchQuery, setSearchQuery] = useState<string>(""); 
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [filters, setFilters] = useState<FilterState>({
     sortBy: "timeCreated",
     order: "desc",
@@ -65,9 +65,7 @@ export function Marketplace() {
     try {
       setError("");
 
-      // Search a part of filter/sort endpoint
       const params = new URLSearchParams();
-
       if (filters.minPrice) params.append("minPrice", filters.minPrice.toString());
       if (filters.maxPrice) params.append("maxPrice", filters.maxPrice.toString());
       if (filters.condition) params.append("condition", filters.condition);
@@ -79,14 +77,12 @@ export function Marketplace() {
 
       const queryString = params.toString();
 
-      // Use in case of search with filters
       if (searchQuery && searchQuery.trim().length > 0) {
         const res = await get(
           `/api/products/search/${searchQuery}${queryString ? `?${queryString}` : ""}`
         );
         if (res.ok) {
-          const data = await res.json();
-          setProducts(data);
+          setProducts(await res.json());
         } else {
           setError("Unable to search products. Try again later.");
         }
@@ -94,10 +90,8 @@ export function Marketplace() {
       }
 
       const res = await get(`/api/products${queryString ? `?${queryString}` : ""}`);
-      
       if (res.ok) {
-        const data = await res.json();
-        setProducts(data);
+        setProducts(await res.json());
       } else {
         setError("Unable to display products. Try again later.");
       }
@@ -107,54 +101,108 @@ export function Marketplace() {
     }
   };
 
-  useEffect(() => {
-    fetchProducts();
-  }, [filters, searchQuery]);
-
-  useEffect(() => {
-    fetchSavedProducts();
-  }, [user]);
+  useEffect(() => { fetchProducts(); }, [filters, searchQuery]);
+  useEffect(() => { fetchSavedProducts(); }, [user]);
 
   return (
     <>
       <Helmet>
         <title>Low-Price Center Marketplace</title>
       </Helmet>
-      <main className="w-full flex justify-center items-center mt-12 mb-20">
-        <div className="max-w-[80%] w-full">
-          <div id="grid-header" className="flex justify-between flex-wrap mb-2 px-3">
-            <p className="text-lg sm:text-3xl font-jetbrains font-medium">Marketplace</p>
+
+      <main className="w-full flex justify-center mt-12 mb-20">
+        <div className="w-full max-w-[1300px] px-4">
+
+          {/* ── Page header ── */}
+          <div className="flex justify-between items-center mb-8">
+            <p className="text-3xl font-jetbrains font-medium text-ucsd-darkblue">
+              Marketplace
+            </p>
             <button
-              className="bg-[#00629B] text-white text-[0.6rem] font-inter font-semibold px-1 py-2 sm:text-base sm:px-4 shadow-lg hover:brightness-90 transition-all"
+              className="bg-ucsd-blue text-white font-inter font-semibold px-5 py-2 rounded-xl shadow-md hover:brightness-90 transition"
               onClick={() => (window.location.href = "/add-product")}
             >
               Add Product
             </button>
           </div>
-          <SearchBar setProducts={setSearchQuery} setError={setError} />
-          
-          <FilterSort filters={filters} setFilters={setFilters} />
 
-          {error && <p className="max-w-[80%] w-full px-3 pt-3 text-red-800">{error}</p>}
-          {!error && products?.length === 0 && (
-            <p className="max-w-[80%] font-inter text-lg w-full px-3 pt-3">No products available</p>
-          )}
-          <div
-            id="grid"
-            className="grid sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 xxl:grid-cols-4"
-          >
-            {products.map((product) => (
-              <div key={product._id} className="px-3 py-3">
-                <Product
-                  productId={product._id}
-                  productName={product.name}
-                  productPrice={product.price}
-                  productImages={product.images ? product.images : []}
-                  isSaved={savedProducts.includes(product._id)}
-                  onSaveToggle={handleSaveToggle}
-                />
+          {/* ── White card ── */}
+          <div className="bg-white rounded-3xl shadow-lg p-8 flex gap-8">
+
+            {/* LEFT SIDEBAR */}
+            <div className="w-[220px] shrink-0 border-r-2 border-ucsd-gold pr-6">
+              <FilterSort filters={filters} setFilters={setFilters} />
+            </div>
+
+            {/* RIGHT CONTENT */}
+            <div className="flex-1 min-w-0 flex flex-col gap-5">
+
+              {/* Search + Sort row */}
+              <div className="flex items-center gap-3">
+                {/* SearchBar expands to fill space */}
+                <div className="flex-1">
+                  <SearchBar setProducts={setSearchQuery} setError={setError} />
+                </div>
+
+                {/* Sort controls */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-sm font-inter text-gray-500 whitespace-nowrap">
+                    Sort:
+                  </span>
+                  <select
+                    className="border border-gray-200 rounded-lg px-3 py-[7px] text-sm font-inter bg-white
+                               focus:ring-2 focus:ring-ucsd-blue focus:border-ucsd-blue outline-none cursor-pointer"
+                    value={filters.sortBy || "timeCreated"}
+                    onChange={(e) =>
+                      setFilters({ ...filters, sortBy: e.target.value as "price" | "timeCreated" })
+                    }
+                  >
+                    <option value="timeCreated">Featured</option>
+                    <option value="price">Price</option>
+                  </select>
+
+                  <select
+                    className="border border-gray-200 rounded-lg px-3 py-[7px] text-sm font-inter bg-white
+                               focus:ring-2 focus:ring-ucsd-blue focus:border-ucsd-blue outline-none cursor-pointer"
+                    value={filters.order || "desc"}
+                    onChange={(e) =>
+                      setFilters({ ...filters, order: e.target.value as "asc" | "desc" })
+                    }
+                  >
+                    <option value="desc">
+                      {filters.sortBy === "price" ? "High to Low" : "Newest First"}
+                    </option>
+                    <option value="asc">
+                      {filters.sortBy === "price" ? "Low to High" : "Oldest First"}
+                    </option>
+                  </select>
+                </div>
               </div>
-            ))}
+
+              {/* Status messages */}
+              {error && (
+                <p className="text-red-500 text-sm font-inter">{error}</p>
+              )}
+              {!error && products?.length === 0 && (
+                <p className="font-inter text-gray-400">No products available</p>
+              )}
+
+              {/* Product grid */}
+              <div className="grid sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 xxl:grid-cols-4 gap-6">
+                {products.map((product) => (
+                  <Product
+                    key={product._id}
+                    productId={product._id}
+                    productName={product.name}
+                    productPrice={product.price}
+                    productImages={product.images || []}
+                    isSaved={savedProducts.includes(product._id)}
+                    onSaveToggle={handleSaveToggle}
+                  />
+                ))}
+              </div>
+
+            </div>
           </div>
         </div>
       </main>
