@@ -112,7 +112,6 @@ export function Marketplace() {
         <title>Low-Price Center</title>
       </Helmet>
         
-      {/* ── HERO IMAGE — replace src with real URL later ── */}
       <div className="w-full h-64 overflow-hidden">
         <img
           src="/ucsd-pricecenter.png"
@@ -126,13 +125,8 @@ export function Marketplace() {
         <div className="w-full max-w-[1300px] px-4">
           <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
 
-            {/* ── TOP BANNER ROW ──
-                Left:  "Low Price Center" heading blended into white
-                Right: Search bar + sort controls stacked
-            */}
             <div className="flex items-start justify-between px-8 pt-7 pb-4">
 
-              {/* Low Price Center — "Low" in ucsd-blue, "Price Center" in ucsd-gold, blended white bg */}
               <div className="font-jetbrains font-bold leading-tight">
                 <span className="text-4xl text-ucsd-blue">Low </span>
                 <span className="text-4xl text-ucsd-gold">Price Center</span>
@@ -182,7 +176,6 @@ export function Marketplace() {
             {/* Thin gold divider under the top banner */}
             <div className="mx-8 border-t border-gray-100" />
 
-            {/* ── BOTTOM SECTION: Sidebar | Products ── */}
             <div className="flex">
 
               {/* LEFT SIDEBAR — fixed width, gold right border */}
