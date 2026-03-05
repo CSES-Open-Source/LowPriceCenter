@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { Helmet } from "react-helmet-async";
+import { useNavigate } from "react-router-dom";
 import Product from "src/components/Product";
 import SearchBar from "src/components/SearchBar";
 import FilterSort from "src/components/FilterSort";
@@ -16,6 +17,7 @@ interface FilterState {
 }
 
 export function Marketplace() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<
     Array<{
       _id: string;
@@ -107,26 +109,21 @@ export function Marketplace() {
   return (
     <>
       <Helmet>
-        <title>Low-Price Center Marketplace</title>
+        <title>Low-Price Center</title>
       </Helmet>
+        
+      {/* ── HERO IMAGE — replace src with real URL later ── */}
+      <div className="w-full h-64 overflow-hidden">
+        <img
+          src="/ucsd-pricecenter.png"
+          alt="UCSD Campus"
+          className="w-full h-full object-cover object-center"
+        />
+      </div>
 
-      <main className="w-full flex justify-center mt-12 mb-20">
+      {/* ── White card ── */}
+      <main className="w-full flex justify-center mb-20 -mt-8 relative z-10">
         <div className="w-full max-w-[1300px] px-4">
-
-          {/* Outer page header: Marketplace title + Add Product */}
-          <div className="flex justify-between items-center mb-6">
-            <p className="text-3xl font-jetbrains font-medium text-ucsd-darkblue">
-              Marketplace
-            </p>
-            <button
-              className="bg-ucsd-blue text-white font-inter font-semibold px-5 py-2 rounded-xl shadow-md hover:brightness-90 transition"
-              onClick={() => (window.location.href = "/add-product")}
-            >
-              Add Product
-            </button>
-          </div>
-
-          {/* ── White card ── */}
           <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
 
             {/* ── TOP BANNER ROW ──

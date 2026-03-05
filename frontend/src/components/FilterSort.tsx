@@ -26,18 +26,6 @@ function Chevron({ open, className = '' }: { open: boolean; className?: string }
   );
 }
 
-function RightChevron({ className = '' }: { className?: string }) {
-  return (
-    <svg
-      className={`w-3.5 h-3.5 shrink-0 ${className}`}
-      viewBox="0 0 12 12"
-      fill="none"
-    >
-      <path d="M4 2l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 export default function FilterBar({ filters, setFilters }: FilterBarProps) {
   const [categoryOpen, setCategoryOpen] = useState(true);
   const [filterOpen, setFilterOpen] = useState(true);
@@ -136,81 +124,86 @@ export default function FilterBar({ filters, setFilters }: FilterBarProps) {
         </button>
 
         {filterOpen && (
-          <div className="relative mt-2 ml-[10px]">
-            {/* Gold spine — only covers the two items, clipped at last */}
-            <div
-              className="absolute left-0 w-[1px] bg-ucsd-gold rounded-full"
-              style={{ top: 0, bottom: priceOpen ? 0 : '20%' }}
-            />
+          <div className="mt-2 ml-[10px]">
 
-            {/* Condition */}
-            <div className="relative">
-              <button
-                onClick={() => setConditionOpen((o) => !o)}
-                className="flex items-center w-full text-left py-[5px] pl-5 group"
-              >
-                <span className="absolute left-[1px] top-1/2 -translate-y-1/2 w-3 h-[1px] bg-ucsd-gold" />
-                <span className="text-[13.5px] text-gray-500 group-hover:text-ucsd-darkblue flex-1">
-                  Condition
-                </span>
-                <RightChevron className="text-gray-400 mr-1" />
-              </button>
-              {conditionOpen && (
-                <div className="ml-5 mt-1 mb-2">
-                  <select
-                    className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-ucsd-blue outline-none"
-                    value={filters.condition || ''}
-                    onChange={(e) => setFilters({ ...filters, condition: e.target.value })}
-                  >
-                    <option value="">All</option>
-                    <option value="New">New</option>
-                    <option value="Used">Used</option>
-                  </select>
-                </div>
-              )}
-            </div>
+            {/* border-l ends exactly at the midpoint of the Price Range row.
+                A 17px spacer inside the container represents the top half of
+                that row. Price Range button is then pulled up via -mt to overlap it. */}
+            <div className="border-l border-ucsd-gold" style={{ borderLeftWidth: '1px' }}>
 
-            {/* Price Range */}
-            <div className="relative">
-              {/* Clip gold spine after midpoint */}
-              <div className="absolute left-0 w-[1px] bg-white" style={{ top: '50%', bottom: 0 }} />
-              <button
-                onClick={() => setPriceOpen((o) => !o)}
-                className="flex items-center w-full text-left py-[5px] pl-5 group"
-              >
-                <span className="absolute left-[1px] top-1/2 -translate-y-1/2 w-3 h-[1px] bg-ucsd-gold" />
-                <span className="text-[13.5px] text-gray-500 group-hover:text-ucsd-darkblue flex-1">
-                  Price Range
-                </span>
-                <Chevron open={priceOpen} className="text-gray-400 mr-1" />
-              </button>
-              {priceOpen && (
-                <div className="ml-5 mt-2 mb-1">
-                  {/* Min — Max inline like mockup */}
-                  <div className="flex items-center gap-2">
-                    <input
+              {/* ── Condition ── */}
+              <div>
+                <button
+                  onClick={() => setConditionOpen((o) => !o)}
+                  className="flex items-center w-full text-left py-[5px] group"
+                >
+                  <span className="w-3 h-[1px] bg-ucsd-gold shrink-0 -ml-px mr-1" />
+                  <span className="text-[13.5px] text-gray-500 group-hover:text-ucsd-darkblue flex-1">
+                    Condition
+                  </span>
+                  <Chevron open={conditionOpen} className="text-gray-400 mr-1" />
+                </button>
+                {conditionOpen && (
+                  <div className="ml-5 mt-1 mb-2 mr-1">
+                    <select
                       className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-ucsd-blue outline-none"
-                      type="number"
-                      placeholder="Min"
-                      value={filters.minPrice || ''}
-                      onChange={(e) =>
-                        setFilters({ ...filters, minPrice: e.target.value ? Number(e.target.value) : undefined })
-                      }
-                    />
-                    <span className="text-ucsd-gold font-bold shrink-0">—</span>
-                    <input
-                      className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-ucsd-blue outline-none"
-                      type="number"
-                      placeholder="Max"
-                      value={filters.maxPrice || ''}
-                      onChange={(e) =>
-                        setFilters({ ...filters, maxPrice: e.target.value ? Number(e.target.value) : undefined })
-                      }
-                    />
+                      value={filters.condition || ''}
+                      onChange={(e) => setFilters({ ...filters, condition: e.target.value })}
+                    >
+                      <option value="">All</option>
+                      <option value="New">New</option>
+                      <option value="Used">Used</option>
+                    </select>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+
+              {/* Top half of Price Range row height — spine ends here */}
+              <div style={{ height: '17px' }} />
+
             </div>
+
+            {/* Price Range button — pulled up by 17px to sit over the spacer,
+                so its text visually aligns with where the branch meets the spine */}
+            <button
+              onClick={() => setPriceOpen((o) => !o)}
+              className="flex items-center w-full text-left py-[5px] group"
+              style={{ marginTop: '-16px' }}
+            >
+              <span className="w-3 h-[1px] bg-ucsd-gold shrink-0 mr-1" />
+              <span className="text-[13.5px] text-gray-500 group-hover:text-ucsd-darkblue flex-1">
+                Price Range
+              </span>
+              <Chevron open={priceOpen} className="text-gray-400 mr-1" />
+            </button>
+
+            {/* Price Range inputs */}
+            {priceOpen && (
+              <div className="ml-5 mt-1 mb-1 mr-1">
+                <div className="flex items-center gap-2">
+                  <input
+                    className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-ucsd-blue outline-none"
+                    type="number"
+                    placeholder="Min"
+                    value={filters.minPrice || ''}
+                    onChange={(e) =>
+                      setFilters({ ...filters, minPrice: e.target.value ? Number(e.target.value) : undefined })
+                    }
+                  />
+                  <span className="text-ucsd-gold font-bold shrink-0">—</span>
+                  <input
+                    className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-ucsd-blue outline-none"
+                    type="number"
+                    placeholder="Max"
+                    value={filters.maxPrice || ''}
+                    onChange={(e) =>
+                      setFilters({ ...filters, maxPrice: e.target.value ? Number(e.target.value) : undefined })
+                    }
+                  />
+                </div>
+              </div>
+            )}
+
           </div>
         )}
       </div>
