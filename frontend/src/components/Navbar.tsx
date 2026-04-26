@@ -1,63 +1,16 @@
 import { faComment, faHeart } from "@fortawesome/free-regular-svg-icons";
-import {
-  faBars,
-  faCartShopping,
-  faMagnifyingGlass,
-  faXmark,
-} from "@fortawesome/free-solid-svg-icons";
+import { faBars, faCartShopping, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { HTMLAttributes, forwardRef, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
-
-interface MiniSearchbarProps extends HTMLAttributes<HTMLDivElement> {
-  open: boolean;
-  onSubmit: React.FormEventHandler;
-}
-
-const MiniSearchbar = forwardRef<HTMLFormElement, MiniSearchbarProps>(
-  ({ open, onSubmit, ...props }, ref) => {
-    return (
-      <div
-        className={`absolute mt-8 -translate-x-1/2 left-1/2 w-[40vh] p-4 bg-white shadow-ucsd-blue shadow-md
-          flex flex-col gap-4 
-          rounded-lg transform transition-all duration-150 ease-out 
-          ${open ? "opacity-100 " : "opacity-0 pointer-events-none"} 
-          `}
-        {...props}
-      >
-        <p className="text-md">Search the marketplace</p>
-        <form onSubmit={onSubmit} ref={ref}>
-          <div className={`flex flex-row w-full rounded-full border-2 p-2 text-[16px]`}>
-            <div className="items-center px-2 pointer-events-none">
-              <FontAwesomeIcon
-                icon={faMagnifyingGlass}
-                aria-label="faMagnifyingGlass"
-                className="text-gray-400"
-              />
-            </div>
-            <input
-              name="query"
-              className={`w-full focus:outline-none text-[16px]`}
-              placeholder="Search UCSD"
-            />
-          </div>
-        </form>
-      </div>
-    );
-  },
-);
-
-MiniSearchbar.displayName = "MiniSearchbar";
 
 export function Navbar() {
   const { user, signOutFromFirebase, openGoogleAuthentication } = useContext(FirebaseContext);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isSearchBarOpen, setSearchbarOpen] = useState<boolean>(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const menuRef = useRef<HTMLUListElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const searchRef = useRef<HTMLFormElement>(null);
   const navigate = useNavigate();
 
   const toggleMobileMenu = () => setMobileMenuOpen((o) => !o);
@@ -72,16 +25,6 @@ export function Navbar() {
     }
   };
 
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-    if (!searchRef.current) return;
-    e.preventDefault();
-    const formData = new FormData(searchRef.current);
-    const url = new URL("/products", window.location.origin);
-    url.searchParams.set("query", formData.get("query") as string);
-    navigate(url.pathname + url.search);
-    return;
-  };
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -91,13 +34,6 @@ export function Navbar() {
         !buttonRef.current.contains(event.target as Node)
       ) {
         setMobileMenuOpen(false);
-      }
-
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setSearchbarOpen(false);
-        setTimeout(() => {
-          if (searchRef.current) searchRef.current.reset();
-        }, 100);
       }
     };
     const handleResize = () => {
@@ -150,18 +86,6 @@ export function Navbar() {
           >
             <FontAwesomeIcon icon={faHeart} className="text-[16px]" />
           </button>
-
-          <div className="relative">
-            <button
-              onClick={() => setSearchbarOpen(true)}
-              title="Search"
-              aria-label="Search"
-              className={iconBtn}
-            >
-              <FontAwesomeIcon icon={faMagnifyingGlass} className="text-[16px]" />
-            </button>
-            <MiniSearchbar open={isSearchBarOpen} ref={searchRef} onSubmit={handleSearch} />
-          </div>
 
           <button
             onClick={() => handleIconClick("/products")}
