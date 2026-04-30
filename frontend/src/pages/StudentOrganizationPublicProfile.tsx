@@ -124,7 +124,7 @@ export function StudentOrganizationPublicProfile() {
         <Helmet>
           <title>{title}</title>
         </Helmet>
-        <div className="w-full mt-10 mb-10">
+        <div className="min-h-screen bg-gray-50 pt-24 pb-10 px-4">
           <p className="text-center font-inter text-gray-700">Loading...</p>
         </div>
       </>
@@ -137,8 +137,8 @@ export function StudentOrganizationPublicProfile() {
         <Helmet>
           <title>{title}</title>
         </Helmet>
-        <div className="w-full mt-10 mb-10 max-w-2xl mx-auto px-4">
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 text-center">
+        <div className="min-h-screen bg-gray-50 pt-24 pb-10 px-4">
+          <div className="max-w-2xl mx-auto bg-white rounded-2xl border border-gray-200 shadow-sm p-6 text-center">
             <p className="font-inter text-gray-700">{error || "Organization not found."}</p>
           </div>
         </div>
@@ -152,8 +152,8 @@ export function StudentOrganizationPublicProfile() {
         <title>{title}</title>
       </Helmet>
 
-      <div className="w-full mt-6 mb-20">
-        <div className="max-w-6xl mx-auto px-4">
+      <div className="min-h-screen bg-gray-50 pt-24 pb-10 px-4">
+        <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-2xl border-2 border-figma-mint shadow-md overflow-hidden">
             {/* Header band */}
             <div className="bg-figma-sand border-b-2 border-figma-orange h-28 md:h-32 relative">
@@ -194,7 +194,7 @@ export function StudentOrganizationPublicProfile() {
 
             {/* Tabs */}
             <div className="px-6 md:px-10 pb-4">
-              <div className="flex gap-10">
+              <div className="flex gap-10 flex-wrap">
                 <TabButton tab="selling" label="Selling" />
                 <TabButton tab="likes" label="Likes" />
                 <TabButton tab="saves" label="Saves" />

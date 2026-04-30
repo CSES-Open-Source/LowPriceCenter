@@ -8,6 +8,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { HTMLAttributes, forwardRef, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { DELETE, get } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 
 interface MiniSearchbarProps extends HTMLAttributes<HTMLDivElement> {
@@ -55,6 +56,7 @@ export function Navbar() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSearchBarOpen, setSearchbarOpen] = useState<boolean>(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [canAccessOrg, setCanAccessOrg] = useState<boolean>(false);
   const menuRef = useRef<HTMLUListElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const searchRef = useRef<HTMLFormElement>(null);
@@ -110,6 +112,37 @@ export function Navbar() {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  useEffect(() => {
+    const fetchOrgAccess = async () => {
+      if (!user) {
+        setCanAccessOrg(false);
+        return;
+      }
+      try {
+        const res = await get("/api/student-organizations/can-access");
+        const data = await res.json();
+        setCanAccessOrg(Boolean(data?.canAccess));
+      } catch {
+        setCanAccessOrg(false);
+      }
+    };
+    void fetchOrgAccess();
+  }, [user]);
+
+  const handleDeleteOrganization = async () => {
+    const ok = confirm(
+      "Delete your student organization profile?\n\nThis will also delete all merch items under the organization. This cannot be undone.",
+    );
+    if (!ok) return;
+    try {
+      await DELETE("/api/student-organizations");
+      navigate("/student-org-profile");
+    } catch (e) {
+      console.error(e);
+      alert("Failed to delete organization. Please try again.");
+    }
+  };
 
   const tabStyling = "text-gray-400 hover:text-gray-800";
   const selectedTabStyling = "text-ucsd-blue";
@@ -194,13 +227,30 @@ export function Navbar() {
                 {user.displayName?.[0]?.toUpperCase() ?? "U"}
               </button>
               {isProfileDropdownOpen && (
-                <div className="absolute right-0 top-full w-40 bg-white text-black shadow-lg rounded-lg py-2 z-[60]">
+                <div className="absolute right-0 top-full w-48 bg-white text-black shadow-lg rounded-lg py-2 z-[60]">
                   <a
                     href="/profile"
                     className="block w-full text-left px-4 py-2 text-sm font-inter hover:bg-gray-100 transition-colors"
                   >
                     My Profile
                   </a>
+                  {canAccessOrg && (
+                    <>
+                      <hr className="my-1 border-gray-200" />
+                      <a
+                        href="/student-org-profile"
+                        className="block w-full text-left px-4 py-2 text-sm font-inter hover:bg-gray-100 transition-colors"
+                      >
+                        My Organization
+                      </a>
+                      <button
+                        onClick={handleDeleteOrganization}
+                        className="w-full text-left px-4 py-2 text-sm font-inter hover:bg-red-50 text-red-600 transition-colors"
+                      >
+                        Delete Organization
+                      </button>
+                    </>
+                  )}
                   <hr className="my-1 border-gray-200" />
                   <button
                     onClick={signOutFromFirebase}

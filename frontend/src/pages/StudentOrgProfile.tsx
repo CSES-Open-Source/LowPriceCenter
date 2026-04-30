@@ -253,6 +253,27 @@ export function StudentOrgProfile() {
     setFileError(null);
   };
 
+  const handleDeleteOrganization = async () => {
+    if (
+      !confirm(
+        "Delete your student organization profile?\n\nThis will also delete all merch items under the organization. This cannot be undone.",
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await DELETE("/api/student-organizations");
+      setOrganization(null);
+      setMerchItems([]);
+      setActiveTab("selling");
+      setIsEditing(false);
+      setShowEditModal(false);
+    } catch (err) {
+      setError("Failed to delete organization profile. Please try again.");
+    }
+  };
+
   // Merch management functions
   const handleMerchImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !e.target.files[0]) return;
@@ -397,8 +418,8 @@ export function StudentOrgProfile() {
         <Helmet>
           <title>Student Organization Profile - Low-Price Center</title>
         </Helmet>
-        <div className="w-full mt-12 mb-6">
-          <p className="text-center font-inter">Loading...</p>
+        <div className="min-h-screen bg-gray-50 pt-24 pb-10 px-4">
+          <p className="text-center font-inter text-gray-700">Loading...</p>
         </div>
       </>
     );
@@ -410,10 +431,13 @@ export function StudentOrgProfile() {
         <Helmet>
           <title>Access denied - Low-Price Center</title>
         </Helmet>
-        <div className="w-full mt-12 mb-6 max-w-xl mx-auto p-4 text-center">
-          <p className="font-inter text-gray-700">
-            You don&apos;t have access to My Organization. Only approved organization accounts can create and manage a profile.
-          </p>
+        <div className="min-h-screen bg-gray-50 pt-24 pb-10 px-4">
+          <div className="max-w-xl mx-auto bg-white rounded-2xl border border-gray-200 shadow-sm p-6 text-center">
+            <p className="font-inter text-gray-700">
+              You don&apos;t have access to My Organization. Only approved organization accounts can create and manage a
+              profile.
+            </p>
+          </div>
         </div>
       </>
     );
@@ -422,7 +446,7 @@ export function StudentOrgProfile() {
   const isCreating = !organization;
 
   // Render create/edit form in modal
-  if (isCreating || isEditing || showEditModal) {
+  if (isEditing || showEditModal) {
     return (
       <>
         <Helmet>
@@ -430,8 +454,8 @@ export function StudentOrgProfile() {
             {isCreating ? "Create" : "Edit"} - Student Organization Profile
           </title>
         </Helmet>
-        <div className="w-full mt-12 mb-20">
-          <div className="max-w-2xl mx-auto p-4">
+        <div className="min-h-screen bg-gray-50 pt-24 pb-10 px-4">
+          <div className="max-w-2xl mx-auto">
             <h1 className="text-3xl text-center font-jetbrains font-medium mb-6">
               {isCreating ? "Create Student Organization Profile" : "Edit Profile"}
             </h1>
@@ -567,19 +591,18 @@ export function StudentOrgProfile() {
 
               {/* Action Buttons */}
               <div className="flex justify-between gap-3 mt-6">
-                {!isCreating && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsEditing(false);
-                      setShowEditModal(false);
-                      handleCancel();
-                    }}
-                    className="bg-gray-500 text-white font-semibold font-inter py-2 px-4 shadow-lg hover:brightness-90 transition-all"
-                  >
-                    Cancel
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditing(false);
+                    setShowEditModal(false);
+                    handleCancel();
+                    setError("");
+                  }}
+                  className="bg-gray-500 text-white font-semibold font-inter py-2 px-4 shadow-lg hover:brightness-90 transition-all"
+                >
+                  Cancel
+                </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -597,14 +620,48 @@ export function StudentOrgProfile() {
     );
   }
 
+  if (isCreating) {
+    return (
+      <>
+        <Helmet>
+          <title>My Organization - Low-Price Center</title>
+        </Helmet>
+        <div className="min-h-screen bg-gray-50 pt-24 pb-10 px-4">
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-white rounded-2xl border-2 border-figma-mint shadow-md p-8 md:p-10">
+              <h1 className="text-3xl text-center font-jetbrains font-medium mb-3 text-black">
+                My Organization
+              </h1>
+              <p className="text-center font-inter text-gray-600 max-w-xl mx-auto">
+                Create a student organization profile to sell merch and share how students can find you.
+              </p>
+              <div className="mt-6 flex justify-center">
+                <button
+                  onClick={() => {
+                    setIsEditing(true);
+                    setShowEditModal(true);
+                  }}
+                  className="bg-figma-orange text-black font-inter font-extrabold px-8 py-2 rounded-md shadow-sm hover:brightness-95 transition-all"
+                >
+                  Create Profile
+                </button>
+              </div>
+              {error && <p className="text-sm text-red-600 text-center mt-4">{error}</p>}
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   // Main profile view
   return (
     <>
       <Helmet>
         <title>{organization?.organizationName || "Student Organization"} - Low-Price Center</title>
       </Helmet>
-      <div className="w-full mt-6 mb-20">
-        <div className="max-w-6xl mx-auto px-4">
+      <div className="min-h-screen bg-gray-50 pt-24 pb-10 px-4">
+        <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-2xl border-2 border-figma-mint shadow-md overflow-hidden">
             {/* Header band */}
             <div className="bg-figma-sand border-b-2 border-figma-orange h-28 md:h-32 relative">
@@ -632,15 +689,23 @@ export function StudentOrgProfile() {
 
               {/* edit */}
               <div className="absolute right-6 md:right-10 top-6 md:top-7">
-                <button
-                  onClick={() => {
-                    setIsEditing(true);
-                    setShowEditModal(true);
-                  }}
-                  className="bg-figma-orange text-black font-inter font-extrabold px-8 py-2 rounded-md shadow-sm hover:brightness-95 transition-all"
-                >
-                  Edit
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setIsEditing(true);
+                      setShowEditModal(true);
+                    }}
+                    className="bg-figma-orange text-black font-inter font-extrabold px-8 py-2 rounded-md shadow-sm hover:brightness-95 transition-all"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={handleDeleteOrganization}
+                    className="bg-white text-red-600 font-inter font-extrabold px-5 py-2 rounded-md border border-red-200 shadow-sm hover:bg-red-50 transition-all"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -658,7 +723,7 @@ export function StudentOrgProfile() {
 
             {/* Tabs */}
             <div className="px-6 md:px-10 pb-4">
-              <div className="flex gap-10">
+              <div className="flex gap-10 flex-wrap">
                 <button
                   onClick={() => setActiveTab("selling")}
                   className={[
