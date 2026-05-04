@@ -1,5 +1,5 @@
 import { faComment, faHeart } from "@fortawesome/free-regular-svg-icons";
-import { faBars, faCartShopping, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -85,15 +85,6 @@ export function Navbar() {
             className={iconBtn}
           >
             <FontAwesomeIcon icon={faHeart} className="text-[16px]" />
-          </button>
-
-          <button
-            onClick={() => handleIconClick("/products")}
-            title="Cart"
-            aria-label="Cart"
-            className={iconBtn}
-          >
-            <FontAwesomeIcon icon={faCartShopping} className="text-[16px]" />
           </button>
 
           <button
