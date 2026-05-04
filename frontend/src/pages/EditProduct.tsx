@@ -2,7 +2,10 @@ import { FormEvent, useContext, useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 import { DELETE, get, patch } from "src/api/requests";
+import PickupLocationField from "src/components/PickupLocationField";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
+import { hasGoogleMapsApiKey } from "src/utils/googleMaps";
+import type { PickupLocation } from "src/utils/pickupLocation";
 
 export function EditProduct() {
   const { id } = useParams();
@@ -19,7 +22,11 @@ export function EditProduct() {
     year: number;
     category: string;
     condition: string;
+    pickupLocation?: PickupLocation;
   }>();
+  const [pickupLocation, setPickupLocation] = useState<PickupLocation | null>(null);
+  const [pickupLocationError, setPickupLocationError] = useState<string | null>(null);
+  const [hasPendingPickupSelection, setHasPendingPickupSelection] = useState(false);
 
   const productName = useRef<HTMLInputElement>(null);
   const productPrice = useRef<HTMLInputElement>(null);
@@ -60,6 +67,7 @@ export function EditProduct() {
       .then((data) => {
         setProduct(data);
         setExistingImages(data.images);
+        if (data.pickupLocation) setPickupLocation(data.pickupLocation);
       })
       .catch(() => setError(true));
   }, [id]);
@@ -163,6 +171,11 @@ export function EditProduct() {
         productCondition.current &&
         user
       ) {
+        if (hasGoogleMapsApiKey && hasPendingPickupSelection) {
+          setPickupLocationError("Select a Google suggestion or clear the pickup address field.");
+          return;
+        }
+
         const body = new FormData();
         body.append("name", productName.current.value);
         body.append("price", productPrice.current.value);
@@ -176,6 +189,13 @@ export function EditProduct() {
         existingImages.forEach((url) => body.append("existingImages", url));
         // append new File objects
         newFiles.forEach((file) => body.append("images", file));
+
+        if (pickupLocation) {
+          body.append("pickupAddress", pickupLocation.address);
+          body.append("pickupPlaceId", pickupLocation.placeId);
+          body.append("pickupLat", pickupLocation.lat.toString());
+          body.append("pickupLng", pickupLocation.lng.toString());
+        }
 
         const res = await patch(`/api/products/${id}`, body);
 
@@ -205,324 +225,170 @@ export function EditProduct() {
     }
   };
 
+  const inputClass = "border border-gray-200 text-black text-sm rounded-lg w-full p-2.5 focus:ring-2 focus:ring-ucsd-blue focus:border-ucsd-blue outline-none";
+  const labelClass = "block mb-2 font-semibold font-inter text-[#182B49]";
+
+  const allPreviews = [
+    ...existingImages.map((url, i) => ({ src: url, kind: "existing" as const, idx: i })),
+    ...newPreviews.map((url, i) => ({ src: url, kind: "new" as const, idx: i })),
+  ];
+
   return (
     <>
       <Helmet>
-        <title>Low-Price Center Marketplace</title>
+        <title>Edit - Low Price Center</title>
       </Helmet>
-      <main className="bg-[#F5F7FA] min-h-screen pt-28 pb-10">
-        <div className="max-w-5xl mx-auto px-4">
-          <form className="pb-10" onSubmit={handleEdit}>
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8 space-y-8">
-              {/* Header */}
-              <section className="pb-4 border-b border-gray-200">
-                <p className="text-2xl md:text-xl font-rubic font-medium text-black-900">
-                  Edit item
-                </p>
-                <p className="mt-2 text-sm text-gray-600 font-inter">
-                  Update photos and details for your listing.
-                </p>
-              </section>
+      <main className="w-[80%] max-w-screen-2xl mx-auto mt-20 mb-6">
+        <h1 className="font-jetbrains font-bold text-2xl text-[#182B49] mb-4">Edit Listing</h1>
 
-              {/* Photos */}
-              <section>
-                <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
-                  <div>
-                    <h2 className="font-rubic text-sm font-semibold uppercase tracking-wide text-black-900">
-                      Photos
-                    </h2>
-                    <p className="mt-1 text-xs text-gray-500">
-                      Add up to 10 photos (max 5MB each)
-                    </p>
+        <form onSubmit={handleEdit}>
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div className="flex flex-col md:flex-row">
+
+              {/* Left — Images */}
+              <section className="w-full md:w-[40%] p-6 bg-[#F8F8F8] border-r border-gray-100">
+                <label className={labelClass}>Images</label>
+                <p className="text-sm text-gray-500 mb-3">Up to 10 photos (max 5MB each)</p>
+
+                {allPreviews.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {allPreviews.map((p) => (
+                      <div key={`${p.kind}-${p.idx}`} className="relative w-24 h-24">
+                        <img src={p.src} alt="" className="w-full h-full object-cover rounded-lg" />
+                        <button
+                          type="button"
+                          onClick={() => p.kind === "existing" ? removeExistingAt(p.idx) : removeNew(p.idx)}
+                          aria-label="Remove image"
+                          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                </div>
-
-                <div className="mt-4 grid grid-cols-3 sm:grid-cols-4 gap-3">
-                  {Array.from({
-                    length: existingImages.length + newPreviews.length >= 8 ? 10 : 8,
-                  }).map((_, idx) => {
-                    const totalExisting = existingImages.length;
-                    const total = totalExisting + newPreviews.length;
-                    const isExisting = idx < totalExisting;
-                    const isNew = idx >= totalExisting && idx < total;
-                    const canAddMore = total < 10;
-                    const isFirstEmpty = !isExisting && !isNew && idx === total;
-
-                    if (isExisting) {
-                      const url = existingImages[idx];
-                      return (
-                        <div key={`existing-${idx}`} className="relative w-full aspect-square">
-                          <img
-                            src={url}
-                            className="w-full h-full object-cover rounded-md border border-gray-200"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeExistingAt(idx)}
-                            className="absolute top-1 right-1 bg-black/70 text-white rounded-full text-xs w-6 h-6 flex items-center justify-center"
-                            aria-label="Remove image"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      );
-                    }
-
-                    if (isNew) {
-                      const src = newPreviews[idx - totalExisting];
-                      return (
-                        <div key={`new-${idx}`} className="relative w-full aspect-square">
-                          <img
-                            src={src}
-                            className="w-full h-full object-cover rounded-md border border-gray-200"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeNew(idx - totalExisting)}
-                            className="absolute top-1 right-1 bg-black/70 text-white rounded-full text-xs w-6 h-6 flex items-center justify-center"
-                            aria-label="Remove image"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <button
-                        key={`slot-${idx}`}
-                        type="button"
-                        disabled={!canAddMore}
-                        onClick={() => productImages.current?.click()}
-                        className={`flex flex-col items-center justify-center w-full aspect-square rounded-md border-2 border-dashed transition-colors ${
-                          canAddMore
-                            ? "border-[#CBD6E3] bg-[#F5F7FA] hover:border-[#00629B] hover:bg-[#EDF4FB]"
-                            : "border-[#CBD6E3] bg-[#F5F7FA] opacity-50 cursor-not-allowed"
-                        }`}
-                        aria-label={canAddMore ? "Add photo" : "Maximum photos reached"}
-                      >
-                        <span className="text-3xl leading-none text-[#9AA5B8]">+</span>
-                        {isFirstEmpty && (
-                          <span className="mt-1 text-[11px] font-inter text-gray-600">
-                            Add photos
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <input
-                  name="images"
-                  id="productImages"
-                  type="file"
-                  multiple
-                  accept="image/png, image/jpeg"
-                  onChange={handleImageChange}
-                  ref={productImages}
-                  className="hidden"
-                />
-
-                {fileError && <p className="text-sm text-red-800 mt-3">{fileError}</p>}
-                {isOptimizingImages && (
-                  <p className="text-xs text-gray-500 mt-2 font-inter">Optimizing photos…</p>
                 )}
-              </section>
 
-              {/* Name */}
-              <section>
-                <h2 className="font-inter text-sm font-semibold uppercase tracking-wide text-gray-700">
-                  Name
-                </h2>
-                <p className="mt-1 text-xs text-gray-500">
-                  Give your listing a clear, descriptive title.
-                </p>
-                <div className="mt-3">
+                <label
+                  htmlFor="productImages"
+                  className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-white hover:bg-gray-50 transition-colors"
+                >
+                  <span className="sr-only">Upload product images</span>
+                  <svg className="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  <p className="mb-1 text-sm text-gray-500 font-semibold">Click to upload</p>
+                  <p className="text-xs text-gray-400">PNG or JPG (MAX. 5MB per image)</p>
                   <input
-                    id="productName"
-                    type="text"
-                    defaultValue={product?.name}
-                    ref={productName}
-                    className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-[#00629B] focus:border-transparent"
-                    placeholder="Item name"
-                    required
+                    name="images"
+                    id="productImages"
+                    type="file"
+                    multiple
+                    accept="image/png, image/jpeg"
+                    onChange={handleImageChange}
+                    ref={productImages}
+                    className="hidden"
                   />
-                </div>
+                </label>
+                {fileError && <p className="text-sm text-red-600 mt-2">{fileError}</p>}
+                {isOptimizingImages && <p className="text-xs text-gray-500 mt-2">Optimizing photos…</p>}
               </section>
 
-              {/* Description */}
-              <section>
-                <h2 className="font-inter text-sm font-semibold uppercase tracking-wide text-gray-700">
-                  Description
-                </h2>
-                <p className="mt-1 text-xs text-gray-500">Describe the item</p>
-                <div className="mt-3">
-                  <textarea
-                    id="productDescription"
-                    rows={8}
-                    defaultValue={product?.description}
-                    ref={productDescription}
-                    className="border border-gray-300 text-black text-sm rounded-md w-full p-3 focus:outline-none focus:ring-2 focus:ring-[#00629B] focus:border-transparent"
-                    placeholder="Describe the item..."
-                  />
+              {/* Right — Details */}
+              <section className="w-full md:w-[60%] p-6">
+                <div className="mb-5">
+                  <label htmlFor="productName" className={labelClass}>Name</label>
+                  <input id="productName" type="text" defaultValue={product?.name} ref={productName} className={inputClass} placeholder="Product Name" required />
                 </div>
-              </section>
 
-              {/* Info */}
-              <section>
-                <h2 className="font-inter text-sm font-semibold uppercase tracking-wide text-gray-700">
-                  Info
-                </h2>
-                <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <label
-                      htmlFor="productCategory"
-                      className="block mb-1 text-xs font-medium font-inter text-gray-700 uppercase tracking-wide"
-                    >
-                      Category
-                    </label>
-                    <select
-                      id="productCategory"
-                      ref={productCategory}
-                      key={`category-${product?.category}`}
-                      defaultValue={product?.category || ""}
-                      className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-[#00629B] focus:border-transparent"
-                      required
-                    >
-                      <option value="">Select</option>
-                      {categories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                <div className="mb-5">
+                  <label htmlFor="productPrice" className={labelClass}>Price</label>
+                  <input id="productPrice" type="number" min={0} step="any" defaultValue={product?.price} ref={productPrice} className={inputClass + " [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"} placeholder="0.00" required />
+                </div>
 
+                <div className="mb-5">
+                  <label htmlFor="productDescription" className={labelClass}>Description</label>
+                  <textarea id="productDescription" rows={3} defaultValue={product?.description} ref={productDescription} className={inputClass} placeholder="Tell us more about this product..." />
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 mb-5">
                   <div>
-                    <label
-                      htmlFor="productYear"
-                      className="block mb-1 text-xs font-medium font-inter text-gray-700 uppercase tracking-wide"
-                    >
-                      Year
-                    </label>
-                    <select
-                      id="productYear"
-                      ref={productYear}
-                      key={`year-${product?.year}`}
-                      defaultValue={product?.year || ""}
-                      className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-[#00629B] focus:border-transparent"
-                      required
-                    >
+                    <label htmlFor="productYear" className={labelClass}>Year</label>
+                    <select id="productYear" ref={productYear} key={`year-${product?.year}`} defaultValue={product?.year || ""} className={inputClass} required>
                       <option value="">Select</option>
                       {years.map((year) => (
-                        <option key={year} value={year}>
-                          {year}
-                        </option>
+                        <option key={year} value={year}>{year}</option>
                       ))}
                     </select>
                   </div>
-
                   <div>
-                    <label
-                      htmlFor="productCondition"
-                      className="block mb-1 text-xs font-medium font-inter text-gray-700 uppercase tracking-wide"
-                    >
-                      Condition
-                    </label>
-                    <select
-                      id="productCondition"
-                      ref={productCondition}
-                      key={`condition-${product?.condition}`}
-                      defaultValue={product?.condition || ""}
-                      className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-[#00629B] focus:border-transparent"
-                      required
-                    >
+                    <label htmlFor="productCategory" className={labelClass}>Category</label>
+                    <select id="productCategory" ref={productCategory} key={`category-${product?.category}`} defaultValue={product?.category || ""} className={inputClass} required>
+                      <option value="">Select</option>
+                      {categories.map((category) => (
+                        <option key={category} value={category}>{category}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="productCondition" className={labelClass}>Condition</label>
+                    <select id="productCondition" ref={productCondition} key={`condition-${product?.condition}`} defaultValue={product?.condition || ""} className={inputClass} required>
                       <option value="">Select</option>
                       {conditions.map((condition) => (
-                        <option key={condition} value={condition}>
-                          {condition}
-                        </option>
+                        <option key={condition} value={condition}>{condition}</option>
                       ))}
                     </select>
                   </div>
                 </div>
-              </section>
 
-              {/* Item Price */}
-              <section>
-                <h2 className="font-inter text-sm font-semibold uppercase tracking-wide text-gray-700">
-                  Item Price
-                </h2>
-                <div className="mt-3 max-w-xs">
-                  <label
-                    htmlFor="productPrice"
-                    className="block mb-1 text-xs font-medium font-inter text-gray-700 uppercase tracking-wide"
-                  >
-                    Price
-                  </label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-3 flex items-center text-gray-500 text-sm">
-                      USD
-                    </span>
-                    <input
-                      id="productPrice"
-                      type="number"
-                      min={0}
-                      max={1000000000}
-                      step={0.01}
-                      defaultValue={product?.price}
-                      ref={productPrice}
-                      className="border border-gray-300 text-black text-sm rounded-md w-full pl-12 pr-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#00629B] focus:border-transparent"
-                      placeholder="0.00"
-                      required
-                    />
-                  </div>
-                </div>
-              </section>
+                <PickupLocationField
+                  value={pickupLocation}
+                  error={pickupLocationError}
+                  onChange={(nextValue) => {
+                    setPickupLocation(nextValue);
+                    setPickupLocationError(null);
+                  }}
+                  onSelectionStatusChange={(hasPendingSelection) => {
+                    setHasPendingPickupSelection(hasPendingSelection);
+                    if (!hasPendingSelection) {
+                      setPickupLocationError(null);
+                    }
+                  }}
+                />
 
-              {/* Actions */}
-              <section>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  {/* Cancel (same behavior as before) */}
+                <div className="h-px w-full bg-gray-100 my-6" />
+
+                <div className="flex justify-end gap-3">
                   <button
                     type="button"
                     onClick={() => navigate(`/products/${id}`)}
-                    className="order-3 sm:order-1 bg-white text-[#00629B] border border-[#00629B] font-semibold font-inter py-2.5 px-6 rounded-md shadow-sm hover:bg-[#00629B] hover:text-white transition-colors"
+                    className="font-inter text-sm font-semibold px-6 py-2.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
                   >
                     Cancel
                   </button>
-
-                  <div className="order-1 sm:order-2 flex flex-col sm:flex-row gap-2 w-full sm:w-auto justify-end">
-                    <button
-                      type="button"
-                      onClick={handleDelete}
-                      className="bg-[#DC3545] text-white font-semibold font-inter py-2.5 px-6 rounded-md shadow-md hover:brightness-95 transition-colors"
-                    >
-                      Delete
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isOptimizingImages || isSubmitting}
-                      className={`bg-[#00629B] text-white font-semibold font-inter py-2.5 px-8 rounded-md shadow-md transition-colors ${
-                        isOptimizingImages || isSubmitting
-                          ? "opacity-60 cursor-not-allowed"
-                          : "hover:brightness-95"
-                      }`}
-                    >
-                      {isOptimizingImages ? "Preparing photos..." : "Save changes"}
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    className="font-inter text-sm font-semibold px-6 py-2.5 rounded-lg bg-red-500 text-white hover:brightness-90 transition-all"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isOptimizingImages || isSubmitting}
+                    className="font-inter text-sm font-semibold px-6 py-2.5 rounded-lg bg-ucsd-blue text-white hover:brightness-90 transition-all disabled:opacity-50"
+                  >
+                    {isOptimizingImages ? "Preparing..." : isSubmitting ? "Saving..." : "Save Changes"}
+                  </button>
                 </div>
 
                 {error && (
-                  <p className="text-sm text-red-800 text-center mt-4">
-                    Error editing product. Try again.
-                  </p>
+                  <p className="text-sm text-red-600 text-center mt-4">Error editing product. Try again.</p>
                 )}
               </section>
+
             </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </main>
     </>
   );
