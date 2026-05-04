@@ -389,6 +389,19 @@ export const updateProductById = [
         updateData.condition = condition;
       }
 
+      const category = getSingleFormValue(req.body.category);
+      if (category !== undefined) {
+        updateData.category = category;
+      }
+
+      const year = getSingleFormValue(req.body.year);
+      if (year !== undefined) {
+        const parsedYear = Number(year);
+        if (!Number.isNaN(parsedYear)) {
+          updateData.year = parsedYear;
+        }
+      }
+
       if (tags) {
         updateData.tags = tags;
       }
