@@ -58,7 +58,7 @@ export function Profile() {
 
           {/* Placeholder for future features */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <a href="/products" className="p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer block">
+            <a href="/my-listings" className="p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer block">
               <h3 className="font-bold text-lg text-ucsd-blue">My Listings</h3>
               <p className="text-sm text-gray-500">Manage the items you are selling.</p>
             </a>

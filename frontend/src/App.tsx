@@ -8,6 +8,7 @@ import { AddProduct } from "src/pages/AddProduct";
 import { EditProduct } from "src/pages/EditProduct";
 import { IndividualProductPage } from "src/pages/Individual-product-page";
 import { Marketplace } from "src/pages/Marketplace";
+import { MyListings } from "src/pages/MyListings";
 import { PageNotFound } from "src/pages/PageNotFound";
 import { Profile } from "src/pages/Profile";
 import { SavedProducts } from "src/pages/SavedProducts";
@@ -71,6 +72,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <SavedProducts />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/my-listings",
+        element: (
+          <PrivateRoute>
+            <MyListings />
           </PrivateRoute>
         ),
       },
