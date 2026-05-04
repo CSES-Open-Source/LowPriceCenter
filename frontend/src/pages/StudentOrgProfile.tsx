@@ -1,10 +1,14 @@
 import { FormEvent, useContext, useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { useNavigate } from "react-router-dom";
 import { get, post, patch, DELETE } from "src/api/requests";
 import { FirebaseContext } from "src/utils/FirebaseProvider";
 import { faStar } from "@fortawesome/free-regular-svg-icons";
 import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import PickupLocationField from "src/components/PickupLocationField";
+import { hasGoogleMapsApiKey } from "src/utils/googleMaps";
+import type { PickupLocation } from "src/utils/pickupLocation";
 
 interface StudentOrganization {
   _id: string;
@@ -36,6 +40,7 @@ export function StudentOrgProfile() {
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB limit
 
   const { user } = useContext(FirebaseContext);
+  const navigate = useNavigate();
   const [organization, setOrganization] = useState<StudentOrganization | null>(null);
   const [canAccessMyOrg, setCanAccessMyOrg] = useState<boolean | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -47,7 +52,6 @@ export function StudentOrgProfile() {
 
   const organizationNameRef = useRef<HTMLInputElement>(null);
   const bioRef = useRef<HTMLTextAreaElement>(null);
-  const locationRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const instagramRef = useRef<HTMLInputElement>(null);
   const websiteRef = useRef<HTMLInputElement>(null);
@@ -57,6 +61,9 @@ export function StudentOrgProfile() {
 
   const [profilePicturePreview, setProfilePicturePreview] = useState<string>("");
   const [newProfilePicture, setNewProfilePicture] = useState<File | null>(null);
+  const [pickupLocation, setPickupLocation] = useState<PickupLocation | null>(null);
+  const [pickupLocationError, setPickupLocationError] = useState<string | null>(null);
+  const [hasPendingPickupSelection, setHasPendingPickupSelection] = useState(false);
 
   // Merch management state
   const [merchItems, setMerchItems] = useState<MerchItem[]>([]);
@@ -96,6 +103,7 @@ export function StudentOrgProfile() {
           const data = await res.json();
           setOrganization(data);
           setProfilePicturePreview(data.profilePicture || "");
+          if (data.pickupLocation) setPickupLocation(data.pickupLocation);
         } else if (res.status === 404) {
           setOrganization(null);
         } else {
@@ -160,10 +168,16 @@ export function StudentOrgProfile() {
         return;
       }
 
+      if (hasGoogleMapsApiKey && hasPendingPickupSelection) {
+        setPickupLocationError("Select a Google suggestion or clear the pickup address field.");
+        setIsSubmitting(false);
+        return;
+      }
+
       const body = new FormData();
       body.append("organizationName", organizationNameRef.current.value);
       body.append("bio", bioRef.current?.value || "");
-      body.append("location", locationRef.current?.value || "");
+      body.append("location", pickupLocation?.address || "");
 
       const contactInfo = {
         email: emailRef.current?.value || "",
@@ -178,12 +192,20 @@ export function StudentOrgProfile() {
         body.append("profilePicture", newProfilePicture);
       }
 
+      if (pickupLocation) {
+        body.append("pickupAddress", pickupLocation.address);
+        body.append("pickupPlaceId", pickupLocation.placeId);
+        body.append("pickupLat", pickupLocation.lat.toString());
+        body.append("pickupLng", pickupLocation.lng.toString());
+      }
+
       const res = await post("/api/student-organizations", body);
       if (res.ok) {
         const data = await res.json();
         setOrganization(data);
         setIsEditing(false);
         setError("");
+        navigate("/student-organizations");
       } else {
         const errorData = await res.json();
         setError(errorData.message || "Failed to create organization profile");
@@ -208,10 +230,16 @@ export function StudentOrgProfile() {
         return;
       }
 
+      if (hasGoogleMapsApiKey && hasPendingPickupSelection) {
+        setPickupLocationError("Select a Google suggestion or clear the pickup address field.");
+        setIsSubmitting(false);
+        return;
+      }
+
       const body = new FormData();
       body.append("organizationName", organizationNameRef.current.value);
       body.append("bio", bioRef.current?.value || "");
-      body.append("location", locationRef.current?.value || "");
+      body.append("location", pickupLocation?.address || organization?.location || "");
 
       const contactInfo = {
         email: emailRef.current?.value || "",
@@ -228,13 +256,22 @@ export function StudentOrgProfile() {
         body.append("existingProfilePicture", organization.profilePicture);
       }
 
+      if (pickupLocation) {
+        body.append("pickupAddress", pickupLocation.address);
+        body.append("pickupPlaceId", pickupLocation.placeId);
+        body.append("pickupLat", pickupLocation.lat.toString());
+        body.append("pickupLng", pickupLocation.lng.toString());
+      }
+
       const res = await patch("/api/student-organizations", body);
       if (res.ok) {
         const data = await res.json();
         setOrganization(data.organization);
         setIsEditing(false);
+        setShowEditModal(false);
         setError("");
         setNewProfilePicture(null);
+        navigate("/student-organizations");
       } else {
         const errorData = await res.json();
         setError(errorData.message || "Failed to update organization profile");
@@ -251,6 +288,27 @@ export function StudentOrgProfile() {
     setNewProfilePicture(null);
     setProfilePicturePreview(organization?.profilePicture || "");
     setFileError(null);
+  };
+
+  const handleDeleteOrganization = async () => {
+    if (
+      !confirm(
+        "Delete your student organization profile?\n\nThis will also delete all merch items under the organization. This cannot be undone.",
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await DELETE("/api/student-organizations");
+      setOrganization(null);
+      setMerchItems([]);
+      setActiveTab("selling");
+      setIsEditing(false);
+      setShowEditModal(false);
+    } catch (err) {
+      setError("Failed to delete organization profile. Please try again.");
+    }
   };
 
   // Merch management functions
@@ -397,8 +455,8 @@ export function StudentOrgProfile() {
         <Helmet>
           <title>Student Organization Profile - Low-Price Center</title>
         </Helmet>
-        <div className="w-full mt-12 mb-6">
-          <p className="text-center font-inter">Loading...</p>
+        <div className="min-h-screen bg-gray-50 pt-24 pb-10 px-4">
+          <p className="text-center font-inter text-gray-700">Loading...</p>
         </div>
       </>
     );
@@ -410,10 +468,13 @@ export function StudentOrgProfile() {
         <Helmet>
           <title>Access denied - Low-Price Center</title>
         </Helmet>
-        <div className="w-full mt-12 mb-6 max-w-xl mx-auto p-4 text-center">
-          <p className="font-inter text-gray-700">
-            You don&apos;t have access to My Organization. Only approved organization accounts can create and manage a profile.
-          </p>
+        <div className="min-h-screen bg-gray-50 pt-24 pb-10 px-4">
+          <div className="max-w-xl mx-auto bg-white rounded-2xl border border-gray-200 shadow-sm p-6 text-center">
+            <p className="font-inter text-gray-700">
+              You don&apos;t have access to My Organization. Only approved organization accounts can create and manage a
+              profile.
+            </p>
+          </div>
         </div>
       </>
     );
@@ -421,176 +482,214 @@ export function StudentOrgProfile() {
 
   const isCreating = !organization;
 
+  const inputClass = "border border-gray-200 text-black text-sm rounded-lg w-full p-2.5 focus:ring-2 focus:ring-ucsd-blue focus:border-ucsd-blue outline-none";
+  const labelClass = "block mb-2 font-semibold font-inter text-[#182B49]";
+
   // Render create/edit form in modal
-  if (isCreating || isEditing || showEditModal) {
+  if (isEditing || showEditModal) {
     return (
       <>
         <Helmet>
-          <title>
-            {isCreating ? "Create" : "Edit"} - Student Organization Profile
-          </title>
+          <title>{isCreating ? "Create" : "Edit"} - Student Organization Profile</title>
         </Helmet>
-        <div className="w-full mt-12 mb-20">
-          <div className="max-w-2xl mx-auto p-4">
-            <h1 className="text-3xl text-center font-jetbrains font-medium mb-6">
-              {isCreating ? "Create Student Organization Profile" : "Edit Profile"}
-            </h1>
+        <main className="w-[80%] max-w-screen-2xl mx-auto mt-20 mb-6">
+          <h1 className="font-jetbrains font-bold text-2xl text-[#182B49] mb-4">
+            {isCreating ? "Create Organization Profile" : "Edit Organization Profile"}
+          </h1>
 
-            <form
-              onSubmit={isCreating ? handleCreate : handleUpdate}
-              className="bg-white rounded-lg shadow-md p-6"
-            >
-              {/* Profile Picture */}
-              <div className="mb-6">
-                <label className="block mb-2 font-medium font-inter text-black">
-                  Profile Picture
-                </label>
-                <div className="flex items-center gap-4">
+          <form onSubmit={isCreating ? handleCreate : handleUpdate}>
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="flex flex-col md:flex-row">
+
+                {/* Left — Profile Picture */}
+                <section className="w-full md:w-[40%] p-6 bg-[#F8F8F8] border-r border-gray-100">
+                  <label className={labelClass}>Profile Picture</label>
+                  <p className="text-sm text-gray-500 mb-3">PNG or JPG (max 5MB)</p>
+
                   {profilePicturePreview && (
-                    <img
-                      src={profilePicturePreview}
-                      alt="Profile preview"
-                      className="w-32 h-32 object-cover rounded-full border-2 border-gray-300"
-                    />
+                    <div className="flex justify-center mb-4">
+                      <img
+                        src={profilePicturePreview}
+                        alt="Profile preview"
+                        className="w-32 h-32 object-cover rounded-full border-2 border-white shadow-md"
+                      />
+                    </div>
                   )}
-                  <div className="flex-1">
+
+                  <label
+                    htmlFor="profilePicture"
+                    className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-white hover:bg-gray-50 transition-colors"
+                  >
+                    <span className="sr-only">Upload profile picture</span>
+                    <svg className="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    <p className="mb-1 text-sm text-gray-500 font-semibold">Click to upload</p>
+                    <p className="text-xs text-gray-400">PNG or JPG (MAX. 5MB)</p>
                     <input
+                      id="profilePicture"
                       type="file"
                       accept="image/png, image/jpeg"
                       onChange={handleProfilePictureChange}
                       ref={profilePictureRef}
-                      className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
+                      className="hidden"
                     />
-                    {fileError && <p className="text-sm text-red-600 mt-1">{fileError}</p>}
+                  </label>
+                  {fileError && <p className="text-sm text-red-600 mt-2">{fileError}</p>}
+                </section>
+
+                {/* Right — Details */}
+                <section className="w-full md:w-[60%] p-6">
+                  <div className="mb-5">
+                    <label htmlFor="organizationName" className={labelClass}>Organization Name *</label>
+                    <input
+                      id="organizationName"
+                      type="text"
+                      ref={organizationNameRef}
+                      defaultValue={organization?.organizationName || ""}
+                      className={inputClass}
+                      placeholder="Organization Name"
+                      required
+                    />
                   </div>
-                </div>
-              </div>
 
-              {/* Organization Name */}
-              <div className="mb-5">
-                <label htmlFor="organizationName" className="block mb-2 font-medium font-inter text-black">
-                  Organization Name *
-                </label>
-                <input
-                  id="organizationName"
-                  type="text"
-                  ref={organizationNameRef}
-                  defaultValue={organization?.organizationName || ""}
-                  className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
-                  placeholder="Organization Name"
-                  required
-                />
-              </div>
+                  <div className="mb-5">
+                    <label htmlFor="bio" className={labelClass}>Bio</label>
+                    <textarea
+                      id="bio"
+                      rows={3}
+                      ref={bioRef}
+                      defaultValue={organization?.bio || ""}
+                      className={inputClass}
+                      placeholder="Tell us about your organization..."
+                    />
+                  </div>
 
-              {/* Bio */}
-              <div className="mb-5">
-                <label htmlFor="bio" className="block mb-2 font-medium font-inter text-black">
-                  Bio
-                </label>
-                <textarea
-                  id="bio"
-                  rows={5}
-                  ref={bioRef}
-                  defaultValue={organization?.bio || ""}
-                  className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
-                  placeholder="Tell us about your organization..."
-                />
-              </div>
-
-              {/* Location */}
-              <div className="mb-5">
-                <label htmlFor="location" className="block mb-2 font-medium font-inter text-black">
-                  Location
-                </label>
-                <input
-                  id="location"
-                  type="text"
-                  ref={locationRef}
-                  defaultValue={organization?.location || ""}
-                  className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
-                  placeholder="e.g., UCSD Campus"
-                />
-              </div>
-
-              {/* Contact Information */}
-              <div className="mb-5">
-                <label className="block mb-2 font-medium font-inter text-black">Contact Information</label>
-                <div className="space-y-3">
-                  <input
-                    type="email"
-                    ref={emailRef}
-                    defaultValue={organization?.contactInfo?.email || ""}
-                    className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
-                    placeholder="Email"
-                  />
-                  <input
-                    type="text"
-                    ref={instagramRef}
-                    defaultValue={organization?.contactInfo?.instagram || ""}
-                    className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
-                    placeholder="Instagram handle"
-                  />
-                  <input
-                    type="url"
-                    ref={websiteRef}
-                    defaultValue={organization?.contactInfo?.website || ""}
-                    className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
-                    placeholder="Website URL"
-                  />
-                  <input
-                    type="text"
-                    ref={otherContactRef}
-                    defaultValue={organization?.contactInfo?.other || ""}
-                    className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
-                    placeholder="Other contact information"
-                  />
-                </div>
-              </div>
-
-              {/* Merch Location */}
-              <div className="mb-5">
-                <label htmlFor="merchLocation" className="block mb-2 font-medium font-inter text-black">
-                  Merch Location
-                </label>
-                <input
-                  id="merchLocation"
-                  type="text"
-                  ref={merchLocationRef}
-                  defaultValue={organization?.merchLocation || ""}
-                  className="border border-gray-300 text-black text-sm rounded-md w-full p-2.5"
-                  placeholder="e.g., Library Walk, Price Center"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Where can students find your merch? (e.g., Library Walk, Price Center)
-                </p>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex justify-between gap-3 mt-6">
-                {!isCreating && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsEditing(false);
-                      setShowEditModal(false);
-                      handleCancel();
+                  <PickupLocationField
+                    value={pickupLocation}
+                    error={pickupLocationError}
+                    onChange={(nextValue) => {
+                      setPickupLocation(nextValue);
+                      setPickupLocationError(null);
                     }}
-                    className="bg-gray-500 text-white font-semibold font-inter py-2 px-4 shadow-lg hover:brightness-90 transition-all"
-                  >
-                    Cancel
-                  </button>
-                )}
+                    onSelectionStatusChange={(hasPendingSelection) => {
+                      setHasPendingPickupSelection(hasPendingSelection);
+                      if (!hasPendingSelection) {
+                        setPickupLocationError(null);
+                      }
+                    }}
+                  />
+
+                  <div className="mb-5">
+                    <label className={labelClass}>Contact Information</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <input
+                        type="email"
+                        ref={emailRef}
+                        defaultValue={organization?.contactInfo?.email || ""}
+                        className={inputClass}
+                        placeholder="Email"
+                      />
+                      <input
+                        type="text"
+                        ref={instagramRef}
+                        defaultValue={organization?.contactInfo?.instagram || ""}
+                        className={inputClass}
+                        placeholder="Instagram handle"
+                      />
+                      <input
+                        type="url"
+                        ref={websiteRef}
+                        defaultValue={organization?.contactInfo?.website || ""}
+                        className={inputClass}
+                        placeholder="Website URL"
+                      />
+                      <input
+                        type="text"
+                        ref={otherContactRef}
+                        defaultValue={organization?.contactInfo?.other || ""}
+                        className={inputClass}
+                        placeholder="Other contact info"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mb-5">
+                    <label htmlFor="merchLocation" className={labelClass}>Merch Location</label>
+                    <input
+                      id="merchLocation"
+                      type="text"
+                      ref={merchLocationRef}
+                      defaultValue={organization?.merchLocation || ""}
+                      className={inputClass}
+                      placeholder="e.g., Library Walk, Price Center"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Where can students find your merch?</p>
+                  </div>
+
+                  <div className="h-px w-full bg-gray-100 my-6" />
+
+                  <div className="flex justify-end gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsEditing(false);
+                        setShowEditModal(false);
+                        handleCancel();
+                        setError("");
+                      }}
+                      className="font-inter text-sm font-semibold px-6 py-2.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="font-inter text-sm font-semibold px-6 py-2.5 rounded-lg bg-ucsd-blue text-white hover:brightness-90 transition-all disabled:opacity-50"
+                    >
+                      {isSubmitting ? "Saving..." : isCreating ? "Create Profile" : "Save Changes"}
+                    </button>
+                  </div>
+
+                  {error && <p className="text-sm text-red-600 text-center mt-4">{error}</p>}
+                </section>
+
+              </div>
+            </div>
+          </form>
+        </main>
+      </>
+    );
+  }
+
+  if (isCreating) {
+    return (
+      <>
+        <Helmet>
+          <title>My Organization - Low-Price Center</title>
+        </Helmet>
+        <div className="min-h-screen bg-gray-50 pt-24 pb-10 px-4">
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-lg p-8 md:p-10">
+              <h1 className="font-jetbrains font-bold text-2xl text-[#182B49] text-center mb-3">
+                My Organization
+              </h1>
+              <p className="text-center font-inter text-sm text-gray-600 max-w-xl mx-auto">
+                Create a student organization profile to sell merch and share how students can find you.
+              </p>
+              <div className="mt-6 flex justify-center">
                 <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="bg-[#00629B] text-white font-semibold font-inter py-2 px-4 shadow-lg hover:brightness-90 transition-all ml-auto"
+                  onClick={() => {
+                    setIsEditing(true);
+                    setShowEditModal(true);
+                  }}
+                  className="font-inter text-sm font-semibold px-6 py-2.5 rounded-lg bg-ucsd-blue text-white hover:brightness-90 transition-all"
                 >
-                  {isSubmitting ? "Saving..." : isCreating ? "Create Profile" : "Save Changes"}
+                  Create Profile
                 </button>
               </div>
-
               {error && <p className="text-sm text-red-600 text-center mt-4">{error}</p>}
-            </form>
+            </div>
           </div>
         </div>
       </>
@@ -603,14 +702,14 @@ export function StudentOrgProfile() {
       <Helmet>
         <title>{organization?.organizationName || "Student Organization"} - Low-Price Center</title>
       </Helmet>
-      <div className="w-full mt-6 mb-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="bg-white rounded-2xl border-2 border-figma-mint shadow-md overflow-hidden">
+      <div className="min-h-screen bg-gray-50 pt-24 pb-10 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
             {/* Header band */}
-            <div className="bg-figma-sand border-b-2 border-figma-orange h-28 md:h-32 relative">
+            <div className="bg-ucsd-blue h-28 md:h-32 relative">
               {/* profile image */}
               <div className="absolute left-6 md:left-10 top-10 md:top-12">
-                <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-white p-1 shadow-sm">
+                <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-white p-1 shadow-md">
                   {organization?.profilePicture ? (
                     <img
                       src={organization.profilePicture}
@@ -625,22 +724,30 @@ export function StudentOrgProfile() {
 
               {/* title */}
               <div className="absolute left-36 md:left-44 top-6 md:top-7">
-                <h1 className="font-inter font-extrabold text-2xl md:text-4xl leading-tight text-black">
+                <h1 className="font-jetbrains font-bold text-2xl md:text-3xl leading-tight text-white">
                   {organization?.organizationName || "Username"}
                 </h1>
               </div>
 
               {/* edit */}
               <div className="absolute right-6 md:right-10 top-6 md:top-7">
-                <button
-                  onClick={() => {
-                    setIsEditing(true);
-                    setShowEditModal(true);
-                  }}
-                  className="bg-figma-orange text-black font-inter font-extrabold px-8 py-2 rounded-md shadow-sm hover:brightness-95 transition-all"
-                >
-                  Edit
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setIsEditing(true);
+                      setShowEditModal(true);
+                    }}
+                    className="font-inter text-sm font-semibold px-6 py-2.5 rounded-lg bg-white text-ucsd-blue hover:bg-gray-50 transition-all"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={handleDeleteOrganization}
+                    className="font-inter text-sm font-semibold px-6 py-2.5 rounded-lg bg-red-500 text-white hover:brightness-90 transition-all"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -658,14 +765,14 @@ export function StudentOrgProfile() {
 
             {/* Tabs */}
             <div className="px-6 md:px-10 pb-4">
-              <div className="flex gap-10">
+              <div className="flex gap-10 flex-wrap">
                 <button
                   onClick={() => setActiveTab("selling")}
                   className={[
-                    "font-inter text-xl md:text-2xl font-semibold",
+                    "font-inter text-lg font-semibold transition-colors",
                     activeTab === "selling"
-                      ? "text-figma-charcoal underline underline-offset-8"
-                      : "text-gray-400",
+                      ? "text-ucsd-blue underline underline-offset-8"
+                      : "text-gray-400 hover:text-gray-700",
                   ].join(" ")}
                 >
                   Selling
@@ -673,10 +780,10 @@ export function StudentOrgProfile() {
                 <button
                   onClick={() => setActiveTab("likes")}
                   className={[
-                    "font-inter text-xl md:text-2xl font-semibold",
+                    "font-inter text-lg font-semibold transition-colors",
                     activeTab === "likes"
-                      ? "text-figma-charcoal underline underline-offset-8"
-                      : "text-gray-400",
+                      ? "text-ucsd-blue underline underline-offset-8"
+                      : "text-gray-400 hover:text-gray-700",
                   ].join(" ")}
                 >
                   Likes
@@ -684,10 +791,10 @@ export function StudentOrgProfile() {
                 <button
                   onClick={() => setActiveTab("saves")}
                   className={[
-                    "font-inter text-xl md:text-2xl font-semibold",
+                    "font-inter text-lg font-semibold transition-colors",
                     activeTab === "saves"
-                      ? "text-figma-charcoal underline underline-offset-8"
-                      : "text-gray-400",
+                      ? "text-ucsd-blue underline underline-offset-8"
+                      : "text-gray-400 hover:text-gray-700",
                   ].join(" ")}
                 >
                   Saves
@@ -723,7 +830,7 @@ export function StudentOrgProfile() {
                       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                         <button
                           onClick={() => startEditingMerch(merch)}
-                          className="bg-figma-teal text-white p-2 rounded-full shadow-sm hover:brightness-95 transition-all"
+                          className="bg-ucsd-blue text-white p-2 rounded-full shadow-sm hover:brightness-90 transition-all"
                           title="Edit"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -737,7 +844,7 @@ export function StudentOrgProfile() {
                         </button>
                         <button
                           onClick={() => handleDeleteMerch(merch._id)}
-                          className="bg-figma-charcoal text-white p-2 rounded-full shadow-sm hover:brightness-95 transition-all"
+                          className="bg-red-500 text-white p-2 rounded-full shadow-sm hover:brightness-90 transition-all"
                           title="Delete"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

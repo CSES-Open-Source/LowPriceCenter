@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "src/config/firebaseConfig";
 import multer from "multer";
+import MerchModel from "src/models/merch";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -234,11 +235,14 @@ export const deleteStudentOrganization = async (req: AuthenticatedRequest, res: 
     if (!req.user) return res.status(404).json({ message: "User not found" });
 
     const firebaseUid = req.user.firebaseUid;
-    const organization = await StudentOrganizationModel.findOneAndDelete({ firebaseUid });
+    const organization = await StudentOrganizationModel.findOne({ firebaseUid });
 
     if (!organization) {
       return res.status(404).json({ message: "Student organization not found" });
     }
+
+    await MerchModel.deleteMany({ studentOrganizationId: organization._id });
+    await StudentOrganizationModel.deleteOne({ _id: organization._id });
 
     res.status(200).json({
       message: "Student organization successfully deleted",
